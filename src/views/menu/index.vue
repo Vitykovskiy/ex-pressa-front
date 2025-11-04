@@ -5,23 +5,24 @@
       <template v-slot:header.name>
         <h2>{{ title }}</h2>
       </template>
+
     </v-data-table>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onBeforeMount, ref, computed } from "vue";
-import type { HttpError } from "@/services/http";
-import { DRINKS_TABLE_HEADERS, GROUPS_TABLE_HEADERS, MENU_DATA, OTHER_TABLE_HEADERS } from "./constants";
-import { type AnyMenuGroup, type TableRow, MenuGroupType, isMenuGroup, isMenuItem } from "./types";
+import { computed, } from "vue";
+import { DRINKS_TABLE_HEADERS, GROUPS_TABLE_HEADERS, OTHER_TABLE_HEADERS } from "./constants";
+import { type TableRow, MenuGroupType, isMenuGroup, isMenuItem } from "./types";
 import type { DataTableHeader } from "vuetify";
 import type { ItemSlotBase } from "vuetify/lib/components/VDataTable/types.mjs";
 import router from "@/router";
 import { useRoute } from "vue-router";
 import { RouteNames } from "@/routes";
+import { useMenu } from "@/composables/useMenu";
 
 const route = useRoute()
-const menu = ref<AnyMenuGroup[]>(MENU_DATA);
+const { menu } = useMenu()
 const activeGroup = computed(() => menu.value.find(({ id }) => id === Number(route.params.group)));
 
 const title = computed(() =>
@@ -64,19 +65,9 @@ function onRowClick(
   }
 
   if (isMenuItem(tableRow)) {
-    router.push({ name: RouteNames.MenuCard, params: { item: tableRow.id } })
+    router.push({ name: RouteNames.MenuItem, params: { item: tableRow.id } })
   }
 }
-
-onBeforeMount(async () => {
-  try {
-    // menu.value = await menuService.fetchMenu();
-    // activeGroup.value = menu.value[0] ?? null;   // если надо сразу открыть первую группу
-  } catch (e) {
-    const err = e as HttpError;
-    console.error(err.message, err.status, err.data);
-  }
-});
 </script>
 
 <style lang="scss" scoped>

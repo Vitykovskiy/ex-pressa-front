@@ -5,9 +5,9 @@ export const enum MenuGroupType {
 }
 
 export const enum DrinkSize {
-  Small = "S",
-  Medium = "M",
-  Large = "L",
+  Small,
+  Medium,
+  Large,
 }
 
 export interface BaseEntity {
@@ -65,4 +65,13 @@ export function isMenuGroup(row: TableRow): row is AnyMenuGroup {
 
 export function isMenuItem(row: TableRow): row is MenuItem {
   return "name" in row && !("items" in row);
+}
+
+export function isDrinkItem(item: unknown): item is DrinkMenuItem {
+  return (
+    !!item &&
+    typeof item === "object" &&
+    "sizes" in item &&
+    typeof (item as any).sizes === "object"
+  );
 }

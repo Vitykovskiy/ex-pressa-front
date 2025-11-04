@@ -266,9 +266,24 @@ export const MENU_DATA: AnyMenuGroup[] = [
 
 export const DRINKS_TABLE_HEADERS: DataTableHeader[] = [
   { title: "Наименование", key: "name", sortable: false },
-  { title: "S", key: "sizes.S.price", align: "end", sortable: false },
-  { title: "M", key: "sizes.M.price", align: "end", sortable: false },
-  { title: "L", key: "sizes.L.price", align: "end", sortable: false },
+  {
+    title: "S",
+    key: `sizes.${DrinkSize.Small}.price`,
+    align: "end",
+    sortable: false,
+  },
+  {
+    title: "M",
+    key: `sizes.${DrinkSize.Medium}.price`,
+    align: "end",
+    sortable: false,
+  },
+  {
+    title: "L",
+    key: `sizes.${DrinkSize.Large}.price`,
+    align: "end",
+    sortable: false,
+  },
 ];
 
 export const OTHER_TABLE_HEADERS: DataTableHeader[] = [

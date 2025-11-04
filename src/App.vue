@@ -17,8 +17,10 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
 import router from './router';
+import { useRoute } from 'vuetify/lib/composables/router.mjs';
 
-const activeGroup = computed(() => true)
+const route = useRoute()
+const activeGroup = computed(() => route.value?.params?.group)
 
 function goBack(): void {
   router.back()
