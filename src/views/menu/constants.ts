@@ -1,8 +1,4 @@
-import {
-  type AnyMenuGroup,
-  DrinkSize,
-  MenuGroupType,
-} from "@/services/menu/types";
+import { type AnyMenuGroup, DrinkSize, MenuGroupType } from "./types";
 import type { DataTableHeader } from "vuetify";
 
 export const MENU_DATA: AnyMenuGroup[] = [

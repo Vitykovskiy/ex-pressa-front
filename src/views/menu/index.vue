@@ -1,42 +1,28 @@
 <template>
   <div class="menu">
-    <div class="menu__header">
-      <div class="menu__header-left">
-        <v-btn v-if="activeGroup" variant="plain" icon="mdi-arrow-left" @click="goToMenu" />
-      </div>
-      <div class="menu__header-right">
-        <v-btn variant="plain" color="primary" icon="mdi-cart-variant" />
-      </div>
-    </div>
-
-    <div class="menu__content">
-      <v-data-table hide-default-footer :items-per-page="-1" :items="items" :headers="headers" hover
-        @click:row="onRowClick">
-        <template v-slot:header.name>
-          <h2 class="menu__title">{{ title }}</h2>
-        </template>
-      </v-data-table>
-    </div>
+    <v-data-table hide-default-footer :items-per-page="-1" :items="items" :headers="headers" hover
+      @click:row="onRowClick">
+      <template v-slot:header.name>
+        <h2>{{ title }}</h2>
+      </template>
+    </v-data-table>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { onBeforeMount, ref, computed } from "vue";
 import type { HttpError } from "@/services/http";
-import {
-  isMenuGroup,
-  isMenuItem,
-  MenuGroupType,
-  type AnyMenuGroup,
-  type TableRow,
-} from "@/services/menu/types";
-import type { DataTableHeader } from "vuetify";
 import { DRINKS_TABLE_HEADERS, GROUPS_TABLE_HEADERS, MENU_DATA, OTHER_TABLE_HEADERS } from "./constants";
+import { type AnyMenuGroup, type TableRow, MenuGroupType, isMenuGroup, isMenuItem } from "./types";
+import type { DataTableHeader } from "vuetify";
 import type { ItemSlotBase } from "vuetify/lib/components/VDataTable/types.mjs";
+import router from "@/router";
+import { useRoute } from "vue-router";
+import { RouteNames } from "@/routes";
 
+const route = useRoute()
 const menu = ref<AnyMenuGroup[]>(MENU_DATA);
-
-const activeGroup = ref<AnyMenuGroup | null>(null);
+const activeGroup = computed(() => menu.value.find(({ id }) => id === Number(route.params.group)));
 
 const title = computed(() =>
   activeGroup.value ? activeGroup.value.name : "Меню",
@@ -72,18 +58,14 @@ function onRowClick(
 ): void {
   const tableRow = ctx.item;
 
-  if (!activeGroup.value && isMenuGroup(tableRow)) {
-    activeGroup.value = tableRow;
+  if (isMenuGroup(tableRow)) {
+    router.push({ name: RouteNames.Menu, params: { group: tableRow.id } })
     return;
   }
 
-  if (activeGroup.value && isMenuItem(tableRow)) {
-    console.log("clicked menu item", tableRow);
+  if (isMenuItem(tableRow)) {
+    router.push({ name: RouteNames.MenuCard, params: { item: tableRow.id } })
   }
-}
-
-function goToMenu(): void {
-  activeGroup.value = null
 }
 
 onBeforeMount(async () => {
@@ -99,38 +81,7 @@ onBeforeMount(async () => {
 
 <style lang="scss" scoped>
 .menu {
-  max-width: 400px;
   display: flex;
   flex-direction: column;
-
-  &__header {
-    display: flex;
-    justify-content: space-between;
-  }
-
-  &__content {
-    display: flex;
-    flex-direction: column;
-  }
-
-  :deep(.v-btn__content) {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-  }
-
-  &__item {
-    padding: 5px 20px;
-    display: flex;
-
-  }
-}
-
-.item {
-  &__variants {
-    display: flex;
-    justify-content: end;
-    gap: 5px
-  }
 }
 </style>
