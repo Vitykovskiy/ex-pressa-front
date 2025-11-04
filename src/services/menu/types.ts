@@ -4,4 +4,6 @@ export interface MenuItem {
   price: number;
   isAvailable: boolean;
   position: number;
+  createdAt: string;
+  updatedAt: string;
 }

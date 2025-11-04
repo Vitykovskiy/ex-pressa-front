@@ -3,15 +3,9 @@
     <div class="menu__header">
       <v-btn variant="plain" color="primary" icon="mdi-cart-variant" />
     </div>
-    <h2 class="menu__title">Меню</h2>
+    <h2 class="menu__title">{{ title }}</h2>
     <div class="menu__content">
-      <template v-for="(item, idx) in menu">
-        <v-btn class="menu__item" variant="flat">
-          <span class="item__name">{{ item.name }}</span>
-          <span class="item__price"> {{ item.price }}</span>
-        </v-btn>
-        <v-divider v-if="idx !== menu.length - 1"></v-divider>
-      </template>
+      <v-data-table hide-default-footer :items-per-page="-1" :items="menu" :headers="headers" />
     </div>
   </div>
 </template>
@@ -21,12 +15,59 @@ import { onBeforeMount, ref } from 'vue';
 import type { HttpError } from '@/services/http';
 import menuService from '@/services/menu';
 import type { MenuItem } from '@/services/menu/types';
+import type { DataTableHeader } from 'vuetify';
 
-const menu = ref<MenuItem[]>([])
+const title = ref('Меню')
+const menu = ref<MenuItem[]>([
+  {
+    "id": 1,
+    "name": "Кофе",
+    "price": 120,
+    "isAvailable": true,
+    "position": 1,
+    "createdAt": "2025-11-03T12:59:40.000Z",
+    "updatedAt": "2025-11-03T12:59:40.000Z"
+  },
+  {
+    "id": 3,
+    "name": "Кофе",
+    "price": 120,
+    "isAvailable": true,
+    "position": 1,
+    "createdAt": "2025-11-03T13:40:07.000Z",
+    "updatedAt": "2025-11-03T13:40:07.000Z"
+  },
+  {
+    "id": 2,
+    "name": "Чай",
+    "price": 100,
+    "isAvailable": true,
+    "position": 2,
+    "createdAt": "2025-11-03T12:59:40.000Z",
+    "updatedAt": "2025-11-03T12:59:40.000Z"
+  },
+  {
+    "id": 4,
+    "name": "Чай",
+    "price": 100,
+    "isAvailable": true,
+    "position": 2,
+    "createdAt": "2025-11-03T13:40:07.000Z",
+    "updatedAt": "2025-11-03T13:40:07.000Z"
+  }
+])
+
+const headers = ref<DataTableHeader[]>([
+  { title: 'Наименование', key: 'name', sortable: false },
+  { title: 'S', key: 'price', align: 'end', sortable: false },
+  { title: 'M', key: 'price', align: 'end', sortable: false },
+  { title: 'L', key: 'price', align: 'end', sortable: false }
+])
+
 
 onBeforeMount(async () => {
   try {
-    menu.value = await menuService.fetchMenu();
+    /*  menu.value = await menuService.fetchMenu(); */
   } catch (e) {
     const err = e as HttpError;
     console.error(err.message, err.status, err.data);
@@ -65,6 +106,14 @@ onBeforeMount(async () => {
     padding: 5px 20px;
     display: flex;
 
+  }
+}
+
+.item {
+  &__variants {
+    display: flex;
+    justify-content: end;
+    gap: 5px
   }
 }
 </style>
