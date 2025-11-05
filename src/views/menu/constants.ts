@@ -210,6 +210,8 @@ export const MENU_DATA: AnyMenuGroup[] = [
         isAvailable: true,
       },
       { id: 603, name: "Сироп", price: 20, position: 3, isAvailable: true },
+      { id: 604, name: "Сахар", position: 4, isAvailable: true },
+      { id: 605, name: "Корица", position: 5, isAvailable: true },
     ],
   },
   {

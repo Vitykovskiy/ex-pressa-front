@@ -40,7 +40,6 @@ const items = computed<TableRow[]>(() => {
       }, {} as DrinkSizesRecord);
 
     const data = activeGroup.value.items.map(({ sizes, ...rest }) => ({ ...rest, sizes: unzip(sizes) }))
-    console.log(data)
     return data
   }
   return activeGroup.value.items

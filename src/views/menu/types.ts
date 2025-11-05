@@ -24,6 +24,10 @@ export interface SimpleMenuItem extends BaseMenuItem {
   price: number;
 }
 
+export interface OptionsMenuItem extends BaseMenuItem {
+  price?: number;
+}
+
 export interface DrinkSizeVariant {
   size: DrinkSize;
   price: number;
@@ -37,11 +41,11 @@ export interface DrinkMenuItem extends BaseMenuItem {
   sizes: DrinkSizeVariant[];
 }
 
-export type MenuItem = DrinkMenuItem | SimpleMenuItem;
+export type MenuItem = DrinkMenuItem | SimpleMenuItem | OptionsMenuItem;
 
 export interface GroupItemsMap {
   [MenuGroupType.Drinks]: DrinkMenuItem;
-  [MenuGroupType.Options]: SimpleMenuItem;
+  [MenuGroupType.Options]: OptionsMenuItem;
   [MenuGroupType.Other]: SimpleMenuItem;
 }
 

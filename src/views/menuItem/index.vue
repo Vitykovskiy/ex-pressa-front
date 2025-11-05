@@ -9,22 +9,10 @@
 
         <template v-if="sizes?.length">
             <div class="card__body">
-                <div class="card__size-container">
+                <div class="card__sizes">
                     <v-btn-toggle v-model="sizeSelector" color="primary" mandatory>
-                        <v-btn v-for="{ size } of sizes" variant="outlined" :ripple="false">{{ size }}</v-btn>
-                    </v-btn-toggle>
-                </div>
-            </div>
-            <v-divider />
-        </template>
-
-        <template v-if="optionsGroup?.items">
-            <div class="card__body">
-                <h3>Добавить</h3>
-                <div class="card__size-container">
-                    <v-btn-toggle v-model="selectedDrinkSize" color="primary" multiple>
-                        <v-btn v-for="option in optionsGroup.items" variant="outlined" :ripple="false">
-                            {{ option }}
+                        <v-btn v-for="{ size } of sizes" :key="size" variant="outlined" :ripple="false">
+                            {{ size }}
                         </v-btn>
                     </v-btn-toggle>
                 </div>
@@ -32,8 +20,21 @@
             <v-divider />
         </template>
 
+        <template v-if="optionsItems?.length">
+            <div class="card__body">
+                <h3>Добавить</h3>
+                <div class="card__options">
+                    <v-btn v-for="option in optionsItems" :key="option.id" variant="outlined" :ripple="false"
+                        :active="isOptionSelected(option)" @click="onOptionClick(option)">
+                        {{ option.name }} {{ option.price }}
+                    </v-btn>
+                </div>
+            </div>
+            <v-divider />
+        </template>
+
         <div class="card__body">
-            <div class="card__size-container">
+            <div class="card__actions">
                 <v-btn-toggle>
                     <v-btn variant="outlined" icon="mdi-minus" :ripple="false" @click="() => countComputed--" />
                     <v-btn variant="outlined" :ripple="false">{{ countComputed }}</v-btn>
@@ -50,31 +51,34 @@
 import { useMenu } from '@/composables/useMenu';
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { isDrinkItem, type AnyMenuGroup, type DrinkSizeVariant, type MenuItem, type OptionsGroup, } from '../menu/types';
+import { isDrinkItem, type AnyMenuGroup, type DrinkSizeVariant, type MenuItem, type OptionsGroup, type OptionsMenuItem, } from '../menu/types';
 import { useCart } from '@/composables/useCart';
 import router from '@/router';
 
-const route = useRoute()
-const { menu, options } = useMenu()
-const { addToCart } = useCart()
+const route = useRoute();
+const { menu, options } = useMenu();
+const { addToCart } = useCart();
 
-const count = ref(1)
-const sizeSelector = ref<number>(1)
-const selectedDrinkSize = computed<DrinkSizeVariant | null>(() => sizes.value?.[sizeSelector.value] ?? null)
+const count = ref(1);
+const sizeSelector = ref<number>(1);
 
 const countComputed = computed({
-    get() { return count.value },
-    set(value) { count.value = value && value <= 10 ? value : count.value }
-})
+    get() {
+        return count.value;
+    },
+    set(value) {
+        count.value = value && value <= 20 ? value : count.value;
+    },
+});
 
 const group = computed<AnyMenuGroup | null>(() => {
     const { group: groupId } = route.params
     return menu.value.find((item) => item.id === Number(groupId)) || null
 })
 
-const optionsGroup = computed<OptionsGroup | null>(() => {
+const optionsItems = computed<OptionsMenuItem[] | null>(() => {
     const optionId = group.value?.optionsId
-    return options.value.find((item) => item.id === Number(optionId)) || null
+    return options.value.find((item) => item.id === Number(optionId))?.items || null
 })
 
 const item = computed<MenuItem | null>(() => {
@@ -84,20 +88,44 @@ const item = computed<MenuItem | null>(() => {
 })
 
 const sizes = computed<DrinkSizeVariant[] | null>(() =>
-    isDrinkItem(item.value) ? item.value.sizes : null
-)
+    isDrinkItem(item.value) ? item.value.sizes : null,
+);
+
+const selectedDrinkSize = computed<DrinkSizeVariant | null>(() =>
+    sizes.value?.[sizeSelector.value] ?? null
+);
+
+const selectedOptions = ref<OptionsMenuItem[]>([]);
 
 const price = computed(() => {
     if (!item.value) return 0
+
     const basePrice = isDrinkItem(item.value) ? selectedDrinkSize.value?.price : item.value?.price
-    return basePrice ? basePrice * count.value : 0
+
+    const optionsPrice = selectedOptions.value.reduce((acc, value) => { return acc + (value.price ?? 0) }, 0)
+
+    return basePrice ? (basePrice + optionsPrice) * count.value : 0
 })
+
+function onOptionClick(option: OptionsMenuItem): void {
+    if (isOptionSelected(option)) {
+        selectedOptions.value = selectedOptions.value.filter(
+            ({ id }) => id !== option.id,
+        );
+    } else {
+        selectedOptions.value.push(option);
+    }
+}
+
+function isOptionSelected(option: OptionsMenuItem): boolean {
+    return selectedOptions.value.some(({ id }) => id === option.id);
+}
 
 function onAdd(): void {
     const item = {}
 
-    addToCart(item)
-    router.back()
+    addToCart(item);
+    router.back();
 }
 
 </script>
@@ -121,10 +149,13 @@ function onAdd(): void {
         gap: 10px;
     }
 
-    &__size-container {
+    &__sizes,
+    &__options,
+    &__actions {
         display: flex;
         justify-content: center;
-        gap: 10px;
+        flex-wrap: wrap;
+        gap: 5px;
     }
 }
 </style>
