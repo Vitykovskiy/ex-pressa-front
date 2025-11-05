@@ -1,13 +1,13 @@
 export const enum MenuGroupType {
   Drinks = "drinks",
-  Food = "food",
+  Options = "options",
   Other = "other",
 }
 
 export const enum DrinkSize {
-  Small,
-  Medium,
-  Large,
+  Small = "S",
+  Medium = "M",
+  Large = "L",
 }
 
 export interface BaseEntity {
@@ -24,20 +24,24 @@ export interface SimpleMenuItem extends BaseMenuItem {
   price: number;
 }
 
-export interface DrinkSizeVariant extends Omit<BaseEntity, "position"> {
+export interface DrinkSizeVariant {
   size: DrinkSize;
   price: number;
 }
 
+// тип для "распакованных" размеров в таблице
+export type DrinkSizesRecord = Record<DrinkSize, { price: number }>;
+
 export interface DrinkMenuItem extends BaseMenuItem {
-  sizes: Partial<Record<DrinkSize, DrinkSizeVariant>>;
+  // в данных меню — массив
+  sizes: DrinkSizeVariant[];
 }
 
 export type MenuItem = DrinkMenuItem | SimpleMenuItem;
 
 export interface GroupItemsMap {
   [MenuGroupType.Drinks]: DrinkMenuItem;
-  [MenuGroupType.Food]: SimpleMenuItem;
+  [MenuGroupType.Options]: SimpleMenuItem;
   [MenuGroupType.Other]: SimpleMenuItem;
 }
 
@@ -45,25 +49,36 @@ export interface BaseMenuGroup extends BaseEntity {
   name: string;
 }
 
-export type MenuGroup<T extends MenuGroupType = MenuGroupType> =
-  BaseMenuGroup & {
-    type: T;
-    items: GroupItemsMap[T][];
-  };
+type MenuGroup<T extends MenuGroupType = MenuGroupType> = BaseMenuGroup & {
+  type: T;
+  optionsId?: number;
+  items: GroupItemsMap[T][];
+};
 
 export type DrinksGroup = MenuGroup<MenuGroupType.Drinks>;
-export type FoodGroup = MenuGroup<MenuGroupType.Food>;
+export type OptionsGroup = MenuGroup<MenuGroupType.Options>;
 export type OtherGroup = MenuGroup<MenuGroupType.Other>;
 
-export type AnyMenuGroup = DrinksGroup | FoodGroup | OtherGroup;
+export type AnyMenuGroup = DrinksGroup | OptionsGroup | OtherGroup;
 
-export type TableRow = AnyMenuGroup | MenuItem;
+// строка, когда показываем список групп
+export type GroupTableRow = AnyMenuGroup;
+// строка напитка в таблице (после unzip)
+export type DrinkTableRow = Omit<DrinkMenuItem, "sizes"> & {
+  sizes: DrinkSizesRecord;
+};
+// строка простого товара (Other/Options)
+export type MenuItemTableRow = SimpleMenuItem | DrinkTableRow;
+
+export type TableRow = GroupTableRow | MenuItemTableRow;
+
+// type guards
 
 export function isMenuGroup(row: TableRow): row is AnyMenuGroup {
   return "items" in row && "type" in row;
 }
 
-export function isMenuItem(row: TableRow): row is MenuItem {
+export function isMenuItem(row: TableRow): row is MenuItemTableRow {
   return "name" in row && !("items" in row);
 }
 
@@ -72,6 +87,10 @@ export function isDrinkItem(item: unknown): item is DrinkMenuItem {
     !!item &&
     typeof item === "object" &&
     "sizes" in item &&
-    typeof (item as any).sizes === "object"
+    Array.isArray((item as any).sizes)
   );
+}
+
+export function isDrinksGroup(item: AnyMenuGroup): item is DrinksGroup {
+  return item.type === MenuGroupType.Drinks;
 }

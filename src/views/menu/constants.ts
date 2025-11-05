@@ -7,75 +7,61 @@ export const MENU_DATA: AnyMenuGroup[] = [
     type: MenuGroupType.Drinks,
     name: "Классика кофе",
     position: 1,
+    optionsId: 6,
     items: [
       {
         id: 101,
         name: "Эспрессо",
         position: 1,
         isAvailable: true,
-        sizes: {
-          [DrinkSize.Small]: {
-            id: 1011,
+        sizes: [
+          {
             size: DrinkSize.Small,
             price: 120,
           },
-          [DrinkSize.Medium]: {
-            id: 1012,
+          {
             size: DrinkSize.Medium,
             price: 150,
           },
-          [DrinkSize.Large]: {
-            id: 1013,
+          {
             size: DrinkSize.Large,
             price: 180,
           },
-        },
+        ],
       },
       {
         id: 102,
         name: "Американо",
         position: 2,
         isAvailable: true,
-        sizes: {
-          [DrinkSize.Small]: {
-            id: 1021,
+        sizes: [
+          {
             size: DrinkSize.Small,
-            price: 130,
+            price: 120,
           },
-          [DrinkSize.Medium]: {
-            id: 1022,
+          {
             size: DrinkSize.Medium,
-            price: 160,
+            price: 150,
           },
-          [DrinkSize.Large]: {
-            id: 1023,
-            size: DrinkSize.Large,
-            price: 190,
-          },
-        },
+          { size: DrinkSize.Large, price: 180 },
+        ],
       },
       {
         id: 103,
         name: "Капучино",
         position: 3,
         isAvailable: true,
-        sizes: {
-          [DrinkSize.Small]: {
-            id: 1031,
+        sizes: [
+          {
             size: DrinkSize.Small,
-            price: 160,
+            price: 120,
           },
-          [DrinkSize.Medium]: {
-            id: 1032,
+          {
             size: DrinkSize.Medium,
-            price: 190,
+            price: 150,
           },
-          [DrinkSize.Large]: {
-            id: 1033,
-            size: DrinkSize.Large,
-            price: 220,
-          },
-        },
+          { size: DrinkSize.Large, price: 180 },
+        ],
       },
     ],
   },
@@ -84,52 +70,41 @@ export const MENU_DATA: AnyMenuGroup[] = [
     type: MenuGroupType.Drinks,
     name: "Сладкий кофе",
     position: 2,
+    optionsId: 6,
     items: [
       {
         id: 201,
         name: "Латте карамельный",
         position: 1,
         isAvailable: true,
-        sizes: {
-          [DrinkSize.Small]: {
-            id: 2011,
+        sizes: [
+          {
             size: DrinkSize.Small,
-            price: 180,
+            price: 120,
           },
-          [DrinkSize.Medium]: {
-            id: 2012,
+          {
             size: DrinkSize.Medium,
-            price: 210,
+            price: 150,
           },
-          [DrinkSize.Large]: {
-            id: 2013,
-            size: DrinkSize.Large,
-            price: 240,
-          },
-        },
+          { size: DrinkSize.Large, price: 180 },
+        ],
       },
       {
         id: 202,
         name: "Мокка",
         position: 2,
         isAvailable: true,
-        sizes: {
-          [DrinkSize.Small]: {
-            id: 2021,
+        sizes: [
+          {
             size: DrinkSize.Small,
-            price: 190,
+            price: 120,
           },
-          [DrinkSize.Medium]: {
-            id: 2022,
+          {
             size: DrinkSize.Medium,
-            price: 220,
+            price: 150,
           },
-          [DrinkSize.Large]: {
-            id: 2023,
-            size: DrinkSize.Large,
-            price: 250,
-          },
-        },
+          { size: DrinkSize.Large, price: 180 },
+        ],
       },
     ],
   },
@@ -144,42 +119,40 @@ export const MENU_DATA: AnyMenuGroup[] = [
         name: "Матча латте",
         position: 1,
         isAvailable: true,
-        sizes: {
-          [DrinkSize.Small]: {
-            id: 3011,
+        sizes: [
+          {
             size: DrinkSize.Small,
-            price: 200,
+            price: 120,
           },
-          [DrinkSize.Medium]: {
-            id: 3012,
+          {
             size: DrinkSize.Medium,
-            price: 230,
+            price: 150,
           },
-        },
+          { size: DrinkSize.Large, price: 180 },
+        ],
       },
       {
         id: 302,
         name: "Какао",
         position: 2,
         isAvailable: true,
-        sizes: {
-          [DrinkSize.Small]: {
-            id: 3021,
+        sizes: [
+          {
             size: DrinkSize.Small,
-            price: 170,
+            price: 120,
           },
-          [DrinkSize.Medium]: {
-            id: 3022,
+          {
             size: DrinkSize.Medium,
-            price: 200,
+            price: 150,
           },
-        },
+          { size: DrinkSize.Large, price: 180 },
+        ],
       },
     ],
   },
   {
     id: 4,
-    type: MenuGroupType.Food,
+    type: MenuGroupType.Other,
     name: "Десерты",
     position: 4,
     items: [
@@ -196,7 +169,7 @@ export const MENU_DATA: AnyMenuGroup[] = [
   },
   {
     id: 5,
-    type: MenuGroupType.Food,
+    type: MenuGroupType.Other,
     name: "Еда",
     position: 5,
     items: [
@@ -218,8 +191,8 @@ export const MENU_DATA: AnyMenuGroup[] = [
   },
   {
     id: 6,
-    type: MenuGroupType.Other,
-    name: "Доп. опции",
+    type: MenuGroupType.Options,
+    name: "Кофе опции",
     position: 6,
     items: [
       {
@@ -241,25 +214,47 @@ export const MENU_DATA: AnyMenuGroup[] = [
   },
   {
     id: 7,
+    type: MenuGroupType.Options,
+    name: "Сырники опции",
+    position: 6,
+    items: [
+      {
+        id: 701,
+        name: "Сметана",
+        price: 30,
+        position: 1,
+        isAvailable: true,
+      },
+      {
+        id: 702,
+        name: "Варенье",
+        price: 50,
+        position: 2,
+        isAvailable: true,
+      },
+    ],
+  },
+  {
+    id: 8,
     type: MenuGroupType.Other,
     name: "Мерч",
     position: 7,
     items: [
       {
-        id: 701,
+        id: 801,
         name: "Кружка фирменная",
         price: 600,
         position: 1,
         isAvailable: true,
       },
       {
-        id: 702,
+        id: 802,
         name: "Термокружка",
         price: 900,
         position: 2,
         isAvailable: true,
       },
-      { id: 703, name: "Худи", price: 2500, position: 3, isAvailable: true },
+      { id: 803, name: "Худи", price: 2500, position: 3, isAvailable: true },
     ],
   },
 ];

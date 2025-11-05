@@ -3,10 +3,13 @@
     <v-main max-width="400">
       <div class="header">
         <div class="header__left">
-          <v-btn v-if="activeGroup" variant="plain" icon="mdi-arrow-left" @click="goBack" />
+          <v-btn v-if="!isMainMenu" variant="plain" icon="mdi-arrow-left" @click="onReturnBtn" />
         </div>
         <div class="header__right">
-          <v-btn variant="plain" color="primary" icon="mdi-cart-variant" />
+          <div class="cart">
+            <v-btn variant="plain" color="primary" icon="mdi-cart-variant" @click="onCart" />
+            <div class="cart__counter">{{ cart.length || '' }}</div>
+          </div>
         </div>
       </div>
       <router-view />
@@ -16,14 +19,24 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 import router from './router';
-import { useRoute } from 'vuetify/lib/composables/router.mjs';
+import { RouteNames } from './routes';
+import { useCart } from './composables/useCart';
 
 const route = useRoute()
-const activeGroup = computed(() => route.value?.params?.group)
+const { cart } = useCart()
 
-function goBack(): void {
+const isMainMenu = computed(() =>
+  route.name === RouteNames.Menu && !route.params.group
+)
+
+function onReturnBtn(): void {
   router.back()
+}
+
+function onCart(): void {
+  router.push({ name: RouteNames.Cart })
 }
 </script>
 
@@ -36,5 +49,21 @@ function goBack(): void {
 
 :deep(.v-main) {
   padding: 0 10px;
+}
+
+.cart {
+  position: relative;
+
+  &__counter {
+    position: absolute;
+    top: 20px;
+    right: 0;
+
+    width: 15px;
+    font-size: 13px;
+
+    user-select: none;
+    pointer-events: none;
+  }
 }
 </style>

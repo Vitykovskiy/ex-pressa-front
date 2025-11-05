@@ -1,19 +1,17 @@
 <template>
-  <div class="menu">
-    <v-data-table hide-default-footer :items-per-page="-1" :items="items" :headers="headers" hover
-      @click:row="onRowClick">
-      <template v-slot:header.name>
-        <h2>{{ title }}</h2>
-      </template>
+  <v-data-table hide-default-footer :items-per-page="-1" :items="items" :headers="headers" hover
+    no-data-text="Пока не загрузилось" @click:row="onRowClick">
+    <template v-slot:header.name>
+      <h2>{{ title }}</h2>
+    </template>
 
-    </v-data-table>
-  </div>
+  </v-data-table>
 </template>
 
 <script lang="ts" setup>
 import { computed, } from "vue";
 import { DRINKS_TABLE_HEADERS, GROUPS_TABLE_HEADERS, OTHER_TABLE_HEADERS } from "./constants";
-import { type TableRow, MenuGroupType, isMenuGroup, isMenuItem } from "./types";
+import { type DrinkSizeVariant, type DrinkSizesRecord, type TableRow, MenuGroupType, isDrinksGroup, isMenuGroup, isMenuItem } from "./types";
 import type { DataTableHeader } from "vuetify";
 import type { ItemSlotBase } from "vuetify/lib/components/VDataTable/types.mjs";
 import router from "@/router";
@@ -29,8 +27,24 @@ const title = computed(() =>
   activeGroup.value ? activeGroup.value.name : "Меню",
 );
 
-const items = computed<TableRow[]>(() =>
-  activeGroup.value ? activeGroup.value.items : menu.value
+const items = computed<TableRow[]>(() => {
+  if (!activeGroup.value) {
+    return menu.value
+  }
+
+  if (isDrinksGroup(activeGroup.value)) {
+    const unzip = (sizes: DrinkSizeVariant[]): DrinkSizesRecord =>
+      sizes.reduce((acc, value) => {
+        acc[value.size] = { price: value.price };
+        return acc;
+      }, {} as DrinkSizesRecord);
+
+    const data = activeGroup.value.items.map(({ sizes, ...rest }) => ({ ...rest, sizes: unzip(sizes) }))
+    console.log(data)
+    return data
+  }
+  return activeGroup.value.items
+}
 );
 
 const headers = computed<DataTableHeader[]>(() => {
@@ -41,9 +55,6 @@ const headers = computed<DataTableHeader[]>(() => {
   switch (activeGroup.value.type) {
     case MenuGroupType.Drinks:
       return DRINKS_TABLE_HEADERS;
-
-    case MenuGroupType.Food:
-      return OTHER_TABLE_HEADERS;
 
     case MenuGroupType.Other:
       return OTHER_TABLE_HEADERS;
@@ -70,9 +81,4 @@ function onRowClick(
 }
 </script>
 
-<style lang="scss" scoped>
-.menu {
-  display: flex;
-  flex-direction: column;
-}
-</style>
+<style lang="scss" scoped></style>
