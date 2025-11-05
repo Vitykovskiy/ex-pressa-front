@@ -3,7 +3,7 @@
         <div class="card__header">
             <h2>{{ item?.name }}</h2>
             <!--   <p>{{ description }}</p> -->
-            <h3>{{ price + " ₽" }}</h3>
+            <h3>{{ basePrice * quantity + " ₽" }}</h3>
         </div>
         <v-divider />
 
@@ -36,9 +36,9 @@
         <div class="card__body">
             <div class="card__actions">
                 <v-btn-toggle>
-                    <v-btn variant="outlined" icon="mdi-minus" :ripple="false" @click="() => countComputed--" />
-                    <v-btn variant="outlined" :ripple="false">{{ countComputed }}</v-btn>
-                    <v-btn variant="outlined" icon="mdi-plus" :ripple="false" @click="() => countComputed++" />
+                    <v-btn variant="outlined" icon="mdi-minus" :ripple="false" @click="() => quantityComputed--" />
+                    <v-btn variant="outlined" :ripple="false">{{ quantityComputed }}</v-btn>
+                    <v-btn variant="outlined" icon="mdi-plus" :ripple="false" @click="() => quantityComputed++" />
                 </v-btn-toggle>
                 <v-btn height="48" color="primary" :ripple="false" @click="onAdd">Добавить</v-btn>
             </div>
@@ -59,15 +59,15 @@ const route = useRoute();
 const { menu, options } = useMenu();
 const { addToCart } = useCart();
 
-const count = ref(1);
+const quantity = ref(1);
 const sizeSelector = ref<number>(1);
 
-const countComputed = computed({
+const quantityComputed = computed({
     get() {
-        return count.value;
+        return quantity.value;
     },
     set(value) {
-        count.value = value && value <= 20 ? value : count.value;
+        quantity.value = value && value <= 20 ? value : quantity.value;
     },
 });
 
@@ -97,14 +97,14 @@ const selectedDrinkSize = computed<DrinkSizeVariant | null>(() =>
 
 const selectedOptions = ref<OptionsMenuItem[]>([]);
 
-const price = computed(() => {
+const basePrice = computed(() => {
     if (!item.value) return 0
 
     const basePrice = isDrinkItem(item.value) ? selectedDrinkSize.value?.price : item.value?.price
 
     const optionsPrice = selectedOptions.value.reduce((acc, value) => { return acc + (value.price ?? 0) }, 0)
 
-    return basePrice ? (basePrice + optionsPrice) * count.value : 0
+    return basePrice ? basePrice + optionsPrice : 0
 })
 
 function onOptionClick(option: OptionsMenuItem): void {
@@ -122,9 +122,17 @@ function isOptionSelected(option: OptionsMenuItem): boolean {
 }
 
 function onAdd(): void {
-    const item = {}
+    if (!item.value) return
 
-    addToCart(item);
+    addToCart({
+        id: item.value.id,
+        name: item.value.name,
+        price: basePrice.value,
+        quantity: quantity.value,
+        size: selectedDrinkSize.value?.size,
+        selectedOptions: selectedOptions.value
+    });
+
     router.back();
 }
 
