@@ -2,7 +2,7 @@
     <div class="card">
         <div class="card__header">
             <h2>{{ item?.name }}</h2>
-            <!--   <p>{{ description }}</p> -->
+            <p>{{ item?.description }}</p>
             <h3>{{ basePrice * quantity + " ₽" }}</h3>
         </div>
         <v-divider />
@@ -51,9 +51,9 @@
 import { useMenu } from '@/composables/useMenu';
 import { computed, onBeforeMount, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { isDrinkItem, type AnyMenuGroup, type DrinkSizeVariant, type MenuItem, type OptionsGroup, type OptionsMenuItem, } from '../menu/types';
 import { useCart } from '@/composables/useCart';
 import router from '@/router';
+import { isDrinkItem, type AnyGroup, type DrinkMenuItem, type DrinkSizeItem, type MenuItem, type OptionMenuItem, type OtherMenuItem } from '@/services/menu/types';
 
 const route = useRoute();
 const { menu, options } = useMenu();
@@ -75,31 +75,31 @@ const quantityComputed = computed({
     },
 });
 
-const group = computed<AnyMenuGroup | null>(() => {
+const group = computed<AnyGroup | null>(() => {
     const { group: groupId } = route.params
     return menu.value.find((item) => item.id === Number(groupId)) || null
 })
 
-const optionsItems = computed<OptionsMenuItem[] | null>(() => {
-    const optionId = group.value?.optionsId
-    return options.value.find((item) => item.id === Number(optionId))?.items || null
-})
-
-const item = computed<MenuItem | null>(() => {
+const item = computed<DrinkMenuItem | OtherMenuItem | null>(() => {
     const { group: groupId, item: itemId } = route.params
     const group = menu.value.find((item) => item.id === Number(groupId))
     return group?.items.find((item) => item.id === Number(itemId)) || null
 })
 
-const sizes = computed<DrinkSizeVariant[] | null>(() =>
-    isDrinkItem(item.value) ? item.value.sizes : null,
+const optionsItems = computed<OptionMenuItem[] | null>(() => {
+    const optionsKey = item.value?.optionsGroupKey
+    return options.value.find((item) => item.key === optionsKey)?.items || null
+})
+
+const sizes = computed<DrinkSizeItem[] | null>(() =>
+    item.value && isDrinkItem(item.value) ? item.value.sizes : null
 );
 
-const selectedDrinkSize = computed<DrinkSizeVariant | null>(() =>
+const selectedDrinkSize = computed<DrinkSizeItem | null>(() =>
     sizes.value?.[sizeSelector.value] ?? null
 );
 
-const selectedOptions = ref<OptionsMenuItem[]>([]);
+const selectedOptions = ref<OptionMenuItem[]>([]);
 
 const basePrice = computed(() => {
     if (!item.value) return 0
@@ -111,7 +111,7 @@ const basePrice = computed(() => {
     return basePrice ? basePrice + optionsPrice : 0
 })
 
-function onOptionClick(option: OptionsMenuItem): void {
+function onOptionClick(option: OptionMenuItem): void {
     if (isOptionSelected(option)) {
         selectedOptions.value = selectedOptions.value.filter(
             ({ id }) => id !== option.id,
@@ -121,7 +121,7 @@ function onOptionClick(option: OptionsMenuItem): void {
     }
 }
 
-function isOptionSelected(option: OptionsMenuItem): boolean {
+function isOptionSelected(option: OptionMenuItem): boolean {
     return selectedOptions.value.some(({ id }) => id === option.id);
 }
 
