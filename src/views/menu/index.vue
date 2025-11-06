@@ -1,6 +1,7 @@
 <template>
   <v-data-table hide-default-footer :items-per-page="-1" :items="items" :headers="headers" hover
     no-data-text="Пока не загрузилось" @click:row="onRowClick">
+
     <template v-slot:header.name>
       <h2>{{ title }}</h2>
     </template>

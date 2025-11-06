@@ -40,7 +40,9 @@
                     <v-btn variant="outlined" :ripple="false">{{ quantityComputed }}</v-btn>
                     <v-btn variant="outlined" icon="mdi-plus" :ripple="false" @click="() => quantityComputed++" />
                 </v-btn-toggle>
-                <v-btn height="48" color="primary" :ripple="false" @click="onAdd">Добавить</v-btn>
+                <v-btn height="48" color="primary" :ripple="false" @click="onConfirmCallback">
+                    {{ isEditForm ? 'Изменить' : 'Добавить' }}
+                </v-btn>
             </div>
         </div>
 
@@ -49,22 +51,34 @@
 
 <script lang="ts" setup>
 import { useMenu } from '@/composables/useMenu';
-import { computed, onBeforeMount, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useCart } from '@/composables/useCart';
 import router from '@/router';
-import { isDrinkItem, type AnyGroup, type DrinkMenuItem, type DrinkSizeItem, type MenuItem, type OptionMenuItem, type OtherMenuItem } from '@/services/menu/types';
+import { DrinkSizes, isDrinkItem, type AnyGroup, type DrinkMenuItem, type DrinkSizeItem, type OptionMenuItem, type OtherMenuItem } from '@/services/menu/types';
 
 const route = useRoute();
 const { menu, options } = useMenu();
-const { addToCart } = useCart();
+const { addToCart, editCartItem } = useCart();
 
-const quantity = ref(1);
-const sizeSelector = ref<number>(1);
+const quantity = ref(parseInt(route.query.quantity as string) || 1);
+const drinkSizes = [DrinkSizes.Small, DrinkSizes.Medium, DrinkSizes.Large]
 
-const initialFormData = () => {
-    return { ...route.params, ...route.query }
-}
+const initialSizeSelector = () => {
+    const size = route.query.size as string | undefined;
+    const index = size ? drinkSizes.indexOf(size as DrinkSizes) : -1;
+    return index >= 0 ? index : 1;
+};
+
+const itemCartIndex = computed(() => {
+    const idx = parseInt(route.query.cartIndex as string);
+    return isNaN(idx) ? null : idx
+})
+const isEditForm = computed(() => itemCartIndex.value !== null)
+
+const onConfirmCallback = computed(() => isEditForm.value ? onEdit : onAdd)
+
+const sizeSelector = ref<number>(initialSizeSelector());
 
 const quantityComputed = computed({
     get() {
@@ -99,7 +113,18 @@ const selectedDrinkSize = computed<DrinkSizeItem | null>(() =>
     sizes.value?.[sizeSelector.value] ?? null
 );
 
-const selectedOptions = ref<OptionMenuItem[]>([]);
+const initialSelectedOptions = () => {
+    const { options } = route.query
+
+    if (options && Array.isArray(options)) {
+        return optionsItems.value?.filter(({ id }) => options.some((optionId) => Number(optionId) === id)) || []
+    }
+
+    return []
+};
+
+
+const selectedOptions = ref<OptionMenuItem[]>(initialSelectedOptions());
 
 const basePrice = computed(() => {
     if (!item.value) return 0
@@ -141,9 +166,21 @@ function onAdd(): void {
     router.back();
 }
 
-onBeforeMount(() => {
-    console.log('initialFormData', initialFormData())
-})
+function onEdit(): void {
+    if (!item.value || !itemCartIndex.value) return
+
+    editCartItem(itemCartIndex.value, {
+        id: item.value.id,
+        groupId: group.value?.id ?? null,
+        name: item.value.name,
+        price: basePrice.value,
+        quantity: quantity.value,
+        size: selectedDrinkSize.value?.size,
+        selectedOptions: selectedOptions.value
+    })
+
+    router.back();
+}
 
 </script>
 

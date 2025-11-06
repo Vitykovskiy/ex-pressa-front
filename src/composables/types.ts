@@ -1,4 +1,4 @@
-import type { DrinkSize, MenuItem } from "@/views/menu/types";
+import type { DrinkSizes, MenuItem } from "@/services/menu/types";
 
 export interface ICartItem {
   id: number;
@@ -6,6 +6,6 @@ export interface ICartItem {
   name: string;
   price: number;
   quantity: number;
-  size?: DrinkSize;
+  size?: DrinkSizes;
   selectedOptions?: MenuItem[];
 }

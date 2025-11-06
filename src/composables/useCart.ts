@@ -8,5 +8,10 @@ export function useCart() {
     cart.value.push(item);
   }
 
-  return { cart, addToCart };
+  function editCartItem(index: number, item: ICartItem): void {
+    if (cart.value[index])
+      cart.value[index] = { ...cart.value[index], ...item };
+  }
+
+  return { cart, addToCart, editCartItem };
 }

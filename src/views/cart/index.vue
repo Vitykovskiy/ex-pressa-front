@@ -31,12 +31,14 @@ function onRowClick(
 ): void {
     const index = ctx.index
     const { id, groupId, name, selectedOptions, ...rest } = ctx.item;
-    // Нужно вытащить id и parentId
-    const selectedOptionsIds = selectedOptions?.map(({ }) => { })
     router.push({
         name: RouteNames.MenuItem,
         params: { group: groupId, item: id },
-        query: { cartIndex: index, ...rest }
+        query: {
+            cartIndex: index,
+            options: selectedOptions?.map(({ id }) => id),
+            ...rest
+        }
     })
 }
 

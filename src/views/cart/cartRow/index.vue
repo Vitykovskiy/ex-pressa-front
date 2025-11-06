@@ -2,13 +2,13 @@
     <div class="cart-row">
         <div class="cart-row__info">
             <h3 class="cart-row__name">
-                {{ item.name }} <span v-if="item.size">({{ item.size }})</span>
+                {{ item.name }} <span v-if="item.size">({{ item.size.toUpperCase() }})</span>
             </h3>
             <div class="cart-row__cost">
                 <div class="cart-row__quantity">
-                    <v-btn variant="text" icon="mdi-minus" :ripple="false" @click="() => quantityComputed--" />
+                    <v-btn variant="text" icon="mdi-minus" :ripple="false" @click.stop="() => quantityComputed--" />
                     <span>{{ quantityComputed }}</span>
-                    <v-btn variant="text" icon="mdi-plus" :ripple="false" @click="() => quantityComputed++" />
+                    <v-btn variant="text" icon="mdi-plus" :ripple="false" @click.stop="() => quantityComputed++" />
                 </div>
                 <h3 class="cart-row__price">{{ item.price * item.quantity }}</h3>
             </div>
