@@ -49,7 +49,7 @@
 
 <script lang="ts" setup>
 import { useMenu } from '@/composables/useMenu';
-import { computed, ref } from 'vue';
+import { computed, onBeforeMount, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { isDrinkItem, type AnyMenuGroup, type DrinkSizeVariant, type MenuItem, type OptionsGroup, type OptionsMenuItem, } from '../menu/types';
 import { useCart } from '@/composables/useCart';
@@ -61,6 +61,10 @@ const { addToCart } = useCart();
 
 const quantity = ref(1);
 const sizeSelector = ref<number>(1);
+
+const initialFormData = () => {
+    return { ...route.params, ...route.query }
+}
 
 const quantityComputed = computed({
     get() {
@@ -126,6 +130,7 @@ function onAdd(): void {
 
     addToCart({
         id: item.value.id,
+        groupId: group.value?.id ?? null,
         name: item.value.name,
         price: basePrice.value,
         quantity: quantity.value,
@@ -135,6 +140,10 @@ function onAdd(): void {
 
     router.back();
 }
+
+onBeforeMount(() => {
+    console.log('initialFormData', initialFormData())
+})
 
 </script>
 

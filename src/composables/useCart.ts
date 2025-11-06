@@ -4,6 +4,7 @@ import type { ICartItem } from "./types";
 const cart = ref<ICartItem[]>([
   {
     id: 202,
+    groupId: 2,
     name: "Мокка",
     price: 250,
     quantity: 2,
