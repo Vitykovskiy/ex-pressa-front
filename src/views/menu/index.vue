@@ -2,7 +2,7 @@
   <v-data-table hide-default-footer :items-per-page="-1" :items="items" :headers="headers" hover
     no-data-text="Пока не загрузилось" @click:row="onRowClick">
 
-    <template v-slot:header.name>
+    <template v-slot:[HEADER_NAME_SLOT]>
       <h2>{{ title }}</h2>
     </template>
 
@@ -20,6 +20,13 @@ import { useRoute } from "vue-router";
 import { RouteNames } from "@/routes";
 import { useMenu } from "@/composables/useMenu";
 import { GroupTypes, isDrinksGroup, type DrinksGroup, type DrinkSizeItem, type OtherMenuGroup } from "@/services/menu/types";
+
+defineOptions({
+  name: 'MenuView',
+});
+
+const HEADER_NAME_SLOT = 'header.name';
+
 
 const route = useRoute()
 const { menu } = useMenu()
@@ -74,7 +81,7 @@ const headers = computed<DataTableHeader[]>(() => {
 });
 
 function onRowClick(
-  _event: MouseEvent,
+  _event: globalThis.MouseEvent,
   ctx: ItemSlotBase<TableRow>,
 ): void {
   const tableRow = ctx.item;

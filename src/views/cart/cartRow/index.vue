@@ -15,7 +15,7 @@
         </div>
 
         <div class="cart-row__options">
-            <v-chip v-for="option in options" variant="text">{{ option }}</v-chip>
+            <v-chip v-for="option in options" :key="option" variant="text">{{ option }}</v-chip>
         </div>
     </div>
 </template>
@@ -23,6 +23,10 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
 import type { IProps } from './types';
+
+defineOptions({
+    name: 'CartRowItem',
+});
 
 
 const props = defineProps<IProps>()

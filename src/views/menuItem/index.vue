@@ -57,6 +57,11 @@ import { useCart } from '@/composables/useCart';
 import router from '@/router';
 import { DrinkSizes, isDrinkItem, type AnyGroup, type DrinkMenuItem, type DrinkSizeItem, type OptionMenuItem, type OtherMenuItem } from '@/services/menu/types';
 
+defineOptions({
+    name: 'MenuItemView',
+});
+
+
 const route = useRoute();
 const { menu, options } = useMenu();
 const { addToCart, editCartItem } = useCart();

@@ -1,10 +1,10 @@
 <template>
     <v-data-table hide-default-footer :items-per-page="-1" :items="cart" :headers="headers" hover
         no-data-text="Пока ничего не добавлено" @click:row="onRowClick">
-        <template v-slot:header.item>
+        <template v-slot:[HEADER_ITEM_SLOT]>
             <h2>Корзина</h2>
         </template>
-        <template v-slot:item.item="{ item }">
+        <template v-slot:[ITEM_ITEM_SLOT]="{ item }">
             <CartRow :item="item" />
         </template>
     </v-data-table>
@@ -21,16 +21,24 @@ import router from '@/router';
 import { RouteNames } from '@/routes';
 import type { ICartItem } from '@/composables/types';
 
+defineOptions({
+    name: 'CartView',
+});
+
+const HEADER_ITEM_SLOT = 'header.item';
+const ITEM_ITEM_SLOT = 'item.item';
+
+
 const { cart } = useCart()
 
 const headers = ref<DataTableHeader[]>(CART_TABLE_HEADERS)
 
 function onRowClick(
-    _event: MouseEvent,
+    _event: globalThis.MouseEvent,
     ctx: ItemSlotBase<ICartItem>
 ): void {
     const index = ctx.index
-    const { id, groupId, name, selectedOptions, ...rest } = ctx.item;
+    const { id, groupId, selectedOptions, ...rest } = ctx.item;
     router.push({
         name: RouteNames.MenuItem,
         params: { group: groupId, item: id },
