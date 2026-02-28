@@ -22,7 +22,7 @@ export class HttpError extends Error {
       status?: number;
       data?: ApiErrorPayload;
       isNetworkError?: boolean;
-    }
+    },
   ) {
     super(message);
     this.name = "HttpError";
@@ -33,13 +33,13 @@ export class HttpError extends Error {
 }
 
 class HttpService {
-  private client: AxiosInstance;
+  private _client: AxiosInstance;
 
   constructor() {
-    this.client = axios.create({
-      baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000",
+    this._client = axios.create({
+      baseURL: import.meta.env.VITE_API_URL,
       timeout: 10000,
-      withCredentials: false,
+      withCredentials: true,
     });
 
     // При желании можно добавить интерсепторы (токен, логирование и т.п.)
@@ -86,7 +86,7 @@ class HttpService {
 
   private async request<T>(config: AxiosRequestConfig): Promise<T> {
     try {
-      const response: AxiosResponse<T> = await this.client.request<T>(config);
+      const response: AxiosResponse<T> = await this._client.request<T>(config);
       return response.data;
     } catch (error) {
       this.handleError(error);
@@ -100,7 +100,7 @@ class HttpService {
   post<T, B = unknown>(
     url: string,
     body?: B,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<T> {
     return this.request<T>({ ...config, method: "POST", url, data: body });
   }
@@ -108,7 +108,7 @@ class HttpService {
   put<T, B = unknown>(
     url: string,
     body?: B,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<T> {
     return this.request<T>({ ...config, method: "PUT", url, data: body });
   }
@@ -116,7 +116,7 @@ class HttpService {
   patch<T, B = unknown>(
     url: string,
     body?: B,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<T> {
     return this.request<T>({ ...config, method: "PATCH", url, data: body });
   }
@@ -126,5 +126,4 @@ class HttpService {
   }
 }
 
-// Одинаковый инстанс на все приложение
 export const http = new HttpService();

@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-main max-width="400">
-      <div class="header">
+      <div v-if="!isAuthPage" class="header">
         <div class="header__left">
           <v-btn v-if="!isMainMenu" variant="plain" icon="mdi-arrow-left" @click="onReturnBtn" />
         </div>
@@ -30,6 +30,7 @@ const { cart } = useCart()
 const isMainMenu = computed(() =>
   route.name === RouteNames.Menu && !route.params.group
 )
+const isAuthPage = computed(() => route.name === RouteNames.AuthRequired)
 
 function onReturnBtn(): void {
   router.back()

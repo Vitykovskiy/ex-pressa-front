@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, } from "vue";
+import { computed } from "vue";
 import { DRINKS_TABLE_HEADERS, GROUPS_TABLE_HEADERS, OTHER_TABLE_HEADERS } from "./constants";
 import { isGroupRow, type DrinkSizesRecord, type GroupTableRowItem, type OtherTableRowItem, type TableRow } from "./types";
 import type { DataTableHeader } from "vuetify";
@@ -19,7 +19,7 @@ import router from "@/router";
 import { useRoute } from "vue-router";
 import { RouteNames } from "@/routes";
 import { useMenu } from "@/composables/useMenu";
-import { GroupTypes, isDrinksGroup, type DrinksGroup, type DrinkSizeItem, type OtherMenuGroup } from "@/services/menu/types";
+import { ProductType, type ProductGroup, type ProductPrice } from "@/services/menu/types";
 
 defineOptions({
   name: 'MenuView',
@@ -30,7 +30,7 @@ const HEADER_NAME_SLOT = 'header.name';
 
 const route = useRoute()
 const { menu } = useMenu()
-const activeGroup = computed<DrinksGroup | OtherMenuGroup | null>(() =>
+const activeGroup = computed<ProductGroup | null>(() =>
   menu.value.find(({ id }) => id === Number(route.params.group)) ?? null
 );
 
@@ -40,25 +40,36 @@ const title = computed(() =>
 
 const items = computed<TableRow[]>(() => {
   if (!activeGroup.value) {
-    return menu.value.map(({ id, key, name, type }) => ({ id, key, name, type })) as GroupTableRowItem[]
+    return menu.value.map(({ id, name }) => ({ id, name })) as GroupTableRowItem[]
   }
 
-  if (isDrinksGroup(activeGroup.value)) {
-    const unzip = (sizes: DrinkSizeItem[]): DrinkSizesRecord =>
-      sizes.reduce((acc, value) => {
-        acc[value.size] = { price: value.price };
+  const products = activeGroup.value.products ?? [];
+  const isDrinkGroup = products.some((item) => item.type === ProductType.Drink);
+
+  if (isDrinkGroup) {
+    const unzip = (prices: ProductPrice[]): DrinkSizesRecord =>
+      prices.reduce((acc, value) => {
+        if (!value.sizeCode) {
+          return acc;
+        }
+        acc[value.sizeCode] = { price: value.priceRub };
         return acc;
       }, {} as DrinkSizesRecord);
 
-    return activeGroup.value.items.map(({ sizes, ...rest }) => ({ ...rest, sizes: unzip(sizes) }))
+    return products.map(({ prices, ...rest }) => ({
+      ...rest,
+      type: ProductType.Drink,
+      sizes: unzip(prices ?? []),
+    }))
 
   }
 
-  return activeGroup.value.items.map(({ id, name, price }) => (
+  return products.map(({ id, name, prices, type }) => (
     {
       id,
       name,
-      price,
+      type: type === ProductType.Drink ? ProductType.Food : type,
+      price: prices?.[0]?.priceRub ?? 0,
     })) as OtherTableRowItem[]
 }
 );
@@ -68,16 +79,11 @@ const headers = computed<DataTableHeader[]>(() => {
     return GROUPS_TABLE_HEADERS
   }
 
-  switch (activeGroup.value.type) {
-    case GroupTypes.Drinks:
-      return DRINKS_TABLE_HEADERS;
+  const isDrinkGroup = activeGroup.value.products?.some(
+    (item) => item.type === ProductType.Drink
+  );
 
-    case GroupTypes.Other:
-      return OTHER_TABLE_HEADERS;
-
-    default:
-      return GROUPS_TABLE_HEADERS;
-  }
+  return isDrinkGroup ? DRINKS_TABLE_HEADERS : OTHER_TABLE_HEADERS;
 });
 
 function onRowClick(

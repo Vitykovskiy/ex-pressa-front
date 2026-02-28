@@ -26,7 +26,7 @@
                 <div class="card__options">
                     <v-btn v-for="option in optionsItems" :key="option.id" variant="outlined" :ripple="false"
                         :active="isOptionSelected(option)" @click="onOptionClick(option)">
-                        {{ option.name }} {{ option.price }}
+                        {{ option.name }} {{ option.priceRub }}
                     </v-btn>
                 </div>
             </div>
@@ -55,7 +55,7 @@ import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useCart } from '@/composables/useCart';
 import router from '@/router';
-import { DrinkSizes, isDrinkItem, type AnyGroup, type DrinkMenuItem, type DrinkSizeItem, type OptionMenuItem, type OtherMenuItem } from '@/services/menu/types';
+import { ProductType, SizeCode, type Addon, type Product, type ProductGroup, type ProductPrice } from '@/services/menu/types';
 
 defineOptions({
     name: 'MenuItemView',
@@ -63,15 +63,15 @@ defineOptions({
 
 
 const route = useRoute();
-const { menu, options } = useMenu();
+const { menu, getAddonGroupsForGroup } = useMenu();
 const { addToCart, editCartItem } = useCart();
 
 const quantity = ref(parseInt(route.query.quantity as string) || 1);
-const drinkSizes = [DrinkSizes.Small, DrinkSizes.Medium, DrinkSizes.Large]
+const drinkSizes = [SizeCode.Small, SizeCode.Medium, SizeCode.Large]
 
 const initialSizeSelector = () => {
     const size = route.query.size as string | undefined;
-    const index = size ? drinkSizes.indexOf(size as DrinkSizes) : -1;
+    const index = size ? drinkSizes.indexOf(size as SizeCode) : -1;
     return index >= 0 ? index : 1;
 };
 
@@ -94,25 +94,54 @@ const quantityComputed = computed({
     },
 });
 
-const group = computed<AnyGroup | null>(() => {
+const group = computed<ProductGroup | null>(() => {
     const { group: groupId } = route.params
     return menu.value.find((item) => item.id === Number(groupId)) || null
 })
 
-const item = computed<DrinkMenuItem | OtherMenuItem | null>(() => {
+const item = computed<Product | null>(() => {
     const { group: groupId, item: itemId } = route.params
     const group = menu.value.find((item) => item.id === Number(groupId))
-    return group?.items.find((item) => item.id === Number(itemId)) || null
+    return group?.products.find((item) => item.id === Number(itemId)) || null
 })
 
-const optionsItems = computed<OptionMenuItem[] | null>(() => {
-    const optionsKey = item.value?.optionsGroupKey
-    return options.value.find((item) => item.key === optionsKey)?.items || null
+const optionsItems = computed<Addon[] | null>(() => {
+    if (!group.value) {
+        return null;
+    }
+
+    const addonGroups = getAddonGroupsForGroup(group.value.id);
+    const addons = addonGroups
+        .filter((addonGroup) => addonGroup.isActive)
+        .flatMap((addonGroup) =>
+            (addonGroup.addons || []).filter((addon) => addon.isActive),
+        );
+
+    const uniq = new Map<number, Addon>();
+    for (const addon of addons) {
+        uniq.set(addon.id, addon);
+    }
+
+    return Array.from(uniq.values());
 })
 
-const sizes = computed<DrinkSizeItem[] | null>(() =>
-    item.value && isDrinkItem(item.value) ? item.value.sizes : null
-);
+type DrinkSizeItem = { size: SizeCode; price: number };
+
+const sizes = computed<DrinkSizeItem[] | null>(() => {
+    if (!item.value || item.value.type !== ProductType.Drink) {
+        return null;
+    }
+
+    return drinkSizes
+        .map((size) =>
+            (item.value?.prices || []).find((price) => price.sizeCode === size),
+        )
+        .filter((price): price is ProductPrice => Boolean(price))
+        .map((price) => ({
+            size: price.sizeCode as SizeCode,
+            price: price.priceRub,
+        }));
+});
 
 const selectedDrinkSize = computed<DrinkSizeItem | null>(() =>
     sizes.value?.[sizeSelector.value] ?? null
@@ -129,19 +158,24 @@ const initialSelectedOptions = () => {
 };
 
 
-const selectedOptions = ref<OptionMenuItem[]>(initialSelectedOptions());
+const selectedOptions = ref<Addon[]>(initialSelectedOptions());
 
 const basePrice = computed(() => {
     if (!item.value) return 0
 
-    const basePrice = isDrinkItem(item.value) ? selectedDrinkSize.value?.price : item.value?.price
+    const basePrice =
+        item.value.type === ProductType.Drink
+            ? selectedDrinkSize.value?.price ?? 0
+            : item.value.prices?.[0]?.priceRub ?? 0;
 
-    const optionsPrice = selectedOptions.value.reduce((acc, value) => { return acc + (value.price ?? 0) }, 0)
+    const optionsPrice = selectedOptions.value.reduce((acc, value) => {
+        return acc + (value.priceRub ?? 0);
+    }, 0);
 
-    return basePrice ? basePrice + optionsPrice : 0
+    return basePrice + optionsPrice
 })
 
-function onOptionClick(option: OptionMenuItem): void {
+function onOptionClick(option: Addon): void {
     if (isOptionSelected(option)) {
         selectedOptions.value = selectedOptions.value.filter(
             ({ id }) => id !== option.id,
@@ -151,7 +185,7 @@ function onOptionClick(option: OptionMenuItem): void {
     }
 }
 
-function isOptionSelected(option: OptionMenuItem): boolean {
+function isOptionSelected(option: Addon): boolean {
     return selectedOptions.value.some(({ id }) => id === option.id);
 }
 

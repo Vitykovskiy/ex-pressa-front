@@ -1,16 +1,16 @@
 import {
-  DrinkSizes,
-  GroupTypes,
-  ItemTypes,
-  type AnyGroup,
+  ProductType,
+  SizeCode,
+  type ProductGroup,
+  type Product,
 } from "@/services/menu/types";
 
 export interface DrinkSizeVariant {
-  size: DrinkSizes;
+  size: SizeCode;
   price: number;
 }
 
-export type DrinkSizesRecord = Record<DrinkSizes, { price: number }>;
+export type DrinkSizesRecord = Record<SizeCode, { price: number }>;
 
 export type TableRow =
   | GroupTableRowItem
@@ -18,29 +18,24 @@ export type TableRow =
   | OtherTableRowItem;
 
 export interface GroupTableRowItem {
-  id: number;
-  name: string;
-  type: AnyGroup["type"];
+  id: ProductGroup["id"];
+  name: ProductGroup["name"];
 }
 
 export interface DrinkTableRowItem {
-  id: number;
-  name: string;
-  type: ItemTypes.Drinks;
-  sizes: Record<DrinkSizes, { price: number }>;
+  id: Product["id"];
+  name: Product["name"];
+  type: ProductType.Drink;
+  sizes: Record<SizeCode, { price: number }>;
 }
 
 export interface OtherTableRowItem {
-  id: number;
-  name: string;
+  id: Product["id"];
+  name: Product["name"];
   price: number;
-  type: ItemTypes.Other;
+  type: Exclude<ProductType, ProductType.Drink>;
 }
 
 export function isGroupRow(item: TableRow): item is GroupTableRowItem {
-  return (
-    item.type === GroupTypes.Drinks ||
-    item.type === GroupTypes.Options ||
-    item.type === GroupTypes.Other
-  );
+  return !("type" in item);
 }

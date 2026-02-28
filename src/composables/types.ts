@@ -1,4 +1,4 @@
-import type { DrinkSizes, MenuItem } from "@/services/menu/types";
+import type { Addon, SizeCode } from "@/services/menu/types";
 
 export interface ICartItem {
   id: number;
@@ -6,6 +6,6 @@ export interface ICartItem {
   name: string;
   price: number;
   quantity: number;
-  size?: DrinkSizes;
-  selectedOptions?: MenuItem[];
+  size?: SizeCode;
+  selectedOptions?: Addon[];
 }

@@ -1,24 +1,16 @@
 import type { HttpError } from "@/services/http";
 import menuService from "@/services/menu";
-import {
-  GroupTypes,
-  type DrinksGroup,
-  type OptionsGroup,
-  type OtherMenuGroup,
-} from "@/services/menu/types";
+import type { AddonGroup, ProductGroup } from "@/services/menu/types";
 
 import { ref } from "vue";
 
-const menu = ref<(DrinksGroup | OtherMenuGroup)[]>([]);
-const options = ref<OptionsGroup[]>([]);
+const menu = ref<ProductGroup[]>([]);
 
 export function useMenu() {
   async function fetchMenu(): Promise<void> {
     try {
       const data = await menuService.fetchMenu();
-
-      menu.value = data.filter((group) => group.type !== GroupTypes.Options);
-      options.value = data.filter((group) => group.type === GroupTypes.Options);
+      menu.value = data;
     } catch (e) {
       const err = e as HttpError;
       console.error(err.message, err.status, err.data);
@@ -29,5 +21,13 @@ export function useMenu() {
     fetchMenu();
   }
 
-  return { menu, options };
+  function getAddonGroupsForGroup(groupId: number): AddonGroup[] {
+    const group = menu.value.find((item) => item.id === groupId);
+    if (!group) return [];
+    return group.addonLinks
+      .map((link) => link.addonGroup)
+      .filter((addonGroup): addonGroup is AddonGroup => Boolean(addonGroup));
+  }
+
+  return { menu, getAddonGroupsForGroup };
 }
