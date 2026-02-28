@@ -11,6 +11,13 @@
                     <v-btn variant="text" icon="mdi-plus" :ripple="false" @click.stop="() => quantityComputed++" />
                 </div>
                 <h3 class="cart-row__price">{{ item.price * item.quantity }}</h3>
+                <v-btn
+                    icon="mdi-trash-can-outline"
+                    variant="text"
+                    color="error"
+                    :ripple="false"
+                    @click.stop="onRemoveClick"
+                />
             </div>
         </div>
 
@@ -30,6 +37,9 @@ defineOptions({
 
 
 const props = defineProps<IProps>()
+const emit = defineEmits<{
+    remove: []
+}>()
 
 const item = ref({ ...props.item })
 
@@ -44,6 +54,10 @@ const quantityComputed = computed({
         item.value.quantity = value >= 0 && value <= 20 ? value : item.value.quantity;
     },
 });
+
+function onRemoveClick(): void {
+    emit("remove");
+}
 
 </script>
 

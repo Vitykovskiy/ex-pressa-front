@@ -1,26 +1,42 @@
 ﻿<template>
-  <v-data-table
-    hide-default-footer
-    :items-per-page="-1"
-    :items="cart"
-    :headers="headers"
-    hover
-    no-data-text="Пока ничего не добавлено"
-    @click:row="onRowClick"
-  >
-    <template v-slot:[HEADER_ITEM_SLOT]>
-      <h2>Корзина</h2>
-    </template>
-    <template v-slot:[ITEM_ITEM_SLOT]="{ item }">
-      <CartRow :item="item" />
-    </template>
-  </v-data-table>
+  <div class="cart-view">
+    <v-data-table
+      class="cart-view__table"
+      hide-default-footer
+      :items-per-page="-1"
+      :items="cart"
+      :headers="headers"
+      hover
+      no-data-text="Пока ничего не добавлено"
+      @click:row="onRowClick"
+    >
+      <template v-slot:[HEADER_ITEM_SLOT]>
+        <h2>Корзина</h2>
+      </template>
+      <template v-slot:[ITEM_ITEM_SLOT]="{ item, index }">
+        <CartRow :item="item" @remove="onRemoveItem(index)" />
+      </template>
+    </v-data-table>
+
+    <div class="cart-view__footer">
+      <v-btn
+        block
+        size="large"
+        color="primary"
+        :disabled="!cart.length"
+        @click="onSubmitOrder"
+      >
+        Оформить заказ
+        <template v-if="cart.length"> · {{ totalPrice }} ₽</template>
+      </v-btn>
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import { useCart } from "@/composables/useCart";
 import CartRow from "./cartRow/index.vue";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { CART_TABLE_HEADERS } from "./constants";
 import type { DataTableHeader } from "vuetify";
 import type { ItemSlotBase } from "vuetify/lib/components/VDataTable/types.mjs";
@@ -35,7 +51,10 @@ defineOptions({
 const HEADER_ITEM_SLOT = "header.item";
 const ITEM_ITEM_SLOT = "item.item";
 
-const { cart } = useCart();
+const { cart, removeCartItem } = useCart();
+const totalPrice = computed(() =>
+  cart.value.reduce((sum, item) => sum + item.price * item.quantity, 0),
+);
 
 const headers = ref<DataTableHeader[]>(CART_TABLE_HEADERS);
 
@@ -55,6 +74,32 @@ function onRowClick(
     },
   });
 }
+
+function onSubmitOrder(): void {
+  // TODO: Подключить отправку заказа через API, когда корзина переедет на backend.
+}
+
+function onRemoveItem(index: number): void {
+  removeCartItem(index);
+}
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.cart-view {
+  padding-bottom: 8px;
+}
+
+.cart-view__footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  margin-top: 12px;
+  padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+  background: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 0.98) 70%,
+    rgba(255, 255, 255, 0)
+  );
+  backdrop-filter: blur(4px);
+}
+</style>

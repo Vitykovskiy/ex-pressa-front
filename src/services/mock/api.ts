@@ -279,7 +279,8 @@ function resolveUnitPrice(product: Product, sizeCode?: SizeCode): number {
   return product.prices[0]?.priceRub ?? 0;
 }
 
-export async function mockAuthorizeTelegram(_initData: string): Promise<void> {
+export async function mockAuthorizeTelegram(initData: string): Promise<void> {
+  void initData;
   await withMockDelay(() => undefined);
 }
 

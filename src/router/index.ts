@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import { useAuth } from "@/composables/useAuth";
 import { AuthStatus } from "@/services/auth/types";
 import { RouteNames } from "@/routes";
+import { isForcedAuthMode } from "@/config/authMode";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -12,7 +13,7 @@ const router = createRouter({
 router.beforeEach((to) => {
   const { status, isAuthorized, initAppAuth } = useAuth();
 
-  if (import.meta.env.DEV) {
+  if (import.meta.env.DEV && !isForcedAuthMode()) {
     return true;
   }
 

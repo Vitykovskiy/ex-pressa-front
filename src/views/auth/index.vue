@@ -7,16 +7,11 @@
           {{ detail }}
         </div>
         <div v-if="status === AuthStatus.Unauthorized" class="auth__hint">
-          Часть функционала доступна после авторизации через Telegram.
+          Функционал доступен после авторизации через Telegram.
         </div>
       </v-card-text>
       <v-card-actions class="auth__actions">
-        <v-btn
-          v-if="status !== AuthStatus.Authorized"
-          color="primary"
-          variant="flat"
-          @click="onRetry"
-        >
+        <v-btn v-if="status !== AuthStatus.Authorized" color="primary" variant="flat" @click="onRetry">
           Попробовать снова
         </v-btn>
         <v-btn v-else color="primary" variant="flat" @click="onContinue">
@@ -37,6 +32,10 @@ import {
 } from "@/composables/useAuth";
 import { AuthStatus } from "@/services/auth/types";
 import { RouteNames } from "@/routes";
+
+defineOptions({
+  name: "AuthView",
+});
 
 const router = useRouter();
 const route = useRoute();

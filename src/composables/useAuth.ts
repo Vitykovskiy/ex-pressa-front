@@ -4,6 +4,7 @@ import { HttpError } from "@/services/http";
 import { authorizeTelegram, fetchMe } from "@/services/auth";
 import { AuthStatus } from "@/services/auth/types";
 import { buildFullName } from "@/helpers";
+import { AuthMode, getAuthMode } from "@/config/authMode";
 
 export const OPEN_APP_BY_TELEGRAM_MESSAGE =
   "Необходимо запустить приложение через Telegram";
@@ -21,6 +22,22 @@ const isAuthorized = computed(() => status.value === AuthStatus.Authorized);
 
 export function useAuth() {
   async function initAppAuth(): Promise<void> {
+    const authMode = getAuthMode();
+
+    if (authMode === AuthMode.Authorized) {
+      status.value = AuthStatus.Authorized;
+      message.value = "";
+      userFullName.value = "Тестовый пользователь";
+      return;
+    }
+
+    if (authMode === AuthMode.Unauthorized) {
+      status.value = AuthStatus.Unauthorized;
+      message.value = OPEN_APP_BY_TELEGRAM_MESSAGE;
+      userFullName.value = "";
+      return;
+    }
+
     if (import.meta.env.DEV) {
       status.value = AuthStatus.Authorized;
       message.value = "";
@@ -58,6 +75,22 @@ export function useAuth() {
   }
 
   async function initTelegramAuth(force = false): Promise<void> {
+    const authMode = getAuthMode();
+
+    if (authMode === AuthMode.Authorized) {
+      status.value = AuthStatus.Authorized;
+      message.value = "";
+      userFullName.value = "Тестовый пользователь";
+      return;
+    }
+
+    if (authMode === AuthMode.Unauthorized) {
+      status.value = AuthStatus.Unauthorized;
+      message.value = OPEN_APP_BY_TELEGRAM_MESSAGE;
+      userFullName.value = "";
+      return;
+    }
+
     if (
       (!force && status.value === AuthStatus.Checking) ||
       status.value === AuthStatus.Authorized
