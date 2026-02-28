@@ -1,4 +1,4 @@
-import { SizeCode } from "@/services/menu/types";
+﻿import { SizeCode } from "@/services/menu/types";
 import type { DataTableHeader } from "vuetify";
 
 export const DRINKS_TABLE_HEADERS: DataTableHeader[] = [

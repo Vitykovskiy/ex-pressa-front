@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <v-container class="auth" fluid>
     <v-card class="auth__card" elevation="2">
       <v-card-title class="auth__title">{{ title }}</v-card-title>
@@ -30,7 +30,11 @@
 <script lang="ts" setup>
 import { computed, onMounted, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { useAuth, AUTHORIZATION_REQUIRED_TITLE, AUTHORIZATION_SUCCESS_MESSAGE } from "@/composables/useAuth";
+import {
+  useAuth,
+  AUTHORIZATION_REQUIRED_TITLE,
+  AUTHORIZATION_SUCCESS_MESSAGE,
+} from "@/composables/useAuth";
 import { AuthStatus } from "@/services/auth/types";
 import { RouteNames } from "@/routes";
 
@@ -50,7 +54,9 @@ const title = computed(() => {
 
 const detail = computed(() => {
   if (status.value === AuthStatus.Authorized) {
-    return userFullName.value ? `Здравствуйте, ${userFullName.value}` : "Вы вошли в систему.";
+    return userFullName.value
+      ? `Здравствуйте, ${userFullName.value}`
+      : "Вы вошли в систему.";
   }
   if (message.value) {
     return message.value;

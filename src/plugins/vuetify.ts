@@ -1,4 +1,4 @@
-import "@mdi/font/css/materialdesignicons.css";
+﻿import "@mdi/font/css/materialdesignicons.css";
 import "vuetify/styles";
 import { createVuetify, type ThemeDefinition } from "vuetify";
 
