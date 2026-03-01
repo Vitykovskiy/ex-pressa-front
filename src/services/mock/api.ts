@@ -22,8 +22,10 @@ import {
   type ProductGroup,
   type ProductGroupAddonGroup,
   type ProductPrice,
+  type RejectOrderDto,
   type TimeSlot,
   type UpdateCartItemDto,
+  type UpdateOrderStatusDto,
 } from "@/services/menu/types";
 import { clone, MOCK_NETWORK_DELAY_MS, wait } from "./index";
 
@@ -40,8 +42,8 @@ const mockUser: User = {
   roles: [
     {
       id: 1,
-      code: RoleCode.User,
-      name: "Пользователь",
+      code: RoleCode.Barista,
+      name: "Бариста",
     },
   ],
   fullName: "Демо Пользователь",
@@ -249,21 +251,21 @@ const seededOrders: Order[] = [
     id: 71001,
     user: { id: mockUser.id, name: mockUser.name },
     timeSlot: {
-      id: 1,
+      id: 4,
       date: "2026-03-01",
-      timeFrom: "09:00",
-      timeTo: "10:00",
+      timeFrom: "12:00",
+      timeTo: "13:00",
     },
-    status: "READY",
-    slotTimeFrom: "09:00",
-    slotTimeTo: "10:00",
-    totalRub: 560,
+    status: "CREATED",
+    slotTimeFrom: "12:00",
+    slotTimeTo: "13:00",
+    totalRub: 990,
     rejectReason: null,
-    createdAt: "2026-02-28T08:15:00.000Z",
-    confirmedAt: "2026-02-28T08:16:30.000Z",
-    readyAt: "2026-02-28T08:28:10.000Z",
+    createdAt: "2026-03-01T08:15:00.000Z",
+    confirmedAt: null,
+    readyAt: null,
     closedAt: null,
-    updatedAt: "2026-02-28T08:28:10.000Z",
+    updatedAt: "2026-03-01T08:15:00.000Z",
     items: [
       {
         id: 81001,
@@ -271,11 +273,43 @@ const seededOrders: Order[] = [
         quantity: 2,
         sizeCode: SizeCode.Medium,
         unitPriceRub: 220,
-        lineTotalRub: 520,
+        lineTotalRub: 610,
         addons: [
           {
             id: 91001,
             addonName: "Ваниль",
+            quantity: 2,
+            unitPriceRub: 40,
+            lineTotalRub: 80,
+          },
+          {
+            id: 91004,
+            addonName: "Кокосовое",
+            quantity: 1,
+            unitPriceRub: 90,
+            lineTotalRub: 90,
+          },
+        ],
+      },
+      {
+        id: 81004,
+        productName: "Круассан",
+        quantity: 1,
+        unitPriceRub: 210,
+        lineTotalRub: 210,
+        addons: [],
+      },
+      {
+        id: 81005,
+        productName: "Эспрессо",
+        quantity: 1,
+        sizeCode: SizeCode.Small,
+        unitPriceRub: 130,
+        lineTotalRub: 170,
+        addons: [
+          {
+            id: 91005,
+            addonName: "Карамель",
             quantity: 1,
             unitPriceRub: 40,
             lineTotalRub: 40,
@@ -421,6 +455,16 @@ function resolveUnitPrice(product: Product, sizeCode?: SizeCode): number {
     }
   }
   return product.prices[0]?.priceRub ?? 0;
+}
+
+function findOrderById(orderId: number): Order | null {
+  for (const orders of ordersByUser.values()) {
+    const order = orders.find((item) => item.id === orderId);
+    if (order) {
+      return order;
+    }
+  }
+  return null;
 }
 
 export async function mockAuthorizeTelegram(initData: string): Promise<void> {
@@ -780,4 +824,49 @@ export async function mockSearchOrders(
 
 export async function mockFetchActiveTimeSlots(): Promise<TimeSlot[]> {
   return withMockDelay(() => timeSlotsStore.filter((slot) => slot.isActive));
+}
+
+export async function mockUpdateOrderStatus(
+  orderId: number,
+  payload: UpdateOrderStatusDto,
+): Promise<Order> {
+  return withMockDelay(() => {
+    const order = findOrderById(orderId);
+    if (!order) {
+      throw new Error(`Order ${orderId} not found`);
+    }
+
+    order.status = payload.status;
+    const now = nowIso();
+    order.updatedAt = now;
+
+    if (payload.status === "CONFIRMED") {
+      order.confirmedAt = now;
+    }
+    if (payload.status === "READY") {
+      order.readyAt = now;
+    }
+    if (payload.status === "CLOSED") {
+      order.closedAt = now;
+    }
+
+    return order;
+  });
+}
+
+export async function mockRejectOrder(
+  orderId: number,
+  payload: RejectOrderDto,
+): Promise<Order> {
+  return withMockDelay(() => {
+    const order = findOrderById(orderId);
+    if (!order) {
+      throw new Error(`Order ${orderId} not found`);
+    }
+
+    order.status = "REJECTED";
+    order.rejectReason = payload.reason;
+    order.updatedAt = nowIso();
+    return order;
+  });
 }

@@ -135,9 +135,24 @@ export interface CreateOrderDto {
 }
 
 export interface OrdersFilterDto {
-  status?: Array<"CREATED" | "CONFIRMED" | "REJECTED" | "READY" | "CLOSED">;
+  status?: OrderStatus[];
   dateFrom?: string;
   dateTo?: string;
+}
+
+export type OrderStatus =
+  | "CREATED"
+  | "CONFIRMED"
+  | "REJECTED"
+  | "READY"
+  | "CLOSED";
+
+export interface UpdateOrderStatusDto {
+  status: Exclude<OrderStatus, "REJECTED">;
+}
+
+export interface RejectOrderDto {
+  reason: string;
 }
 
 export interface TimeSlot {
@@ -194,7 +209,7 @@ export interface Order {
   id: number;
   user: Pick<User, "id" | "name">;
   timeSlot: Pick<TimeSlot, "id" | "date" | "timeFrom" | "timeTo">;
-  status: "CREATED" | "CONFIRMED" | "REJECTED" | "READY" | "CLOSED";
+  status: OrderStatus;
   slotTimeFrom: string;
   slotTimeTo: string;
   totalRub: number;

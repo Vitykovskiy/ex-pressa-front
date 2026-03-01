@@ -3,12 +3,16 @@ import { USE_MOCKS } from "@/services/mock";
 import {
   mockCreateOrderFromCart,
   mockFetchOrderHistory,
+  mockRejectOrder,
   mockSearchOrders,
+  mockUpdateOrderStatus,
 } from "@/services/mock/api";
 import type {
   CreateOrderDto,
   Order,
   OrdersFilterDto,
+  RejectOrderDto,
+  UpdateOrderStatusDto,
 } from "@/services/menu/types";
 
 export async function createOrderFromCart(
@@ -43,4 +47,29 @@ export async function searchOrders(payload: OrdersFilterDto): Promise<Order[]> {
   }
 
   return http.post<Order[], OrdersFilterDto>("/orders/search", payload);
+}
+
+export async function updateOrderStatus(
+  orderId: number,
+  payload: UpdateOrderStatusDto,
+): Promise<Order> {
+  if (USE_MOCKS) {
+    return mockUpdateOrderStatus(orderId, payload);
+  }
+
+  return http.patch<Order, UpdateOrderStatusDto>(
+    `/orders/${orderId}/status`,
+    payload,
+  );
+}
+
+export async function rejectOrder(
+  orderId: number,
+  payload: RejectOrderDto,
+): Promise<Order> {
+  if (USE_MOCKS) {
+    return mockRejectOrder(orderId, payload);
+  }
+
+  return http.post<Order, RejectOrderDto>(`/orders/${orderId}/reject`, payload);
 }
