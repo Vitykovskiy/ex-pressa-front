@@ -28,13 +28,25 @@
                       single-line
                       clearable />
 
+        <v-tooltip text="Очтисть фильтры"
+                   location="top">
+          <template #activator="{ props }">
+            <v-btn v-bind="props"
+                   class="admin-orders__clear-btn"
+                   variant="text"
+                   icon="mdi-trash-can-outline"
+                   :disabled="isLoading"
+                   @click="clearFilters" />
+          </template>
+        </v-tooltip>
+
         <v-btn class="admin-orders__refresh-btn"
                variant="flat"
                color="primary"
-               prepend-icon="mdi-refresh"
+               prepend-icon="mdi-magnify"
                :loading="isLoading"
                @click="loadOrders">
-          Обновить
+          Поиск
         </v-btn>
       </div>
     </div>
@@ -160,6 +172,30 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="statusConfirmDialog"
+              max-width="420">
+      <v-card>
+        <v-card-title>Подтверждение</v-card-title>
+        <v-card-text>
+          {{ statusConfirmText }}
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn variant="text"
+                 :disabled="isStatusConfirmSubmitting"
+                 @click="closeStatusConfirmDialog">
+            Отмена
+          </v-btn>
+          <v-btn variant="flat"
+                 color="primary"
+                 :loading="isStatusConfirmSubmitting"
+                 @click="submitStatusConfirm">
+            Подтвердить
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -186,6 +222,10 @@ const rejectOrderId = ref<number | null>(null);
 const rejectReason = ref("");
 const rejectReasonError = ref("");
 const isRejectSubmitting = ref(false);
+const statusConfirmDialog = ref(false);
+const statusConfirmOrderId = ref<number | null>(null);
+const statusConfirmNextStatus = ref<Exclude<OrderStatus, "REJECTED"> | null>(null);
+const isStatusConfirmSubmitting = ref(false);
 
 const statusFilters = ref<OrderStatus[]>([]);
 const statusFilterItems = [
@@ -237,6 +277,22 @@ function canReject(status: OrderStatus): boolean {
   return status === "CREATED" || status === "CONFIRMED";
 }
 
+function requiresStatusConfirmation(
+  status: Exclude<OrderStatus, "REJECTED">,
+): boolean {
+  return status === "READY" || status === "CLOSED";
+}
+
+const statusConfirmText = computed(() => {
+  if (statusConfirmNextStatus.value === "READY") {
+    return "Перевести заказ в статус «Готов»?";
+  }
+  if (statusConfirmNextStatus.value === "CLOSED") {
+    return "Перевести заказ в статус «Закрыт»?";
+  }
+  return "Подтвердить изменение статуса заказа?";
+});
+
 function formatDate(value: string): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
@@ -262,6 +318,11 @@ function formatOnlyDate(value: string): string {
     month: "2-digit",
     year: "numeric",
   }).format(date);
+}
+
+function clearFilters(): void {
+  statusFilters.value = [];
+  selectedDate.value = "";
 }
 
 const searchPayload = computed(() => {
@@ -300,6 +361,20 @@ async function onStatusAction(
   orderId: number,
   nextStatus: Exclude<OrderStatus, "REJECTED">,
 ): Promise<void> {
+  if (requiresStatusConfirmation(nextStatus)) {
+    statusConfirmOrderId.value = orderId;
+    statusConfirmNextStatus.value = nextStatus;
+    statusConfirmDialog.value = true;
+    return;
+  }
+
+  await applyStatusAction(orderId, nextStatus);
+}
+
+async function applyStatusAction(
+  orderId: number,
+  nextStatus: Exclude<OrderStatus, "REJECTED">,
+): Promise<void> {
   pendingOrderId.value = orderId;
   errorMessage.value = "";
 
@@ -311,6 +386,31 @@ async function onStatusAction(
   } finally {
     pendingOrderId.value = null;
   }
+}
+
+function closeStatusConfirmDialog(): void {
+  if (isStatusConfirmSubmitting.value) {
+    return;
+  }
+
+  statusConfirmDialog.value = false;
+  statusConfirmOrderId.value = null;
+  statusConfirmNextStatus.value = null;
+}
+
+async function submitStatusConfirm(): Promise<void> {
+  if (!statusConfirmOrderId.value || !statusConfirmNextStatus.value) {
+    return;
+  }
+
+  isStatusConfirmSubmitting.value = true;
+  try {
+    await applyStatusAction(statusConfirmOrderId.value, statusConfirmNextStatus.value);
+  } finally {
+    isStatusConfirmSubmitting.value = false;
+  }
+
+  closeStatusConfirmDialog();
 }
 
 function openRejectDialog(orderId: number): void {
@@ -402,6 +502,10 @@ watch(
 }
 
 .admin-orders__refresh-btn {
+  flex: 0 0 auto;
+}
+
+.admin-orders__clear-btn {
   flex: 0 0 auto;
 }
 
