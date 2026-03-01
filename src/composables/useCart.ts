@@ -1,33 +1,39 @@
-import { ref } from "vue";
+﻿import { ref } from "vue";
 import type { ICartItem } from "./types";
 import { SizeCode } from "@/services/menu/types";
+
+const mockProducts = [
+  { id: 101, groupId: 1, name: "Эспрессо", basePrice: 130, isDrink: true },
+  { id: 102, groupId: 1, name: "Капучино", basePrice: 180, isDrink: true },
+  { id: 201, groupId: 2, name: "Круассан", basePrice: 210, isDrink: false },
+  { id: 202, groupId: 2, name: "Чизкейк", basePrice: 290, isDrink: false },
+] as const;
 
 function createCartStubItems(): ICartItem[] {
   return Array.from({ length: 20 }, (_, index) => {
     const i = index + 1;
-    const isDrink = i % 2 === 0;
+    const product = mockProducts[index % mockProducts.length]!;
     const quantity = (i % 3) + 1;
-    const basePrice = isDrink ? 180 : 240;
 
     return {
-      id: 10_000 + i,
-      groupId: isDrink ? 1 : 2,
-      name: isDrink ? `Drink ${i}` : `Dessыыыыыыert ${i}`,
-      price: basePrice + (i % 5) * 10,
+      id: product.id,
+      groupId: product.groupId,
+      name: product.name,
+      price: product.basePrice,
       quantity,
-      size: isDrink
+      size: product.isDrink
         ? i % 3 === 0
           ? SizeCode.Large
           : i % 3 === 1
             ? SizeCode.Small
             : SizeCode.Medium
         : undefined,
-      selectedOptions: isDrink
+      selectedOptions: product.isDrink
         ? [
             {
-              id: 20_000 + i,
-              name: i % 2 === 0 ? "Vanilla syrup" : "Coconut milk",
-              priceRub: 40 + (i % 2) * 20,
+              id: i % 2 === 0 ? 3 : 2,
+              name: i % 2 === 0 ? "Ваниль" : "Кокосовое",
+              priceRub: i % 2 === 0 ? 40 : 90,
               isActive: true,
             },
           ]
@@ -51,8 +57,9 @@ export function useCart() {
   }
 
   function editCartItem(index: number, item: ICartItem): void {
-    if (cart.value[index])
+    if (cart.value[index]) {
       cart.value[index] = { ...cart.value[index], ...item };
+    }
   }
 
   function removeCartItem(index: number): void {
@@ -61,5 +68,9 @@ export function useCart() {
     }
   }
 
-  return { cart, addToCart, editCartItem, removeCartItem };
+  function clearCart(): void {
+    cart.value = [];
+  }
+
+  return { cart, addToCart, editCartItem, removeCartItem, clearCart };
 }

@@ -81,7 +81,7 @@ function onRowClick(
 }
 
 function onSubmitOrder(): void {
-  // TODO: Подключить отправку заказа через API, когда корзина переедет на backend.
+  router.push({ name: RouteNames.OrderSlot });
 }
 
 function onRemoveItem(index: number): void {

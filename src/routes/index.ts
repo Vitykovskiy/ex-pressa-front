@@ -4,11 +4,13 @@ import MenuItem from "@/views/menuItem/index.vue";
 import Cart from "@/views/cart/index.vue";
 import AuthRequired from "@/views/auth/index.vue";
 import OrdersHistory from "@/views/orders/index.vue";
+import OrderSlot from "@/views/orderSlot/index.vue";
 
 export const enum RouteNames {
   Menu = "Menu",
   MenuItem = "MenuItem",
   Cart = "Cart",
+  OrderSlot = "OrderSlot",
   OrdersHistory = "OrdersHistory",
   AuthRequired = "AuthRequired",
 }
@@ -33,6 +35,11 @@ export const routes: RouteRecordRaw[] = [
     path: "/cart",
     name: RouteNames.Cart,
     component: Cart,
+  },
+  {
+    path: "/order/slot",
+    name: RouteNames.OrderSlot,
+    component: OrderSlot,
   },
   {
     path: "/orders",
