@@ -254,18 +254,10 @@ const selectedDate = ref<string>(getTodayDateString());
 
 const statusMap: Record<OrderStatus, { label: string; color: string }> = {
   CREATED: { label: "Создан", color: "info" },
-  CONFIRMED: { label: "Подтвержден", color: "primary" },
+  CONFIRMED: { label: "Подтвержден", color: "secondary" },
   READY: { label: "Готов", color: "success" },
-  CLOSED: { label: "Закрыт", color: "secondary" },
+  CLOSED: { label: "Закрыт", color: "primary" },
   REJECTED: { label: "Отклонен", color: "error" },
-};
-
-const statusSortPriority: Record<OrderStatus, number> = {
-  CREATED: 0,
-  CONFIRMED: 1,
-  READY: 2,
-  CLOSED: 3,
-  REJECTED: 4,
 };
 
 const actionLabelMap: Record<Exclude<OrderStatus, "REJECTED">, string> = {
@@ -284,20 +276,44 @@ const nextStatusMap: Record<OrderStatus, Array<Exclude<OrderStatus, "REJECTED">>
 };
 
 const sortedOrders = computed(() => {
+  const rank = (status: OrderStatus): number => {
+    if (status === "CREATED") {
+      return 0;
+    }
+    if (status === "CONFIRMED" || status === "READY") {
+      return 1;
+    }
+    return 2;
+  };
+
+  const slotTs = (order: Order): number => {
+    return Date.parse(`${order.timeSlot.date}T${order.slotTimeFrom}:00`);
+  };
+
+  const createdTs = (order: Order): number => {
+    return Date.parse(order.createdAt);
+  };
+
   return [...orders.value].sort((a, b) => {
-    const statusDiff = statusSortPriority[a.status] - statusSortPriority[b.status];
-    if (statusDiff !== 0) {
-      return statusDiff;
+    const rankDiff = rank(a.status) - rank(b.status);
+    if (rankDiff !== 0) {
+      return rankDiff;
     }
 
-    const slotDateA = Date.parse(`${a.timeSlot.date}T${a.slotTimeFrom}:00`);
-    const slotDateB = Date.parse(`${b.timeSlot.date}T${b.slotTimeFrom}:00`);
-    if (!Number.isNaN(slotDateA) && !Number.isNaN(slotDateB) && slotDateA !== slotDateB) {
-      return slotDateA - slotDateB;
+    if (rank(a.status) === 1) {
+      const slotDateA = slotTs(a);
+      const slotDateB = slotTs(b);
+      if (
+        !Number.isNaN(slotDateA) &&
+        !Number.isNaN(slotDateB) &&
+        slotDateA !== slotDateB
+      ) {
+        return slotDateA - slotDateB;
+      }
     }
 
-    const createdA = Date.parse(a.createdAt);
-    const createdB = Date.parse(b.createdAt);
+    const createdA = createdTs(a);
+    const createdB = createdTs(b);
     if (!Number.isNaN(createdA) && !Number.isNaN(createdB) && createdA !== createdB) {
       return createdA - createdB;
     }
