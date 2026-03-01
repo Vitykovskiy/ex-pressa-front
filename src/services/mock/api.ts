@@ -44,40 +44,40 @@ const mockUser: User = {
     {
       id: 1,
       code: RoleCode.Barista,
-      name: "Р‘Р°СЂРёСЃС‚Р°",
+      name: "Бариста",
     },
   ],
-  fullName: "Р”РµРјРѕ РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ",
-  firstName: "Р”РµРјРѕ",
-  lastName: "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ",
+  fullName: "Демо Пользователь",
+  firstName: "Демо",
+  lastName: "Пользователь",
   middleName: null,
 };
 
 const addonGroupsStore: AddonGroup[] = [
   {
     id: 1,
-    name: "РњРѕР»РѕРєРѕ",
+    name: "Молоко",
     sortOrder: 1,
     isActive: true,
     addons: [
-      { id: 1, name: "РћРІСЃСЏРЅРѕРµ", priceRub: 80, isActive: true },
-      { id: 2, name: "РљРѕРєРѕСЃРѕРІРѕРµ", priceRub: 90, isActive: true },
+      { id: 1, name: "Овсяное", priceRub: 80, isActive: true },
+      { id: 2, name: "Кокосовое", priceRub: 90, isActive: true },
     ],
   },
   {
     id: 2,
-    name: "РЎРёСЂРѕРї",
+    name: "Сироп",
     sortOrder: 2,
     isActive: true,
     addons: [
-      { id: 3, name: "Р’Р°РЅРёР»СЊ", priceRub: 40, isActive: true },
-      { id: 4, name: "РљР°СЂР°РјРµР»СЊ", priceRub: 40, isActive: true },
+      { id: 3, name: "Ваниль", priceRub: 40, isActive: true },
+      { id: 4, name: "Карамель", priceRub: 40, isActive: true },
     ],
   },
 ];
 
-const coffeeGroupRef = { id: 1, name: "РљРѕС„Рµ" };
-const dessertsGroupRef = { id: 2, name: "Р”РµСЃРµСЂС‚С‹" };
+const coffeeGroupRef = { id: 1, name: "Кофе" };
+const dessertsGroupRef = { id: 2, name: "Десерты" };
 
 const productGroupsStore: ProductGroup[] = [
   {
@@ -89,8 +89,8 @@ const productGroupsStore: ProductGroup[] = [
       {
         id: 101,
         group: coffeeGroupRef,
-        name: "Р­СЃРїСЂРµСЃСЃРѕ",
-        description: "РљСЂРµРїРєРёР№ Рё РЅР°СЃС‹С‰РµРЅРЅС‹Р№",
+        name: "Эспрессо",
+        description: "Крепкий и насыщенный",
         type: ProductType.Drink,
         isActive: true,
         isAvailable: true,
@@ -109,8 +109,8 @@ const productGroupsStore: ProductGroup[] = [
       {
         id: 102,
         group: coffeeGroupRef,
-        name: "РљР°РїСѓС‡РёРЅРѕ",
-        description: "РЎ РІРѕР·РґСѓС€РЅРѕР№ РјРѕР»РѕС‡РЅРѕР№ РїРµРЅРєРѕР№",
+        name: "Капучино",
+        description: "С воздушной молочной пенкой",
         type: ProductType.Drink,
         isActive: true,
         isAvailable: true,
@@ -138,8 +138,8 @@ const productGroupsStore: ProductGroup[] = [
       {
         id: 201,
         group: dessertsGroupRef,
-        name: "РљСЂСѓР°СЃСЃР°РЅ",
-        description: "РЎРІРµР¶Р°СЏ РІС‹РїРµС‡РєР° СЃ РјР°СЃР»РѕРј",
+        name: "Круассан",
+        description: "Свежая выпечка с маслом",
         type: ProductType.Food,
         isActive: true,
         isAvailable: true,
@@ -149,8 +149,8 @@ const productGroupsStore: ProductGroup[] = [
       {
         id: 202,
         group: dessertsGroupRef,
-        name: "Р§РёР·РєРµР№Рє",
-        description: "РљР»Р°СЃСЃРёС‡РµСЃРєРёР№ РќСЊСЋ-Р™РѕСЂРє",
+        name: "Чизкейк",
+        description: "Классический Нью-Йорк",
         type: ProductType.Food,
         isActive: true,
         isAvailable: true,
@@ -270,7 +270,7 @@ const seededOrders: Order[] = [
     items: [
       {
         id: 81001,
-        productName: "РљР°РїСѓС‡РёРЅРѕ",
+        productName: "Капучино",
         quantity: 2,
         sizeCode: SizeCode.Medium,
         unitPriceRub: 220,
@@ -278,14 +278,14 @@ const seededOrders: Order[] = [
         addons: [
           {
             id: 91001,
-            addonName: "Р’Р°РЅРёР»СЊ",
+            addonName: "Ваниль",
             quantity: 2,
             unitPriceRub: 40,
             lineTotalRub: 80,
           },
           {
             id: 91004,
-            addonName: "РљРѕРєРѕСЃРѕРІРѕРµ",
+            addonName: "Кокосовое",
             quantity: 1,
             unitPriceRub: 90,
             lineTotalRub: 90,
@@ -294,7 +294,7 @@ const seededOrders: Order[] = [
       },
       {
         id: 81004,
-        productName: "РљСЂСѓР°СЃСЃР°РЅ",
+        productName: "Круассан",
         quantity: 1,
         unitPriceRub: 210,
         lineTotalRub: 210,
@@ -302,7 +302,7 @@ const seededOrders: Order[] = [
       },
       {
         id: 81005,
-        productName: "Р­СЃРїСЂРµСЃСЃРѕ",
+        productName: "Эспрессо",
         quantity: 1,
         sizeCode: SizeCode.Small,
         unitPriceRub: 130,
@@ -310,7 +310,7 @@ const seededOrders: Order[] = [
         addons: [
           {
             id: 91005,
-            addonName: "РљР°СЂР°РјРµР»СЊ",
+            addonName: "Карамель",
             quantity: 1,
             unitPriceRub: 40,
             lineTotalRub: 40,
@@ -341,7 +341,7 @@ const seededOrders: Order[] = [
     items: [
       {
         id: 81002,
-        productName: "Р§РёР·РєРµР№Рє",
+        productName: "Чизкейк",
         quantity: 1,
         unitPriceRub: 290,
         lineTotalRub: 290,
@@ -362,7 +362,7 @@ const seededOrders: Order[] = [
     slotTimeFrom: "11:00",
     slotTimeTo: "12:00",
     totalRub: 130,
-    rejectReason: "РЎР»РѕС‚ СѓР¶Рµ Р·Р°РїРѕР»РЅРµРЅ",
+    rejectReason: "Слот уже заполнен",
     createdAt: "2026-02-26T09:55:00.000Z",
     confirmedAt: null,
     readyAt: null,
@@ -371,7 +371,7 @@ const seededOrders: Order[] = [
     items: [
       {
         id: 81003,
-        productName: "Р­СЃРїСЂРµСЃСЃРѕ",
+        productName: "Эспрессо",
         quantity: 1,
         sizeCode: SizeCode.Small,
         unitPriceRub: 130,
@@ -402,7 +402,7 @@ const seededOrders: Order[] = [
     items: [
       {
         id: 81006,
-        productName: "РљР°РїСѓС‡РёРЅРѕ",
+        productName: "Капучино",
         quantity: 2,
         sizeCode: SizeCode.Small,
         unitPriceRub: 180,
@@ -410,7 +410,7 @@ const seededOrders: Order[] = [
         addons: [
           {
             id: 91006,
-            addonName: "Р’Р°РЅРёР»СЊ",
+            addonName: "Ваниль",
             quantity: 1,
             unitPriceRub: 40,
             lineTotalRub: 80,
@@ -419,7 +419,7 @@ const seededOrders: Order[] = [
       },
       {
         id: 81007,
-        productName: "Р§РёР·РєРµР№Рє",
+        productName: "Чизкейк",
         quantity: 1,
         unitPriceRub: 290,
         lineTotalRub: 290,
@@ -449,7 +449,7 @@ const seededOrders: Order[] = [
     items: [
       {
         id: 81008,
-        productName: "РљСЂСѓР°СЃСЃР°РЅ",
+        productName: "Круассан",
         quantity: 2,
         unitPriceRub: 210,
         lineTotalRub: 420,
@@ -479,7 +479,7 @@ const seededOrders: Order[] = [
     items: [
       {
         id: 81009,
-        productName: "Р­СЃРїСЂРµСЃСЃРѕ",
+        productName: "Эспрессо",
         quantity: 1,
         sizeCode: SizeCode.Large,
         unitPriceRub: 190,
@@ -487,14 +487,14 @@ const seededOrders: Order[] = [
         addons: [
           {
             id: 91007,
-            addonName: "РљРѕРєРѕСЃРѕРІРѕРµ",
+            addonName: "Кокосовое",
             quantity: 1,
             unitPriceRub: 90,
             lineTotalRub: 90,
           },
           {
             id: 91008,
-            addonName: "РљР°СЂР°РјРµР»СЊ",
+            addonName: "Карамель",
             quantity: 1,
             unitPriceRub: 40,
             lineTotalRub: 40,
@@ -503,7 +503,7 @@ const seededOrders: Order[] = [
       },
       {
         id: 81010,
-        productName: "РљСЂСѓР°СЃСЃР°РЅ",
+        productName: "Круассан",
         quantity: 1,
         unitPriceRub: 210,
         lineTotalRub: 210,
@@ -533,7 +533,7 @@ const seededOrders: Order[] = [
     items: [
       {
         id: 81011,
-        productName: "РљР°РїСѓС‡РёРЅРѕ",
+        productName: "Капучино",
         quantity: 1,
         sizeCode: SizeCode.Small,
         unitPriceRub: 180,
@@ -555,7 +555,7 @@ const seededOrders: Order[] = [
     slotTimeFrom: "10:00",
     slotTimeTo: "11:00",
     totalRub: 460,
-    rejectReason: "РќРµС‚ РЅСѓР¶РЅРѕРіРѕ РёРЅРіСЂРµРґРёРµРЅС‚Р°",
+    rejectReason: "Нет нужного ингредиента",
     createdAt: "2026-03-01T07:05:00.000Z",
     confirmedAt: null,
     readyAt: null,
@@ -564,28 +564,28 @@ const seededOrders: Order[] = [
     items: [
       {
         id: 81012,
-        productName: "Р§РёР·РєРµР№Рє",
+        productName: "Чизкейк",
         quantity: 1,
         unitPriceRub: 290,
         lineTotalRub: 460,
         addons: [
           {
             id: 91009,
-            addonName: "Р’Р°РЅРёР»СЊ",
+            addonName: "Ваниль",
             quantity: 1,
             unitPriceRub: 40,
             lineTotalRub: 40,
           },
           {
             id: 91010,
-            addonName: "РљР°СЂР°РјРµР»СЊ",
+            addonName: "Карамель",
             quantity: 1,
             unitPriceRub: 40,
             lineTotalRub: 40,
           },
           {
             id: 91011,
-            addonName: "РљРѕРєРѕСЃРѕРІРѕРµ",
+            addonName: "Кокосовое",
             quantity: 1,
             unitPriceRub: 90,
             lineTotalRub: 90,
@@ -1085,4 +1085,6 @@ export async function mockRejectOrder(
     return order;
   });
 }
+
+
 
