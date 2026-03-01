@@ -3,32 +3,37 @@
     class="app-shell"
     :class="{ 'app-shell--blue': isBlueTheme }"
   >
-    <v-main max-width="400">
-      <div
-        v-if="!isAuthPage"
-        class="header"
-      >
-        <div class="header__left">
-          <v-btn
-            v-if="!isMainMenu"
-            variant="plain"
-            icon="mdi-arrow-left"
-            @click="onReturnBtn"
-          />
-        </div>
-        <div class="header__right">
-          <div class="cart">
+    <v-main class="app-main">
+      <div class="app-frame">
+        <div
+          v-if="!isAuthPage"
+          class="header"
+        >
+          <div class="header__left">
             <v-btn
-              class="cart__btn"
+              v-if="!isMainMenu"
               variant="plain"
-              icon="mdi-cart-variant"
-              @click="onCart"
+              icon="mdi-arrow-left"
+              @click="onReturnBtn"
             />
-            <div class="cart__counter">{{ cart.length || "" }}</div>
+          </div>
+          <div class="header__right">
+            <div class="cart">
+              <v-btn
+                class="cart__btn"
+                variant="plain"
+                icon="mdi-cart-variant"
+                @click="onCart"
+              />
+              <div class="cart__counter">{{ cart.length || "" }}</div>
+            </div>
           </div>
         </div>
+
+        <div class="app-content">
+          <router-view />
+        </div>
       </div>
-      <router-view />
     </v-main>
   </v-app>
 </template>
@@ -62,13 +67,35 @@ function onCart(): void {
 </script>
 
 <style lang="scss" scoped>
+.app-main {
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+}
+
+.app-frame {
+  width: min(400px, 100%);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0 10px;
+}
+
 .header {
   display: flex;
   justify-content: space-between;
+  flex: 0 0 auto;
+}
+
+.app-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
 }
 
 :deep(.v-main) {
-  padding: 0 10px;
+  padding: 0;
 }
 
 .app-shell--blue :deep(.v-main) {

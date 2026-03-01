@@ -1,25 +1,27 @@
 ﻿<template>
   <div class="cart-view">
-    <v-data-table
-      class="cart-view__table"
-      hide-default-footer
-      :items-per-page="-1"
-      :items="cart"
-      :headers="headers"
-      hover
-      no-data-text="Пока ничего не добавлено"
-      @click:row="onRowClick"
-    >
-      <template v-slot:[HEADER_ITEM_SLOT]>
-        <h2>Корзина</h2>
-      </template>
-      <template v-slot:[ITEM_ITEM_SLOT]="{ item, index }">
-        <CartRow
-          :item="item"
-          @remove="onRemoveItem(index)"
-        />
-      </template>
-    </v-data-table>
+    <div class="cart-view__content">
+      <v-data-table
+        class="cart-view__table"
+        hide-default-footer
+        :items-per-page="-1"
+        :items="cart"
+        :headers="headers"
+        hover
+        no-data-text="Пока ничего не добавлено"
+        @click:row="onRowClick"
+      >
+        <template v-slot:[HEADER_ITEM_SLOT]>
+          <h2>Корзина</h2>
+        </template>
+        <template v-slot:[ITEM_ITEM_SLOT]="{ item, index }">
+          <CartRow
+            :item="item"
+            @remove="onRemoveItem(index)"
+          />
+        </template>
+      </v-data-table>
+    </div>
 
     <div class="cart-view__footer">
       <v-btn
@@ -91,13 +93,20 @@ function onRemoveItem(index: number): void {
 .cart-view {
   display: flex;
   flex-direction: column;
-  min-height: calc(100dvh - 88px);
+  height: 100%;
+  min-height: 0;
+}
+
+.cart-view__content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding-bottom: 8px;
 }
 
 .cart-view__table {
-  flex: 1 1 auto;
-  min-height: 0;
+  width: 100%;
 }
 
 .cart-view__footer {
