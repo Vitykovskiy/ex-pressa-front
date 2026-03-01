@@ -2,7 +2,7 @@
 import { retrieveRawInitData } from "@tma.js/sdk";
 import { HttpError } from "@/services/http";
 import { authorizeTelegram, fetchMe } from "@/services/auth";
-import { AuthStatus } from "@/services/auth/types";
+import { AuthStatus, RoleCode, type User } from "@/services/auth/types";
 import { buildFullName } from "@/helpers";
 import { AuthMode, getAuthMode } from "@/config/authMode";
 
@@ -18,30 +18,62 @@ export const AUTHORIZATION_SUCCESS_MESSAGE = "Авторизация успеш�
 const status = ref<AuthStatus>(AuthStatus.Idle);
 const message = ref<string>("");
 const userFullName = ref<string>("");
+const currentUser = ref<User | null>(null);
+
 const isAuthorized = computed(() => status.value === AuthStatus.Authorized);
+const roleCodes = computed(
+  () => currentUser.value?.roles.map((role) => role.code) ?? [],
+);
+
+function createMockAuthorizedUser(): User {
+  const now = new Date().toISOString();
+
+  return {
+    id: 1,
+    name: "mock-admin",
+    tgId: "100000001",
+    tgUsername: "mock_admin",
+    isActive: true,
+    createdAt: now,
+    updatedAt: now,
+    roles: [
+      { id: 1, code: RoleCode.Admin, name: "Администратор" },
+      { id: 2, code: RoleCode.Barista, name: "Бариста" },
+    ],
+    fullName: "Тестовый пользователь",
+  };
+}
+
+function setAuthorized(user: User): void {
+  status.value = AuthStatus.Authorized;
+  currentUser.value = user;
+  userFullName.value = buildFullName(user);
+  message.value = "";
+}
+
+function setUnauthorized(nextMessage: string): void {
+  status.value = AuthStatus.Unauthorized;
+  currentUser.value = null;
+  userFullName.value = "";
+  message.value = nextMessage;
+}
 
 export function useAuth() {
   async function initAppAuth(): Promise<void> {
     const authMode = getAuthMode();
 
     if (authMode === AuthMode.Authorized) {
-      status.value = AuthStatus.Authorized;
-      message.value = "";
-      userFullName.value = "Тестовый пользователь";
+      setAuthorized(createMockAuthorizedUser());
       return;
     }
 
     if (authMode === AuthMode.Unauthorized) {
-      status.value = AuthStatus.Unauthorized;
-      message.value = OPEN_APP_BY_TELEGRAM_MESSAGE;
-      userFullName.value = "";
+      setUnauthorized(OPEN_APP_BY_TELEGRAM_MESSAGE);
       return;
     }
 
     if (import.meta.env.DEV) {
-      status.value = AuthStatus.Authorized;
-      message.value = "";
-      userFullName.value = "";
+      setAuthorized(createMockAuthorizedUser());
       return;
     }
 
@@ -55,18 +87,15 @@ export function useAuth() {
     status.value = AuthStatus.Checking;
     message.value = AUTHORIZATION_LOADING_MESSAGE;
     userFullName.value = "";
+    currentUser.value = null;
 
     try {
       const me = await fetchMe();
-      status.value = AuthStatus.Authorized;
-      userFullName.value = buildFullName(me);
-      message.value = "";
+      setAuthorized(me);
       return;
     } catch (error) {
       if (!(error instanceof HttpError) || error.status !== 401) {
-        status.value = AuthStatus.Unauthorized;
-        message.value = AUTHORIZATION_FAILED_MESSAGE;
-        userFullName.value = "";
+        setUnauthorized(AUTHORIZATION_FAILED_MESSAGE);
         return;
       }
     }
@@ -78,16 +107,12 @@ export function useAuth() {
     const authMode = getAuthMode();
 
     if (authMode === AuthMode.Authorized) {
-      status.value = AuthStatus.Authorized;
-      message.value = "";
-      userFullName.value = "Тестовый пользователь";
+      setAuthorized(createMockAuthorizedUser());
       return;
     }
 
     if (authMode === AuthMode.Unauthorized) {
-      status.value = AuthStatus.Unauthorized;
-      message.value = OPEN_APP_BY_TELEGRAM_MESSAGE;
-      userFullName.value = "";
+      setUnauthorized(OPEN_APP_BY_TELEGRAM_MESSAGE);
       return;
     }
 
@@ -101,40 +126,35 @@ export function useAuth() {
     status.value = AuthStatus.Checking;
     message.value = AUTHORIZATION_LOADING_MESSAGE;
     userFullName.value = "";
+    currentUser.value = null;
 
     const initData = retrieveRawInitData() || "";
     if (!initData) {
-      status.value = AuthStatus.Unauthorized;
-      message.value = OPEN_APP_BY_TELEGRAM_MESSAGE;
-      userFullName.value = "";
+      setUnauthorized(OPEN_APP_BY_TELEGRAM_MESSAGE);
       return;
     }
 
     try {
       await authorizeTelegram(initData);
       const me = await fetchMe();
-      status.value = AuthStatus.Authorized;
-      userFullName.value = buildFullName(me);
-      message.value = "";
-    } catch (error) {
-      const fallbackMessage = AUTHORIZATION_FAILED_MESSAGE;
-
-      if (error instanceof HttpError && error.status === 401) {
-        message.value = fallbackMessage;
-      } else {
-        message.value = fallbackMessage;
-      }
-
-      status.value = AuthStatus.Unauthorized;
-      userFullName.value = "";
+      setAuthorized(me);
+    } catch {
+      setUnauthorized(AUTHORIZATION_FAILED_MESSAGE);
     }
+  }
+
+  function hasAnyRole(roles: RoleCode[]): boolean {
+    return roles.some((role) => roleCodes.value.includes(role));
   }
 
   return {
     status,
     message,
     userFullName,
+    currentUser,
+    roleCodes,
     isAuthorized,
+    hasAnyRole,
     initAppAuth,
     initTelegramAuth,
   };
