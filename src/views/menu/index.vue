@@ -51,11 +51,16 @@ const activeGroup = computed<ProductGroup | null>(
   () => menu.value.find(({ id }) => id === Number(route.params.group)) ?? null,
 );
 
-const title = computed(() => (activeGroup.value ? activeGroup.value.name : "Меню"));
+const title = computed(() =>
+  activeGroup.value ? activeGroup.value.name : "Меню",
+);
 
 const items = computed<TableRow[]>(() => {
   if (!activeGroup.value) {
-    return menu.value.map(({ id, name }) => ({ id, name })) as GroupTableRowItem[];
+    return menu.value.map(({ id, name }) => ({
+      id,
+      name,
+    })) as GroupTableRowItem[];
   }
 
   const products = activeGroup.value.products ?? [];

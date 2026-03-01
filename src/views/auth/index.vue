@@ -1,20 +1,42 @@
 ﻿<template>
-  <v-container class="auth" fluid>
-    <v-card class="auth__card" elevation="2">
+  <v-container
+    class="auth"
+    fluid
+  >
+    <v-card
+      class="auth__card"
+      elevation="2"
+    >
       <v-card-title class="auth__title">{{ title }}</v-card-title>
       <v-card-text class="auth__text">
-        <div class="auth__status" :data-status="status">
+        <div
+          class="auth__status"
+          :data-status="status"
+        >
           {{ detail }}
         </div>
-        <div v-if="status === AuthStatus.Unauthorized" class="auth__hint">
+        <div
+          v-if="status === AuthStatus.Unauthorized"
+          class="auth__hint"
+        >
           Функционал доступен после авторизации через Telegram.
         </div>
       </v-card-text>
       <v-card-actions class="auth__actions">
-        <v-btn v-if="status !== AuthStatus.Authorized" color="primary" variant="flat" @click="onRetry">
+        <v-btn
+          v-if="status !== AuthStatus.Authorized"
+          color="primary"
+          variant="flat"
+          @click="onRetry"
+        >
           Попробовать снова
         </v-btn>
-        <v-btn v-else color="primary" variant="flat" @click="onContinue">
+        <v-btn
+          v-else
+          color="primary"
+          variant="flat"
+          @click="onContinue"
+        >
           Продолжить
         </v-btn>
       </v-card-actions>

@@ -94,7 +94,12 @@ const productGroupsStore: ProductGroup[] = [
         sortOrder: 1,
         prices: [
           { id: 1001, sizeCode: SizeCode.Small, priceRub: 130, isActive: true },
-          { id: 1002, sizeCode: SizeCode.Medium, priceRub: 160, isActive: true },
+          {
+            id: 1002,
+            sizeCode: SizeCode.Medium,
+            priceRub: 160,
+            isActive: true,
+          },
           { id: 1003, sizeCode: SizeCode.Large, priceRub: 190, isActive: true },
         ],
       },
@@ -109,7 +114,12 @@ const productGroupsStore: ProductGroup[] = [
         sortOrder: 2,
         prices: [
           { id: 1004, sizeCode: SizeCode.Small, priceRub: 180, isActive: true },
-          { id: 1005, sizeCode: SizeCode.Medium, priceRub: 220, isActive: true },
+          {
+            id: 1005,
+            sizeCode: SizeCode.Medium,
+            priceRub: 220,
+            isActive: true,
+          },
           { id: 1006, sizeCode: SizeCode.Large, priceRub: 260, isActive: true },
         ],
       },
@@ -155,7 +165,9 @@ const coffeeLinks: ProductGroupAddonGroup[] = addonGroupsStore.map((group) => ({
   productGroup: coffeeGroupRef,
   addonGroup: group,
 }));
-const coffeeGroup = productGroupsStore.find((group) => group.id === coffeeGroupRef.id);
+const coffeeGroup = productGroupsStore.find(
+  (group) => group.id === coffeeGroupRef.id,
+);
 if (coffeeGroup) {
   coffeeGroup.addonLinks = coffeeLinks;
 }
@@ -382,9 +394,7 @@ export async function mockCreateAddonGroup(
   });
 }
 
-export async function mockCreateAddon(
-  payload: CreateAddonDto,
-): Promise<Addon> {
+export async function mockCreateAddon(payload: CreateAddonDto): Promise<Addon> {
   return withMockDelay(() => {
     const group = addonGroupsStore.find((g) => g.id === payload.addonGroupId);
     if (!group) {
@@ -564,7 +574,10 @@ export async function mockCreateOrderFromCart(
       };
     });
 
-    const totalRub = orderItems.reduce((sum, item) => sum + item.lineTotalRub, 0);
+    const totalRub = orderItems.reduce(
+      (sum, item) => sum + item.lineTotalRub,
+      0,
+    );
     const now = nowIso();
 
     const order: Order = {

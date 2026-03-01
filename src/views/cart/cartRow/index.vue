@@ -2,56 +2,64 @@
     <div class="cart-row">
         <div class="cart-row__info">
             <h3 class="cart-row__name">
-                {{ item.name }} <span v-if="item.size">({{ item.size.toUpperCase() }})</span>
+                {{ item.name }}
+                <span v-if="item.size">({{ item.size.toUpperCase() }})</span>
             </h3>
             <div class="cart-row__cost">
                 <div class="cart-row__quantity">
-                    <v-btn variant="text" icon="mdi-minus" :ripple="false" @click.stop="() => quantityComputed--" />
+                    <v-btn variant="text"
+                           icon="mdi-minus"
+                           :ripple="false"
+                           @click.stop="() => quantityComputed--" />
                     <span>{{ quantityComputed }}</span>
-                    <v-btn variant="text" icon="mdi-plus" :ripple="false" @click.stop="() => quantityComputed++" />
+                    <v-btn variant="text"
+                           icon="mdi-plus"
+                           :ripple="false"
+                           @click.stop="() => quantityComputed++" />
                 </div>
                 <h3 class="cart-row__price">{{ item.price * item.quantity }}</h3>
-                <v-btn
-                    icon="mdi-trash-can-outline"
-                    variant="text"
-                    color="error"
-                    :ripple="false"
-                    @click.stop="onRemoveClick"
-                />
+                <v-btn class="cart-row__remove"
+                       icon="mdi-trash-can-outline"
+                       variant="text"
+                       :ripple="false"
+                       @click.stop="onRemoveClick" />
             </div>
         </div>
 
         <div class="cart-row__options">
-            <v-chip v-for="option in options" :key="option" variant="text">{{ option }}</v-chip>
+            <v-chip v-for="option in options"
+                    :key="option"
+                    variant="text">{{ option }}</v-chip>
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
-import type { IProps } from './types';
+import { computed, ref } from "vue";
+import type { IProps } from "./types";
 
 defineOptions({
-    name: 'CartRowItem',
+    name: "CartRowItem",
 });
 
-
-const props = defineProps<IProps>()
+const props = defineProps<IProps>();
 const emit = defineEmits<{
-    remove: []
-}>()
+    remove: [];
+}>();
 
-const item = ref({ ...props.item })
+const item = ref({ ...props.item });
 
-const options = computed<string[]>(() => props.item.selectedOptions?.map(({ name }) => name) ?? [])
-
+const options = computed<string[]>(
+    () => props.item.selectedOptions?.map(({ name }) => name) ?? [],
+);
 
 const quantityComputed = computed({
     get() {
         return item.value.quantity;
     },
     set(value) {
-        item.value.quantity = value >= 0 && value <= 20 ? value : item.value.quantity;
+        item.value.quantity =
+            value >= 0 && value <= 20 ? value : item.value.quantity;
     },
 });
 
@@ -92,8 +100,6 @@ function onRemoveClick(): void {
         align-items: center;
     }
 
-    &__price {
-        width: 40px
-    }
+
 }
 </style>

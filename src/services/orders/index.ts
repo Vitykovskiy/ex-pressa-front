@@ -19,7 +19,10 @@ export async function createOrderFromCart(
     return mockCreateOrderFromCart(userId, payload);
   }
 
-  return http.post<Order, CreateOrderDto>(`/orders/from-cart/${userId}`, payload);
+  return http.post<Order, CreateOrderDto>(
+    `/orders/from-cart/${userId}`,
+    payload,
+  );
 }
 
 export async function fetchOrderHistory(

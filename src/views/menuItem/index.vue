@@ -10,8 +10,17 @@
     <template v-if="sizes?.length">
       <div class="card__body">
         <div class="card__sizes">
-          <v-btn-toggle v-model="sizeSelector" color="primary" mandatory>
-            <v-btn v-for="{ size } of sizes" :key="size" variant="outlined" :ripple="false">
+          <v-btn-toggle
+            v-model="sizeSelector"
+            color="primary"
+            mandatory
+          >
+            <v-btn
+              v-for="{ size } of sizes"
+              :key="size"
+              variant="outlined"
+              :ripple="false"
+            >
               {{ size }}
             </v-btn>
           </v-btn-toggle>
@@ -42,11 +51,30 @@
     <div class="card__body">
       <div class="card__actions">
         <v-btn-toggle>
-          <v-btn variant="outlined" icon="mdi-minus" :ripple="false" @click="() => quantityComputed--" />
-          <v-btn variant="outlined" :ripple="false">{{ quantityComputed }}</v-btn>
-          <v-btn variant="outlined" icon="mdi-plus" :ripple="false" @click="() => quantityComputed++" />
+          <v-btn
+            variant="outlined"
+            icon="mdi-minus"
+            :ripple="false"
+            @click="() => quantityComputed--"
+          />
+          <v-btn
+            variant="outlined"
+            :ripple="false"
+            >{{ quantityComputed }}</v-btn
+          >
+          <v-btn
+            variant="outlined"
+            icon="mdi-plus"
+            :ripple="false"
+            @click="() => quantityComputed++"
+          />
         </v-btn-toggle>
-        <v-btn height="48" color="primary" :ripple="false" @click="onConfirmCallback">
+        <v-btn
+          height="48"
+          color="primary"
+          :ripple="false"
+          @click="onConfirmCallback"
+        >
           {{ isEditForm ? "Изменить" : "Добавить" }}
         </v-btn>
       </div>
@@ -179,8 +207,8 @@ const basePrice = computed(() => {
 
   const basePrice =
     item.value.type === ProductType.Drink
-      ? selectedDrinkSize.value?.price ?? 0
-      : item.value.prices?.[0]?.priceRub ?? 0;
+      ? (selectedDrinkSize.value?.price ?? 0)
+      : (item.value.prices?.[0]?.priceRub ?? 0);
 
   const optionsPrice = selectedOptions.value.reduce((acc, value) => {
     return acc + (value.priceRub ?? 0);

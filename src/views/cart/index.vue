@@ -14,7 +14,10 @@
         <h2>Корзина</h2>
       </template>
       <template v-slot:[ITEM_ITEM_SLOT]="{ item, index }">
-        <CartRow :item="item" @remove="onRemoveItem(index)" />
+        <CartRow
+          :item="item"
+          @remove="onRemoveItem(index)"
+        />
       </template>
     </v-data-table>
 
@@ -86,20 +89,20 @@ function onRemoveItem(index: number): void {
 
 <style lang="scss" scoped>
 .cart-view {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - 88px);
   padding-bottom: 8px;
 }
 
+.cart-view__table {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .cart-view__footer {
-  position: sticky;
-  bottom: 0;
-  z-index: 10;
+  flex: 0 0 auto;
   margin-top: 12px;
   padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
-  background: linear-gradient(
-    to top,
-    rgba(255, 255, 255, 0.98) 70%,
-    rgba(255, 255, 255, 0)
-  );
-  backdrop-filter: blur(4px);
 }
 </style>
