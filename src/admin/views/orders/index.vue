@@ -71,6 +71,10 @@
         <div class="order-card__head">
           <div>
             <div class="order-card__title">Заказ #{{ order.id }}</div>
+            <div class="order-card__author">
+              <span class="order-card__author-label">Автор:</span>
+              <span class="order-card__author-value">{{ order.user.name }}</span>
+            </div>
             <div class="order-card__meta">
               <span class="order-card__meta-label">Создан:</span>
               <span class="order-card__meta-value">{{ formatDate(order.createdAt) }}</span>
@@ -611,6 +615,24 @@ watch(
 .order-card__title {
   font-weight: 700;
   color: rgb(var(--v-theme-on-surface));
+}
+
+.order-card__author {
+  margin-top: 2px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.order-card__author-label {
+  font-weight: 600;
+  color: rgba(var(--v-theme-on-surface), 0.68);
+}
+
+.order-card__author-value {
+  font-weight: 600;
+  color: rgba(var(--v-theme-on-surface), 0.86);
 }
 
 .order-card__meta {
