@@ -27,6 +27,8 @@ import {
   type TimeSlot,
   type UpdateCartItemDto,
   type UpdateOrderStatusDto,
+  type UpdateProductDto,
+  type UpdateProductGroupDto,
 } from "@/services/menu/types";
 import { clone, MOCK_NETWORK_DELAY_MS, wait } from "./index";
 
@@ -618,6 +620,24 @@ function findProductById(productId: number): Product | undefined {
   return undefined;
 }
 
+function findProductGroupById(groupId: number): ProductGroup | undefined {
+  return productGroupsStore.find((group) => group.id === groupId);
+}
+
+function findProductWithGroup(productId: number): {
+  product: Product;
+  group: ProductGroup;
+  index: number;
+} | null {
+  for (const group of productGroupsStore) {
+    const index = group.products.findIndex((product) => product.id === productId);
+    if (index >= 0) {
+      return { product: group.products[index]!, group, index };
+    }
+  }
+  return null;
+}
+
 function findAddonById(addonId: number): Addon | undefined {
   for (const group of addonGroupsStore) {
     const addon = group.addons.find((a) => a.id === addonId);
@@ -722,6 +742,47 @@ export async function mockCreateProductGroup(
   });
 }
 
+export async function mockUpdateProductGroup(
+  groupId: number,
+  payload: UpdateProductGroupDto,
+): Promise<ProductGroup> {
+  return withMockDelay(() => {
+    const group = findProductGroupById(groupId);
+    if (!group) {
+      throw new Error(`Group ${groupId} not found`);
+    }
+
+    if (payload.name !== undefined) {
+      group.name = payload.name;
+    }
+    if (payload.sortOrder !== undefined) {
+      group.sortOrder = payload.sortOrder;
+    }
+    if (payload.isActive !== undefined) {
+      group.isActive = payload.isActive;
+    }
+
+    for (const product of group.products) {
+      product.group = { id: group.id, name: group.name };
+    }
+    for (const link of group.addonLinks) {
+      link.productGroup = { id: group.id, name: group.name };
+    }
+
+    return group;
+  });
+}
+
+export async function mockDeleteProductGroup(groupId: number): Promise<void> {
+  return withMockDelay(() => {
+    const index = productGroupsStore.findIndex((group) => group.id === groupId);
+    if (index < 0) {
+      throw new Error(`Group ${groupId} not found`);
+    }
+    productGroupsStore.splice(index, 1);
+  });
+}
+
 export async function mockCreateProduct(
   payload: CreateProductDto,
 ): Promise<Product> {
@@ -748,6 +809,61 @@ export async function mockCreateProduct(
   });
 }
 
+export async function mockUpdateProduct(
+  productId: number,
+  payload: UpdateProductDto,
+): Promise<Product> {
+  return withMockDelay(() => {
+    const found = findProductWithGroup(productId);
+    if (!found) {
+      throw new Error(`Product ${productId} not found`);
+    }
+
+    let targetGroup = found.group;
+    if (payload.groupId !== undefined && payload.groupId !== found.group.id) {
+      const nextGroup = findProductGroupById(payload.groupId);
+      if (!nextGroup) {
+        throw new Error(`Group ${payload.groupId} not found`);
+      }
+      found.group.products.splice(found.index, 1);
+      nextGroup.products.push(found.product);
+      targetGroup = nextGroup;
+    }
+
+    if (payload.name !== undefined) {
+      found.product.name = payload.name;
+    }
+    if (payload.description !== undefined) {
+      found.product.description = payload.description;
+    }
+    if (payload.type !== undefined) {
+      found.product.type = payload.type;
+    }
+    if (payload.isActive !== undefined) {
+      found.product.isActive = payload.isActive;
+    }
+    if (payload.isAvailable !== undefined) {
+      found.product.isAvailable = payload.isAvailable;
+    }
+    if (payload.sortOrder !== undefined) {
+      found.product.sortOrder = payload.sortOrder;
+    }
+
+    found.product.group = { id: targetGroup.id, name: targetGroup.name };
+    return found.product;
+  });
+}
+
+export async function mockDeleteProduct(productId: number): Promise<void> {
+  return withMockDelay(() => {
+    const found = findProductWithGroup(productId);
+    if (!found) {
+      throw new Error(`Product ${productId} not found`);
+    }
+    found.group.products.splice(found.index, 1);
+  });
+}
+
 export async function mockCreateProductPrice(
   payload: CreateProductPriceDto,
 ): Promise<ProductPrice> {
@@ -766,6 +882,27 @@ export async function mockCreateProductPrice(
 
     product.prices.push(created);
     return created;
+  });
+}
+
+export async function mockReplaceProductPrices(
+  productId: number,
+  payload: Array<Pick<CreateProductPriceDto, "sizeCode" | "priceRub" | "isActive">>,
+): Promise<ProductPrice[]> {
+  return withMockDelay(() => {
+    const product = findProductById(productId);
+    if (!product) {
+      throw new Error(`Product ${productId} not found`);
+    }
+
+    product.prices = payload.map((row) => ({
+      id: nextId("price"),
+      sizeCode: row.sizeCode,
+      priceRub: row.priceRub ?? 0,
+      isActive: row.isActive ?? true,
+    }));
+
+    return product.prices;
   });
 }
 

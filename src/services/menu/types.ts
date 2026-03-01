@@ -79,11 +79,27 @@ export interface CreateProductGroupDto {
   isActive?: boolean;
 }
 
+export interface UpdateProductGroupDto {
+  name?: string;
+  sortOrder?: number;
+  isActive?: boolean;
+}
+
 export interface CreateProductDto {
   groupId: number;
   name: string;
   description?: string | null;
   type: ProductType;
+  isActive?: boolean;
+  isAvailable?: boolean;
+  sortOrder?: number;
+}
+
+export interface UpdateProductDto {
+  groupId?: number;
+  name?: string;
+  description?: string | null;
+  type?: ProductType;
   isActive?: boolean;
   isAvailable?: boolean;
   sortOrder?: number;

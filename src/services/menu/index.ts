@@ -6,9 +6,14 @@ import {
   mockCreateProduct,
   mockCreateProductGroup,
   mockCreateProductPrice,
+  mockDeleteProduct,
+  mockDeleteProductGroup,
   mockFetchMenu,
   mockFetchProductById,
   mockLinkAddonGroup,
+  mockReplaceProductPrices,
+  mockUpdateProduct,
+  mockUpdateProductGroup,
 } from "@/services/mock/api";
 import type {
   Addon,
@@ -23,6 +28,8 @@ import type {
   ProductGroup,
   ProductGroupAddonGroup,
   ProductPrice,
+  UpdateProductDto,
+  UpdateProductGroupDto,
 } from "./types";
 
 async function fetchMenu(): Promise<ProductGroup[]> {
@@ -62,6 +69,50 @@ async function createProduct(payload: CreateProductDto): Promise<Product> {
   return http.post<Product, CreateProductDto>("/catalog/products", payload);
 }
 
+async function updateProductGroup(
+  groupId: number,
+  payload: UpdateProductGroupDto,
+): Promise<ProductGroup> {
+  if (USE_MOCKS) {
+    return mockUpdateProductGroup(groupId, payload);
+  }
+
+  return http.patch<ProductGroup, UpdateProductGroupDto>(
+    `/catalog/product-groups/${groupId}`,
+    payload,
+  );
+}
+
+async function deleteProductGroup(groupId: number): Promise<void> {
+  if (USE_MOCKS) {
+    return mockDeleteProductGroup(groupId);
+  }
+
+  return http.delete<void>(`/catalog/product-groups/${groupId}`);
+}
+
+async function updateProduct(
+  productId: number,
+  payload: UpdateProductDto,
+): Promise<Product> {
+  if (USE_MOCKS) {
+    return mockUpdateProduct(productId, payload);
+  }
+
+  return http.patch<Product, UpdateProductDto>(
+    `/catalog/products/${productId}`,
+    payload,
+  );
+}
+
+async function deleteProduct(productId: number): Promise<void> {
+  if (USE_MOCKS) {
+    return mockDeleteProduct(productId);
+  }
+
+  return http.delete<void>(`/catalog/products/${productId}`);
+}
+
 async function createProductPrice(
   payload: CreateProductPriceDto,
 ): Promise<ProductPrice> {
@@ -73,6 +124,20 @@ async function createProductPrice(
     "/catalog/product-prices",
     payload,
   );
+}
+
+async function replaceProductPrices(
+  productId: number,
+  payload: Array<Pick<CreateProductPriceDto, "sizeCode" | "priceRub" | "isActive">>,
+): Promise<ProductPrice[]> {
+  if (USE_MOCKS) {
+    return mockReplaceProductPrices(productId, payload);
+  }
+
+  return http.put<
+    ProductPrice[],
+    Array<Pick<CreateProductPriceDto, "sizeCode" | "priceRub" | "isActive">>
+  >(`/catalog/products/${productId}/prices`, payload);
 }
 
 async function createAddonGroup(
@@ -113,8 +178,13 @@ export default {
   fetchMenu,
   fetchProductById,
   createProductGroup,
+  updateProductGroup,
+  deleteProductGroup,
   createProduct,
+  updateProduct,
+  deleteProduct,
   createProductPrice,
+  replaceProductPrices,
   createAddonGroup,
   createAddon,
   linkAddonGroup,

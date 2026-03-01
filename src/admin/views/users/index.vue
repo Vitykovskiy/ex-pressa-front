@@ -3,60 +3,50 @@
     <div class="admin-users__toolbar">
       <h2>Пользователи</h2>
       <div class="admin-users__toolbar-actions">
-        <v-select
-          v-model="roleFilters"
-          class="admin-users__role-filter"
-          :items="roleFilterItems"
-          label="Типы пользователей"
-          variant="outlined"
-          density="compact"
-          hide-details
-          multiple
-          chips
-          clearable
-        />
+        <v-select v-model="roleFilters"
+                  class="admin-users__role-filter"
+                  :items="roleFilterItems"
+                  label="Типы пользователей"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  multiple
+                  chips
+                  clearable />
 
-        <v-text-field
-          v-model="search"
-          class="admin-users__search"
-          variant="outlined"
-          density="compact"
-          hide-details
-          placeholder="Поиск по имени"
-          prepend-inner-icon="mdi-magnify"
-        />
+        <v-text-field v-model="search"
+                      class="admin-users__search"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                      placeholder="Поиск по имени"
+                      prepend-inner-icon="mdi-magnify" />
       </div>
     </div>
 
     <div class="admin-users__list">
-      <v-card
-        v-for="user in filteredUsers"
-        :key="user.id"
-        class="admin-users__card"
-        variant="outlined"
-      >
+      <v-card v-for="user in filteredUsers"
+              :key="user.id"
+              class="admin-users__card"
+              variant="outlined">
         <div class="admin-users__row">
           <div>
             <div class="admin-users__name">{{ user.fullName }}</div>
             <div class="admin-users__meta">@{{ user.tgUsername }}</div>
           </div>
-          <v-chip
-            :color="user.isActive ? 'success' : 'error'"
-            size="small"
-            variant="tonal"
-          >
+          <v-chip :color="user.isActive ? 'success' : 'error'"
+                  size="small"
+                  variant="tonal">
             {{ user.isActive ? "Активен" : "Отключен" }}
           </v-chip>
         </div>
 
         <div class="admin-users__roles">
-          <v-chip
-            v-for="role in user.roles"
-            :key="role"
-            size="small"
-            color="primary"
-            variant="outlined"
-          >
+          <v-chip v-for="role in user.roles"
+                  :key="role"
+                  size="small"
+                  color="primary"
+                  variant="outlined">
             {{ role }}
           </v-chip>
         </div>
@@ -145,6 +135,7 @@ const filteredUsers = computed(() => {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  padding-top: 12px;
   gap: 12px;
 }
 
