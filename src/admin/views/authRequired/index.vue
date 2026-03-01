@@ -1,27 +1,12 @@
 <template>
-  <div class="auth-required">
-    <v-alert type="warning"
-             variant="tonal"
-             class="auth-required__card">
-      Для входа в панель администратора нужна авторизация через Telegram.
-    </v-alert>
-  </div>
+  <AccessState type="warning"
+               message="Для входа в панель администратора нужна авторизация через Telegram." />
 </template>
 
 <script lang="ts" setup>
+import AccessState from "@/components/AccessState.vue";
+
 defineOptions({
   name: "AdminAuthRequiredView",
 });
 </script>
-
-<style lang="scss" scoped>
-.auth-required {
-  height: 100%;
-  display: flex;
-  align-items: center;
-}
-
-.auth-required__card {
-  width: 100%;
-}
-</style>
