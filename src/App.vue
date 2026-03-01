@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <v-app
     class="app-shell"
     :class="{ 'app-shell--blue': isBlueTheme }"
@@ -17,11 +17,20 @@
               @click="onReturnBtn"
             />
           </div>
+
           <div class="header__right">
+            <v-btn
+              variant="plain"
+              color="primary"
+              icon="mdi-history"
+              @click="onOrders"
+            />
+
             <div class="cart">
               <v-btn
                 class="cart__btn"
                 variant="plain"
+                color="primary"
                 icon="mdi-cart-variant"
                 @click="onCart"
               />
@@ -64,18 +73,24 @@ function onReturnBtn(): void {
 function onCart(): void {
   router.push({ name: RouteNames.Cart });
 }
+
+function onOrders(): void {
+  router.push({ name: RouteNames.OrdersHistory });
+}
 </script>
 
 <style lang="scss" scoped>
 .app-main {
   height: 100dvh;
   overflow: hidden;
+  width: 100%;
   display: flex;
   justify-content: center;
 }
 
 .app-frame {
-  width: min(400px, 100%);
+  width: 100%;
+  max-width: 700px;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -92,6 +107,11 @@ function onCart(): void {
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
+}
+
+.header__right {
+  display: flex;
+  align-items: center;
 }
 
 :deep(.v-main) {

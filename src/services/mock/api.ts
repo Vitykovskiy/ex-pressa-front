@@ -217,6 +217,111 @@ const ids = {
   orderItemAddon: 90000,
 };
 
+const seededOrders: Order[] = [
+  {
+    id: 71001,
+    user: { id: mockUser.id, name: mockUser.name },
+    timeSlot: {
+      id: 1,
+      date: "2026-03-01",
+      timeFrom: "09:00",
+      timeTo: "10:00",
+    },
+    status: "READY",
+    slotTimeFrom: "09:00",
+    slotTimeTo: "10:00",
+    totalRub: 560,
+    rejectReason: null,
+    createdAt: "2026-02-28T08:15:00.000Z",
+    confirmedAt: "2026-02-28T08:16:30.000Z",
+    readyAt: "2026-02-28T08:28:10.000Z",
+    closedAt: null,
+    updatedAt: "2026-02-28T08:28:10.000Z",
+    items: [
+      {
+        id: 81001,
+        productName: "Капучино",
+        quantity: 2,
+        sizeCode: SizeCode.Medium,
+        unitPriceRub: 220,
+        lineTotalRub: 520,
+        addons: [
+          {
+            id: 91001,
+            addonName: "Ваниль",
+            quantity: 1,
+            unitPriceRub: 40,
+            lineTotalRub: 40,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 71002,
+    user: { id: mockUser.id, name: mockUser.name },
+    timeSlot: {
+      id: 2,
+      date: "2026-03-01",
+      timeFrom: "10:00",
+      timeTo: "11:00",
+    },
+    status: "CLOSED",
+    slotTimeFrom: "10:00",
+    slotTimeTo: "11:00",
+    totalRub: 290,
+    rejectReason: null,
+    createdAt: "2026-02-27T10:02:00.000Z",
+    confirmedAt: "2026-02-27T10:03:00.000Z",
+    readyAt: "2026-02-27T10:17:00.000Z",
+    closedAt: "2026-02-27T10:35:00.000Z",
+    updatedAt: "2026-02-27T10:35:00.000Z",
+    items: [
+      {
+        id: 81002,
+        productName: "Чизкейк",
+        quantity: 1,
+        unitPriceRub: 290,
+        lineTotalRub: 290,
+        addons: [],
+      },
+    ],
+  },
+  {
+    id: 71003,
+    user: { id: mockUser.id, name: mockUser.name },
+    timeSlot: {
+      id: 3,
+      date: "2026-03-01",
+      timeFrom: "11:00",
+      timeTo: "12:00",
+    },
+    status: "REJECTED",
+    slotTimeFrom: "11:00",
+    slotTimeTo: "12:00",
+    totalRub: 130,
+    rejectReason: "Слот уже заполнен",
+    createdAt: "2026-02-26T09:55:00.000Z",
+    confirmedAt: null,
+    readyAt: null,
+    closedAt: null,
+    updatedAt: "2026-02-26T09:56:20.000Z",
+    items: [
+      {
+        id: 81003,
+        productName: "Эспрессо",
+        quantity: 1,
+        sizeCode: SizeCode.Small,
+        unitPriceRub: 130,
+        lineTotalRub: 130,
+        addons: [],
+      },
+    ],
+  },
+];
+
+ordersByUser.set(mockUser.id, seededOrders);
+
 function nextId(key: keyof typeof ids): number {
   ids[key] += 1;
   return ids[key];
