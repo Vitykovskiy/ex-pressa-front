@@ -140,15 +140,16 @@ export interface OrdersFilterDto {
   dateTo?: string;
 }
 
-export type OrderStatus =
-  | "CREATED"
-  | "CONFIRMED"
-  | "REJECTED"
-  | "READY"
-  | "CLOSED";
+export enum OrderStatus {
+  CREATED = "CREATED",
+  CONFIRMED = "CONFIRMED",
+  REJECTED = "REJECTED",
+  READY = "READY",
+  CLOSED = "CLOSED",
+}
 
 export interface UpdateOrderStatusDto {
-  status: Exclude<OrderStatus, "REJECTED">;
+  status: Exclude<OrderStatus, OrderStatus.REJECTED>;
 }
 
 export interface RejectOrderDto {

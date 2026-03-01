@@ -216,7 +216,7 @@ import {
   searchOrders,
   updateOrderStatus,
 } from "@/services/orders";
-import type { Order, OrderStatus } from "@/services/menu/types";
+import { OrderStatus, type Order } from "@/services/menu/types";
 
 defineOptions({
   name: "AdminOrdersView",
@@ -234,16 +234,18 @@ const rejectReasonError = ref("");
 const isRejectSubmitting = ref(false);
 const statusConfirmDialog = ref(false);
 const statusConfirmOrderId = ref<number | null>(null);
-const statusConfirmNextStatus = ref<Exclude<OrderStatus, "REJECTED"> | null>(null);
+const statusConfirmNextStatus = ref<
+  Exclude<OrderStatus, OrderStatus.REJECTED> | null
+>(null);
 const isStatusConfirmSubmitting = ref(false);
 
 const statusFilters = ref<OrderStatus[]>([]);
 const statusFilterItems = [
-  { title: "Создан", value: "CREATED" },
-  { title: "Подтвержден", value: "CONFIRMED" },
-  { title: "Готов", value: "READY" },
-  { title: "Закрыт", value: "CLOSED" },
-  { title: "Отклонен", value: "REJECTED" },
+  { title: "Создан", value: OrderStatus.CREATED },
+  { title: "Подтвержден", value: OrderStatus.CONFIRMED },
+  { title: "Готов", value: OrderStatus.READY },
+  { title: "Закрыт", value: OrderStatus.CLOSED },
+  { title: "Отклонен", value: OrderStatus.REJECTED },
 ] as const;
 
 function getTodayDateString(): string {
@@ -257,34 +259,40 @@ function getTodayDateString(): string {
 const selectedDate = ref<string>(getTodayDateString());
 
 const statusMap: Record<OrderStatus, { label: string; color: string }> = {
-  CREATED: { label: "Создан", color: "info" },
-  CONFIRMED: { label: "Подтвержден", color: "secondary" },
-  READY: { label: "Готов", color: "success" },
-  CLOSED: { label: "Закрыт", color: "primary" },
-  REJECTED: { label: "Отклонен", color: "error" },
+  [OrderStatus.CREATED]: { label: "Создан", color: "info" },
+  [OrderStatus.CONFIRMED]: { label: "Подтвержден", color: "secondary" },
+  [OrderStatus.READY]: { label: "Готов", color: "success" },
+  [OrderStatus.CLOSED]: { label: "Закрыт", color: "primary" },
+  [OrderStatus.REJECTED]: { label: "Отклонен", color: "error" },
 };
 
-const actionLabelMap: Record<Exclude<OrderStatus, "REJECTED">, string> = {
-  CREATED: "Создан",
-  CONFIRMED: "Подтвердить",
-  READY: "Готов",
-  CLOSED: "Закрыть",
+const actionLabelMap: Record<
+  Exclude<OrderStatus, OrderStatus.REJECTED>,
+  string
+> = {
+  [OrderStatus.CREATED]: "Создан",
+  [OrderStatus.CONFIRMED]: "Подтвердить",
+  [OrderStatus.READY]: "Готов",
+  [OrderStatus.CLOSED]: "Закрыть",
 };
 
-const nextStatusMap: Record<OrderStatus, Array<Exclude<OrderStatus, "REJECTED">>> = {
-  CREATED: ["CONFIRMED"],
-  CONFIRMED: ["READY"],
-  READY: ["CLOSED"],
-  CLOSED: [],
-  REJECTED: [],
+const nextStatusMap: Record<
+  OrderStatus,
+  Array<Exclude<OrderStatus, OrderStatus.REJECTED>>
+> = {
+  [OrderStatus.CREATED]: [OrderStatus.CONFIRMED],
+  [OrderStatus.CONFIRMED]: [OrderStatus.READY],
+  [OrderStatus.READY]: [OrderStatus.CLOSED],
+  [OrderStatus.CLOSED]: [],
+  [OrderStatus.REJECTED]: [],
 };
 
 const sortedOrders = computed(() => {
   const rank = (status: OrderStatus): number => {
-    if (status === "CREATED") {
+    if (status === OrderStatus.CREATED) {
       return 0;
     }
-    if (status === "CONFIRMED" || status === "READY") {
+    if (status === OrderStatus.CONFIRMED || status === OrderStatus.READY) {
       return 1;
     }
     return 2;
@@ -326,25 +334,27 @@ const sortedOrders = computed(() => {
   });
 });
 
-function getActions(status: OrderStatus): Array<Exclude<OrderStatus, "REJECTED">> {
+function getActions(
+  status: OrderStatus,
+): Array<Exclude<OrderStatus, OrderStatus.REJECTED>> {
   return nextStatusMap[status];
 }
 
 function canReject(status: OrderStatus): boolean {
-  return status === "CREATED" || status === "CONFIRMED";
+  return status === OrderStatus.CREATED || status === OrderStatus.CONFIRMED;
 }
 
 function requiresStatusConfirmation(
-  status: Exclude<OrderStatus, "REJECTED">,
+  status: Exclude<OrderStatus, OrderStatus.REJECTED>,
 ): boolean {
-  return status === "READY" || status === "CLOSED";
+  return status === OrderStatus.READY || status === OrderStatus.CLOSED;
 }
 
 const statusConfirmText = computed(() => {
-  if (statusConfirmNextStatus.value === "READY") {
+  if (statusConfirmNextStatus.value === OrderStatus.READY) {
     return "Перевести заказ в статус «Готов»?";
   }
-  if (statusConfirmNextStatus.value === "CLOSED") {
+  if (statusConfirmNextStatus.value === OrderStatus.CLOSED) {
     return "Перевести заказ в статус «Закрыт»?";
   }
   return "Подтвердить изменение статуса заказа?";
@@ -416,7 +426,7 @@ async function loadOrders(): Promise<void> {
 
 async function onStatusAction(
   orderId: number,
-  nextStatus: Exclude<OrderStatus, "REJECTED">,
+  nextStatus: Exclude<OrderStatus, OrderStatus.REJECTED>,
 ): Promise<void> {
   if (requiresStatusConfirmation(nextStatus)) {
     statusConfirmOrderId.value = orderId;
@@ -430,7 +440,7 @@ async function onStatusAction(
 
 async function applyStatusAction(
   orderId: number,
-  nextStatus: Exclude<OrderStatus, "REJECTED">,
+  nextStatus: Exclude<OrderStatus, OrderStatus.REJECTED>,
 ): Promise<void> {
   pendingOrderId.value = orderId;
   errorMessage.value = "";

@@ -27,19 +27,26 @@ const roleCodes = computed(
 
 function createMockAuthorizedUser(): User {
   const now = new Date().toISOString();
+  const appTarget = String(import.meta.env.VITE_APP_TARGET ?? "customer")
+    .trim()
+    .toLowerCase();
+
+  const roles =
+    appTarget === "admin"
+      ? [{ id: 1, code: RoleCode.Admin, name: "Администратор" }]
+      : appTarget === "barista"
+        ? [{ id: 2, code: RoleCode.Barista, name: "Бариста" }]
+        : [{ id: 3, code: RoleCode.User, name: "Пользователь" }];
 
   return {
     id: 1,
-    name: "mock-admin",
+    name: `mock-${appTarget}`,
     tgId: "100000001",
-    tgUsername: "mock_admin",
+    tgUsername: `mock_${appTarget}`,
     isActive: true,
     createdAt: now,
     updatedAt: now,
-    roles: [
-      { id: 1, code: RoleCode.Admin, name: "Администратор" },
-      { id: 2, code: RoleCode.Barista, name: "Бариста" },
-    ],
+    roles,
     fullName: "Тестовый пользователь",
   };
 }

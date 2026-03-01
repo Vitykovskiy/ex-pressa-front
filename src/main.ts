@@ -18,6 +18,17 @@ async function bootstrap(): Promise<void> {
     return;
   }
 
+  if (appTarget === "barista") {
+    const [{ default: App }, { default: router }] = await Promise.all([
+      import("@/barista/App.vue"),
+      import("@/barista/router"),
+    ]);
+    const app = createApp(App);
+    registerPlugins(app, router);
+    app.mount("#app");
+    return;
+  }
+
   const [{ default: App }, { default: router }] = await Promise.all([
     import("./App.vue"),
     import("./router"),

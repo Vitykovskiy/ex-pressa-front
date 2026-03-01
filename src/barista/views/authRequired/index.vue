@@ -3,14 +3,14 @@
     <v-alert type="warning"
              variant="tonal"
              class="auth-required__card">
-      Для входа в панель администратора нужна авторизация через Telegram.
+      Для входа в панель баристы нужна авторизация через Telegram.
     </v-alert>
   </div>
 </template>
 
 <script lang="ts" setup>
 defineOptions({
-  name: "AdminAuthRequiredView",
+  name: "BaristaAuthRequiredView",
 });
 </script>
 

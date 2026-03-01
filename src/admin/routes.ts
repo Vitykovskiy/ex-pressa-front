@@ -1,10 +1,12 @@
 import type { RouteRecordRaw } from "vue-router";
-import OrdersView from "@/admin/views/orders/index.vue";
+import MenuView from "@/admin/views/menu/index.vue";
+import UsersView from "@/admin/views/users/index.vue";
 import AuthRequiredView from "@/admin/views/authRequired/index.vue";
 import AccessDeniedView from "@/admin/views/accessDenied/index.vue";
 
 export const enum AdminRouteNames {
-  Orders = "AdminOrders",
+  Menu = "AdminMenu",
+  Users = "AdminUsers",
   AuthRequired = "AdminAuthRequired",
   AccessDenied = "AdminAccessDenied",
 }
@@ -12,12 +14,17 @@ export const enum AdminRouteNames {
 export const adminRoutes: RouteRecordRaw[] = [
   {
     path: "/",
-    name: AdminRouteNames.Orders,
-    component: OrdersView,
+    redirect: { name: AdminRouteNames.Menu },
   },
   {
-    path: "/orders",
-    redirect: { name: AdminRouteNames.Orders },
+    path: "/menu",
+    name: AdminRouteNames.Menu,
+    component: MenuView,
+  },
+  {
+    path: "/users",
+    name: AdminRouteNames.Users,
+    component: UsersView,
   },
   {
     path: "/auth",

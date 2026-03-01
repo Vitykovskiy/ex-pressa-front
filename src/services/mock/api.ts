@@ -1,5 +1,6 @@
-import { RoleCode, type User } from "@/services/auth/types";
+﻿import { RoleCode, type User } from "@/services/auth/types";
 import {
+  OrderStatus,
   ProductType,
   SizeCode,
   type AddCartItemDto,
@@ -43,40 +44,40 @@ const mockUser: User = {
     {
       id: 1,
       code: RoleCode.Barista,
-      name: "Бариста",
+      name: "Р‘Р°СЂРёСЃС‚Р°",
     },
   ],
-  fullName: "Демо Пользователь",
-  firstName: "Демо",
-  lastName: "Пользователь",
+  fullName: "Р”РµРјРѕ РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ",
+  firstName: "Р”РµРјРѕ",
+  lastName: "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ",
   middleName: null,
 };
 
 const addonGroupsStore: AddonGroup[] = [
   {
     id: 1,
-    name: "Молоко",
+    name: "РњРѕР»РѕРєРѕ",
     sortOrder: 1,
     isActive: true,
     addons: [
-      { id: 1, name: "Овсяное", priceRub: 80, isActive: true },
-      { id: 2, name: "Кокосовое", priceRub: 90, isActive: true },
+      { id: 1, name: "РћРІСЃСЏРЅРѕРµ", priceRub: 80, isActive: true },
+      { id: 2, name: "РљРѕРєРѕСЃРѕРІРѕРµ", priceRub: 90, isActive: true },
     ],
   },
   {
     id: 2,
-    name: "Сироп",
+    name: "РЎРёСЂРѕРї",
     sortOrder: 2,
     isActive: true,
     addons: [
-      { id: 3, name: "Ваниль", priceRub: 40, isActive: true },
-      { id: 4, name: "Карамель", priceRub: 40, isActive: true },
+      { id: 3, name: "Р’Р°РЅРёР»СЊ", priceRub: 40, isActive: true },
+      { id: 4, name: "РљР°СЂР°РјРµР»СЊ", priceRub: 40, isActive: true },
     ],
   },
 ];
 
-const coffeeGroupRef = { id: 1, name: "Кофе" };
-const dessertsGroupRef = { id: 2, name: "Десерты" };
+const coffeeGroupRef = { id: 1, name: "РљРѕС„Рµ" };
+const dessertsGroupRef = { id: 2, name: "Р”РµСЃРµСЂС‚С‹" };
 
 const productGroupsStore: ProductGroup[] = [
   {
@@ -88,8 +89,8 @@ const productGroupsStore: ProductGroup[] = [
       {
         id: 101,
         group: coffeeGroupRef,
-        name: "Эспрессо",
-        description: "Крепкий и насыщенный",
+        name: "Р­СЃРїСЂРµСЃСЃРѕ",
+        description: "РљСЂРµРїРєРёР№ Рё РЅР°СЃС‹С‰РµРЅРЅС‹Р№",
         type: ProductType.Drink,
         isActive: true,
         isAvailable: true,
@@ -108,8 +109,8 @@ const productGroupsStore: ProductGroup[] = [
       {
         id: 102,
         group: coffeeGroupRef,
-        name: "Капучино",
-        description: "С воздушной молочной пенкой",
+        name: "РљР°РїСѓС‡РёРЅРѕ",
+        description: "РЎ РІРѕР·РґСѓС€РЅРѕР№ РјРѕР»РѕС‡РЅРѕР№ РїРµРЅРєРѕР№",
         type: ProductType.Drink,
         isActive: true,
         isAvailable: true,
@@ -137,8 +138,8 @@ const productGroupsStore: ProductGroup[] = [
       {
         id: 201,
         group: dessertsGroupRef,
-        name: "Круассан",
-        description: "Свежая выпечка с маслом",
+        name: "РљСЂСѓР°СЃСЃР°РЅ",
+        description: "РЎРІРµР¶Р°СЏ РІС‹РїРµС‡РєР° СЃ РјР°СЃР»РѕРј",
         type: ProductType.Food,
         isActive: true,
         isAvailable: true,
@@ -148,8 +149,8 @@ const productGroupsStore: ProductGroup[] = [
       {
         id: 202,
         group: dessertsGroupRef,
-        name: "Чизкейк",
-        description: "Классический Нью-Йорк",
+        name: "Р§РёР·РєРµР№Рє",
+        description: "РљР»Р°СЃСЃРёС‡РµСЃРєРёР№ РќСЊСЋ-Р™РѕСЂРє",
         type: ProductType.Food,
         isActive: true,
         isAvailable: true,
@@ -256,7 +257,7 @@ const seededOrders: Order[] = [
       timeFrom: "12:00",
       timeTo: "13:00",
     },
-    status: "CREATED",
+    status: OrderStatus.CREATED,
     slotTimeFrom: "12:00",
     slotTimeTo: "13:00",
     totalRub: 990,
@@ -269,7 +270,7 @@ const seededOrders: Order[] = [
     items: [
       {
         id: 81001,
-        productName: "Капучино",
+        productName: "РљР°РїСѓС‡РёРЅРѕ",
         quantity: 2,
         sizeCode: SizeCode.Medium,
         unitPriceRub: 220,
@@ -277,14 +278,14 @@ const seededOrders: Order[] = [
         addons: [
           {
             id: 91001,
-            addonName: "Ваниль",
+            addonName: "Р’Р°РЅРёР»СЊ",
             quantity: 2,
             unitPriceRub: 40,
             lineTotalRub: 80,
           },
           {
             id: 91004,
-            addonName: "Кокосовое",
+            addonName: "РљРѕРєРѕСЃРѕРІРѕРµ",
             quantity: 1,
             unitPriceRub: 90,
             lineTotalRub: 90,
@@ -293,7 +294,7 @@ const seededOrders: Order[] = [
       },
       {
         id: 81004,
-        productName: "Круассан",
+        productName: "РљСЂСѓР°СЃСЃР°РЅ",
         quantity: 1,
         unitPriceRub: 210,
         lineTotalRub: 210,
@@ -301,7 +302,7 @@ const seededOrders: Order[] = [
       },
       {
         id: 81005,
-        productName: "Эспрессо",
+        productName: "Р­СЃРїСЂРµСЃСЃРѕ",
         quantity: 1,
         sizeCode: SizeCode.Small,
         unitPriceRub: 130,
@@ -309,7 +310,7 @@ const seededOrders: Order[] = [
         addons: [
           {
             id: 91005,
-            addonName: "Карамель",
+            addonName: "РљР°СЂР°РјРµР»СЊ",
             quantity: 1,
             unitPriceRub: 40,
             lineTotalRub: 40,
@@ -327,7 +328,7 @@ const seededOrders: Order[] = [
       timeFrom: "10:00",
       timeTo: "11:00",
     },
-    status: "CLOSED",
+    status: OrderStatus.CLOSED,
     slotTimeFrom: "10:00",
     slotTimeTo: "11:00",
     totalRub: 290,
@@ -340,7 +341,7 @@ const seededOrders: Order[] = [
     items: [
       {
         id: 81002,
-        productName: "Чизкейк",
+        productName: "Р§РёР·РєРµР№Рє",
         quantity: 1,
         unitPriceRub: 290,
         lineTotalRub: 290,
@@ -357,11 +358,11 @@ const seededOrders: Order[] = [
       timeFrom: "11:00",
       timeTo: "12:00",
     },
-    status: "REJECTED",
+    status: OrderStatus.REJECTED,
     slotTimeFrom: "11:00",
     slotTimeTo: "12:00",
     totalRub: 130,
-    rejectReason: "Слот уже заполнен",
+    rejectReason: "РЎР»РѕС‚ СѓР¶Рµ Р·Р°РїРѕР»РЅРµРЅ",
     createdAt: "2026-02-26T09:55:00.000Z",
     confirmedAt: null,
     readyAt: null,
@@ -370,7 +371,7 @@ const seededOrders: Order[] = [
     items: [
       {
         id: 81003,
-        productName: "Эспрессо",
+        productName: "Р­СЃРїСЂРµСЃСЃРѕ",
         quantity: 1,
         sizeCode: SizeCode.Small,
         unitPriceRub: 130,
@@ -388,7 +389,7 @@ const seededOrders: Order[] = [
       timeFrom: "09:00",
       timeTo: "10:00",
     },
-    status: "CONFIRMED",
+    status: OrderStatus.CONFIRMED,
     slotTimeFrom: "09:00",
     slotTimeTo: "10:00",
     totalRub: 730,
@@ -401,7 +402,7 @@ const seededOrders: Order[] = [
     items: [
       {
         id: 81006,
-        productName: "Капучино",
+        productName: "РљР°РїСѓС‡РёРЅРѕ",
         quantity: 2,
         sizeCode: SizeCode.Small,
         unitPriceRub: 180,
@@ -409,7 +410,7 @@ const seededOrders: Order[] = [
         addons: [
           {
             id: 91006,
-            addonName: "Ваниль",
+            addonName: "Р’Р°РЅРёР»СЊ",
             quantity: 1,
             unitPriceRub: 40,
             lineTotalRub: 80,
@@ -418,7 +419,7 @@ const seededOrders: Order[] = [
       },
       {
         id: 81007,
-        productName: "Чизкейк",
+        productName: "Р§РёР·РєРµР№Рє",
         quantity: 1,
         unitPriceRub: 290,
         lineTotalRub: 290,
@@ -435,7 +436,7 @@ const seededOrders: Order[] = [
       timeFrom: "12:00",
       timeTo: "13:00",
     },
-    status: "READY",
+    status: OrderStatus.READY,
     slotTimeFrom: "12:00",
     slotTimeTo: "13:00",
     totalRub: 420,
@@ -448,7 +449,7 @@ const seededOrders: Order[] = [
     items: [
       {
         id: 81008,
-        productName: "Круассан",
+        productName: "РљСЂСѓР°СЃСЃР°РЅ",
         quantity: 2,
         unitPriceRub: 210,
         lineTotalRub: 420,
@@ -465,7 +466,7 @@ const seededOrders: Order[] = [
       timeFrom: "10:00",
       timeTo: "11:00",
     },
-    status: "CREATED",
+    status: OrderStatus.CREATED,
     slotTimeFrom: "10:00",
     slotTimeTo: "11:00",
     totalRub: 560,
@@ -478,7 +479,7 @@ const seededOrders: Order[] = [
     items: [
       {
         id: 81009,
-        productName: "Эспрессо",
+        productName: "Р­СЃРїСЂРµСЃСЃРѕ",
         quantity: 1,
         sizeCode: SizeCode.Large,
         unitPriceRub: 190,
@@ -486,14 +487,14 @@ const seededOrders: Order[] = [
         addons: [
           {
             id: 91007,
-            addonName: "Кокосовое",
+            addonName: "РљРѕРєРѕСЃРѕРІРѕРµ",
             quantity: 1,
             unitPriceRub: 90,
             lineTotalRub: 90,
           },
           {
             id: 91008,
-            addonName: "Карамель",
+            addonName: "РљР°СЂР°РјРµР»СЊ",
             quantity: 1,
             unitPriceRub: 40,
             lineTotalRub: 40,
@@ -502,7 +503,7 @@ const seededOrders: Order[] = [
       },
       {
         id: 81010,
-        productName: "Круассан",
+        productName: "РљСЂСѓР°СЃСЃР°РЅ",
         quantity: 1,
         unitPriceRub: 210,
         lineTotalRub: 210,
@@ -519,7 +520,7 @@ const seededOrders: Order[] = [
       timeFrom: "09:00",
       timeTo: "10:00",
     },
-    status: "CLOSED",
+    status: OrderStatus.CLOSED,
     slotTimeFrom: "09:00",
     slotTimeTo: "10:00",
     totalRub: 180,
@@ -532,7 +533,7 @@ const seededOrders: Order[] = [
     items: [
       {
         id: 81011,
-        productName: "Капучино",
+        productName: "РљР°РїСѓС‡РёРЅРѕ",
         quantity: 1,
         sizeCode: SizeCode.Small,
         unitPriceRub: 180,
@@ -550,11 +551,11 @@ const seededOrders: Order[] = [
       timeFrom: "10:00",
       timeTo: "11:00",
     },
-    status: "REJECTED",
+    status: OrderStatus.REJECTED,
     slotTimeFrom: "10:00",
     slotTimeTo: "11:00",
     totalRub: 460,
-    rejectReason: "Нет нужного ингредиента",
+    rejectReason: "РќРµС‚ РЅСѓР¶РЅРѕРіРѕ РёРЅРіСЂРµРґРёРµРЅС‚Р°",
     createdAt: "2026-03-01T07:05:00.000Z",
     confirmedAt: null,
     readyAt: null,
@@ -563,28 +564,28 @@ const seededOrders: Order[] = [
     items: [
       {
         id: 81012,
-        productName: "Чизкейк",
+        productName: "Р§РёР·РєРµР№Рє",
         quantity: 1,
         unitPriceRub: 290,
         lineTotalRub: 460,
         addons: [
           {
             id: 91009,
-            addonName: "Ваниль",
+            addonName: "Р’Р°РЅРёР»СЊ",
             quantity: 1,
             unitPriceRub: 40,
             lineTotalRub: 40,
           },
           {
             id: 91010,
-            addonName: "Карамель",
+            addonName: "РљР°СЂР°РјРµР»СЊ",
             quantity: 1,
             unitPriceRub: 40,
             lineTotalRub: 40,
           },
           {
             id: 91011,
-            addonName: "Кокосовое",
+            addonName: "РљРѕРєРѕСЃРѕРІРѕРµ",
             quantity: 1,
             unitPriceRub: 90,
             lineTotalRub: 90,
@@ -979,7 +980,7 @@ export async function mockCreateOrderFromCart(
         timeFrom: slot.timeFrom,
         timeTo: slot.timeTo,
       },
-      status: "CREATED",
+      status: OrderStatus.CREATED,
       slotTimeFrom: slot.timeFrom,
       slotTimeTo: slot.timeTo,
       totalRub,
@@ -1054,13 +1055,13 @@ export async function mockUpdateOrderStatus(
     const now = nowIso();
     order.updatedAt = now;
 
-    if (payload.status === "CONFIRMED") {
+    if (payload.status === OrderStatus.CONFIRMED) {
       order.confirmedAt = now;
     }
-    if (payload.status === "READY") {
+    if (payload.status === OrderStatus.READY) {
       order.readyAt = now;
     }
-    if (payload.status === "CLOSED") {
+    if (payload.status === OrderStatus.CLOSED) {
       order.closedAt = now;
     }
 
@@ -1078,9 +1079,10 @@ export async function mockRejectOrder(
       throw new Error(`Order ${orderId} not found`);
     }
 
-    order.status = "REJECTED";
+    order.status = OrderStatus.REJECTED;
     order.rejectReason = payload.reason;
     order.updatedAt = nowIso();
     return order;
   });
 }
+

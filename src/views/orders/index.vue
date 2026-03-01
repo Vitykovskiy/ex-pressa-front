@@ -86,7 +86,7 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
 import { fetchOrderHistory } from "@/services/orders";
-import type { Order } from "@/services/menu/types";
+import { OrderStatus, type Order } from "@/services/menu/types";
 
 defineOptions({
   name: "OrdersHistoryView",
@@ -99,11 +99,11 @@ const errorMessage = ref("");
 const orders = ref<Order[]>([]);
 
 const statusMap: Record<Order["status"], { label: string; color: string }> = {
-  CREATED: { label: "Создан", color: "info" },
-  CONFIRMED: { label: "Подтвержден", color: "primary" },
-  REJECTED: { label: "Отклонен", color: "error" },
-  READY: { label: "Готов", color: "success" },
-  CLOSED: { label: "Закрыт", color: "secondary" },
+  [OrderStatus.CREATED]: { label: "Создан", color: "info" },
+  [OrderStatus.CONFIRMED]: { label: "Подтвержден", color: "primary" },
+  [OrderStatus.REJECTED]: { label: "Отклонен", color: "error" },
+  [OrderStatus.READY]: { label: "Готов", color: "success" },
+  [OrderStatus.CLOSED]: { label: "Закрыт", color: "secondary" },
 };
 
 function formatDate(value: string): string {

@@ -1,9 +1,19 @@
-<template>
+﻿<template>
   <v-app class="admin-shell">
     <v-main class="admin-main">
       <div class="admin-frame">
         <header class="admin-header">
-          <h1>Панель баристы</h1>
+          <h1>Панель администратора</h1>
+          <v-tabs class="admin-tabs"
+                  density="comfortable"
+                  color="primary">
+            <v-tab :to="{ name: AdminRouteNames.Menu }">
+              Меню
+            </v-tab>
+            <v-tab :to="{ name: AdminRouteNames.Users }">
+              Пользователи
+            </v-tab>
+          </v-tabs>
         </header>
 
         <section class="admin-content">
@@ -17,6 +27,8 @@
 </template>
 
 <script lang="ts" setup>
+import { AdminRouteNames } from "@/admin/routes";
+
 defineOptions({
   name: "AdminAppShell",
 });
@@ -45,14 +57,20 @@ defineOptions({
 .admin-header {
   flex: 0 0 auto;
   display: flex;
-  align-items: center;
-  min-height: 56px;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 92px;
+  padding-top: 10px;
 }
 
 .admin-header h1 {
   margin: 0;
   font-size: 24px;
   font-weight: 700;
+}
+
+.admin-tabs {
+  margin-top: 6px;
 }
 
 .admin-content {

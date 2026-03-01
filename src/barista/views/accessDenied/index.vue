@@ -3,14 +3,14 @@
     <v-alert type="error"
              variant="tonal"
              class="access-denied__card">
-      У вас нет прав для доступа к панели администратора.
+      У вас нет прав для доступа к панели баристы.
     </v-alert>
   </div>
 </template>
 
 <script lang="ts" setup>
 defineOptions({
-  name: "AdminAccessDeniedView",
+  name: "BaristaAccessDeniedView",
 });
 </script>
 

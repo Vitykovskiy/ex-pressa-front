@@ -6,7 +6,7 @@ interface ImportMetaEnv {
   readonly VITE_USE_MOCKS?: string;
   readonly VITE_AUTH_MODE?: "auto" | "authorized" | "unauthorized";
   readonly VITE_APP_THEME?: "classic" | "blue-minimal";
-  readonly VITE_APP_TARGET?: "customer" | "admin";
+  readonly VITE_APP_TARGET?: "customer" | "admin" | "barista";
 }
 
 interface ImportMeta {
