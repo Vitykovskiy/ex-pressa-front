@@ -7,7 +7,9 @@
         </header>
 
         <section class="admin-content">
-          <router-view />
+          <router-view v-slot="{ Component }">
+            <component :is="Component" class="admin-content__view" />
+          </router-view>
         </section>
       </div>
     </v-main>
@@ -23,6 +25,7 @@ defineOptions({
 <style lang="scss" scoped>
 .admin-main {
   height: 100dvh;
+  max-height: 100dvh;
   overflow: hidden;
   display: flex;
   justify-content: center;
@@ -35,6 +38,7 @@ defineOptions({
   min-height: 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   padding: 0 10px;
 }
 
@@ -54,6 +58,18 @@ defineOptions({
 .admin-content {
   flex: 1 1 auto;
   min-height: 0;
+  display: flex;
   overflow: hidden;
+}
+
+.admin-content__view {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+:deep(.v-main) {
+  padding: 0;
 }
 </style>

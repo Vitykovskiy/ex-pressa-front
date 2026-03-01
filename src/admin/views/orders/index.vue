@@ -64,7 +64,7 @@
     </div>
 
     <div class="admin-orders__list">
-      <v-card v-for="order in orders"
+      <v-card v-for="order in sortedOrders"
               :key="order.id"
               class="order-card"
               variant="outlined">
@@ -86,11 +86,17 @@
           </v-chip>
         </div>
 
-        <div class="order-card__slot">
-          <span class="order-card__slot-label">Слот:</span>
-          <span class="order-card__slot-value">
-            {{ formatOnlyDate(order.timeSlot.date) }} {{ order.slotTimeFrom }}-{{ order.slotTimeTo }}
-          </span>
+        <div class="order-card__slot-row">
+          <div class="order-card__slot">
+            <span class="order-card__slot-label">Слот:</span>
+            <span class="order-card__slot-value">
+              {{ formatOnlyDate(order.timeSlot.date) }} {{ order.slotTimeFrom }}-{{ order.slotTimeTo }}
+            </span>
+          </div>
+          <div class="order-card__total">
+            <span class="order-card__total-label">Итого:</span>
+            <strong class="order-card__total-value">{{ order.totalRub }} ₽</strong>
+          </div>
         </div>
 
         <div class="order-card__items">
@@ -254,6 +260,14 @@ const statusMap: Record<OrderStatus, { label: string; color: string }> = {
   REJECTED: { label: "Отклонен", color: "error" },
 };
 
+const statusSortPriority: Record<OrderStatus, number> = {
+  CREATED: 0,
+  CONFIRMED: 1,
+  READY: 2,
+  CLOSED: 3,
+  REJECTED: 4,
+};
+
 const actionLabelMap: Record<Exclude<OrderStatus, "REJECTED">, string> = {
   CREATED: "Создан",
   CONFIRMED: "Подтвердить",
@@ -268,6 +282,29 @@ const nextStatusMap: Record<OrderStatus, Array<Exclude<OrderStatus, "REJECTED">>
   CLOSED: [],
   REJECTED: [],
 };
+
+const sortedOrders = computed(() => {
+  return [...orders.value].sort((a, b) => {
+    const statusDiff = statusSortPriority[a.status] - statusSortPriority[b.status];
+    if (statusDiff !== 0) {
+      return statusDiff;
+    }
+
+    const slotDateA = Date.parse(`${a.timeSlot.date}T${a.slotTimeFrom}:00`);
+    const slotDateB = Date.parse(`${b.timeSlot.date}T${b.slotTimeFrom}:00`);
+    if (!Number.isNaN(slotDateA) && !Number.isNaN(slotDateB) && slotDateA !== slotDateB) {
+      return slotDateA - slotDateB;
+    }
+
+    const createdA = Date.parse(a.createdAt);
+    const createdB = Date.parse(b.createdAt);
+    if (!Number.isNaN(createdA) && !Number.isNaN(createdB) && createdA !== createdB) {
+      return createdA - createdB;
+    }
+
+    return a.id - b.id;
+  });
+});
 
 function getActions(status: OrderStatus): Array<Exclude<OrderStatus, "REJECTED">> {
   return nextStatusMap[status];
@@ -530,6 +567,7 @@ watch(
 }
 
 .order-card {
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -593,6 +631,13 @@ watch(
   font-size: 16px;
 }
 
+.order-card__slot-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
 .order-card__slot-label {
   font-weight: 700;
   color: rgb(var(--v-theme-warning));
@@ -600,6 +645,25 @@ watch(
 
 .order-card__slot-value {
   font-weight: 600;
+  color: rgb(var(--v-theme-primary));
+}
+
+.order-card__total {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.order-card__total-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(var(--v-theme-on-surface), 0.72);
+}
+
+.order-card__total-value {
+  font-size: 20px;
+  line-height: 1;
   color: rgb(var(--v-theme-primary));
 }
 
