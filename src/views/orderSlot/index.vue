@@ -32,7 +32,9 @@
           <template #label>
             <div class="slot-option">
               <div class="slot-option__title">
-                {{ formatSlotDate(slot.date) }} · {{ slot.timeFrom }}-{{ slot.timeTo }}
+                {{ formatSlotDate(slot.date) }} · {{ slot.timeFrom }}-{{
+                  slot.timeTo
+                }}
               </div>
               <div class="slot-option__meta">
                 Свободно: {{ Math.max(slot.capacity - slot.bookedCount, 0) }} из
@@ -118,7 +120,9 @@ async function loadSlots(): Promise<void> {
   }
 }
 
-function mapToServerCartItem(item: (typeof cart.value)[number]): AddCartItemDto {
+function mapToServerCartItem(
+  item: (typeof cart.value)[number],
+): AddCartItemDto {
   return {
     productId: item.id,
     sizeCode: item.size,

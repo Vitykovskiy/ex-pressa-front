@@ -11,7 +11,11 @@
       />
     </div>
 
-    <v-progress-linear v-if="isLoading" color="primary" indeterminate />
+    <v-progress-linear
+      v-if="isLoading"
+      color="primary"
+      indeterminate
+    />
 
     <v-alert
       v-else-if="errorMessage"
@@ -23,18 +27,28 @@
       {{ errorMessage }}
     </v-alert>
 
-    <div v-else-if="!orders.length" class="orders-view__empty">
+    <div
+      v-else-if="!orders.length"
+      class="orders-view__empty"
+    >
       Заказов пока нет
     </div>
 
-    <v-expansion-panels v-else variant="accordion">
-      <v-expansion-panel v-for="order in orders" :key="order.id">
+    <v-expansion-panels
+      v-else
+      variant="accordion"
+    >
+      <v-expansion-panel
+        v-for="order in orders"
+        :key="order.id"
+      >
         <v-expansion-panel-title>
           <div class="order-title">
             <div class="order-title__main">
               <div class="order-title__id">Заказ #{{ order.id }}</div>
               <div class="order-title__meta">
-                {{ formatDate(order.createdAt) }} · {{ order.items.length }} поз.
+                {{ formatDate(order.createdAt) }} ·
+                {{ order.items.length }} поз.
               </div>
             </div>
             <div class="order-title__right">
@@ -53,7 +67,9 @@
         <v-expansion-panel-text>
           <div class="order-card">
             <div class="order-card__slot">
-              Слот: {{ order.timeSlot.date }} {{ order.slotTimeFrom }}-{{ order.slotTimeTo }}
+              Слот: {{ order.timeSlot.date }} {{ order.slotTimeFrom }}-{{
+                order.slotTimeTo
+              }}
             </div>
             <div
               v-for="item in order.items"
@@ -63,7 +79,9 @@
               <div class="order-card__row">
                 <span>
                   {{ item.productName }}
-                  <template v-if="item.sizeCode">({{ item.sizeCode }})</template>
+                  <template v-if="item.sizeCode"
+                    >({{ item.sizeCode }})</template
+                  >
                   x{{ item.quantity }}
                 </span>
                 <strong>{{ item.lineTotalRub }} ₽</strong>

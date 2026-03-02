@@ -1,6 +1,8 @@
 <template>
-  <v-card class="order-card"
-          variant="outlined">
+  <v-card
+    class="order-card"
+    variant="outlined"
+  >
     <div class="order-card__head">
       <div>
         <div class="order-card__title">Заказ #{{ order.id }}</div>
@@ -10,15 +12,21 @@
         </div>
         <div class="order-card__meta">
           <span class="order-card__meta-label">Создан:</span>
-          <span class="order-card__meta-value">{{ formatDate(order.createdAt) }}</span>
+          <span class="order-card__meta-value">{{
+            formatDate(order.createdAt)
+          }}</span>
           <span class="order-card__meta-separator">·</span>
-          <span class="order-card__meta-count">{{ order.items.length }} позиции</span>
+          <span class="order-card__meta-count"
+            >{{ order.items.length }} позиции</span
+          >
         </div>
       </div>
-      <v-chip class="order-card__status-chip"
-              size="small"
-              :color="statusMap[order.status].color"
-              variant="tonal">
+      <v-chip
+        class="order-card__status-chip"
+        size="small"
+        :color="statusMap[order.status].color"
+        variant="tonal"
+      >
         {{ statusMap[order.status].label }}
       </v-chip>
     </div>
@@ -27,7 +35,9 @@
       <div class="order-card__slot">
         <span class="order-card__slot-label">Слот:</span>
         <span class="order-card__slot-value">
-          {{ formatOnlyDate(order.timeSlot.date) }} {{ order.slotTimeFrom }}-{{ order.slotTimeTo }}
+          {{ formatOnlyDate(order.timeSlot.date) }} {{ order.slotTimeFrom }}-{{
+            order.slotTimeTo
+          }}
         </span>
       </div>
       <div class="order-card__total">
@@ -37,9 +47,11 @@
     </div>
 
     <div class="order-card__items">
-      <div v-for="item in order.items"
-           :key="item.id"
-           class="order-card__item-wrap">
+      <div
+        v-for="item in order.items"
+        :key="item.id"
+        class="order-card__item-wrap"
+      >
         <div class="order-card__item">
           <div>
             <span class="order-card__item-main">
@@ -47,41 +59,51 @@
               <template v-if="item.sizeCode">({{ item.sizeCode }})</template>
               x{{ item.quantity }}
             </span>
-            <div v-for="addon in item.addons"
-                 :key="addon.id"
-                 class="order-card__addon">
+            <div
+              v-for="addon in item.addons"
+              :key="addon.id"
+              class="order-card__addon"
+            >
               + {{ addon.addonName }} x{{ addon.quantity }}
             </div>
           </div>
-          <strong class="order-card__item-price">{{ item.lineTotalRub }} ₽</strong>
+          <strong class="order-card__item-price"
+            >{{ item.lineTotalRub }} ₽</strong
+          >
         </div>
         <v-divider class="mt-2" />
       </div>
     </div>
 
-    <div v-if="order.rejectReason"
-         class="order-card__reject">
+    <div
+      v-if="order.rejectReason"
+      class="order-card__reject"
+    >
       Причина отклонения: {{ order.rejectReason }}
     </div>
 
     <div class="order-card__actions">
-      <v-btn v-for="action in getActions(order.status)"
-             :key="action"
-             size="small"
-             variant="flat"
-             color="primary"
-             :loading="pendingOrderId === order.id"
-             :disabled="pendingOrderId !== null"
-             @click="$emit('status-action', order.id, action)">
+      <v-btn
+        v-for="action in getActions(order.status)"
+        :key="action"
+        size="small"
+        variant="flat"
+        color="primary"
+        :loading="pendingOrderId === order.id"
+        :disabled="pendingOrderId !== null"
+        @click="$emit('status-action', order.id, action)"
+      >
         {{ actionLabelMap[action] }}
       </v-btn>
 
-      <v-btn v-if="canReject(order.status)"
-             size="small"
-             variant="outlined"
-             color="error"
-             :disabled="pendingOrderId !== null"
-             @click="$emit('reject', order.id)">
+      <v-btn
+        v-if="canReject(order.status)"
+        size="small"
+        variant="outlined"
+        color="error"
+        :disabled="pendingOrderId !== null"
+        @click="$emit('reject', order.id)"
+      >
         Отклонить
       </v-btn>
     </div>

@@ -1,6 +1,8 @@
 <template>
-  <AccessState type="error"
-               message="У вас нет прав для доступа к панели администратора." />
+  <AccessState
+    type="error"
+    message="У вас нет прав для доступа к панели администратора."
+  />
 </template>
 
 <script lang="ts" setup>

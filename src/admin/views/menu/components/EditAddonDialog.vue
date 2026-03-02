@@ -1,40 +1,52 @@
 <template>
-  <v-dialog :model-value="modelValue"
-            max-width="460"
-            @update:model-value="onModelUpdate">
+  <v-dialog
+    :model-value="modelValue"
+    max-width="460"
+    @update:model-value="onModelUpdate"
+  >
     <v-card>
       <v-card-title>Редактировать доп</v-card-title>
       <v-card-text>
-        <v-text-field v-model.trim="name"
-                      label="Название"
-                      variant="outlined"
-                      density="comfortable"
-                      :error-messages="nameError" />
+        <v-text-field
+          v-model.trim="name"
+          label="Название"
+          variant="outlined"
+          density="comfortable"
+          :error-messages="nameError"
+        />
 
-        <v-text-field v-model.number="priceRub"
-                      class="mt-2"
-                      type="number"
-                      min="0"
-                      label="Цена, ₽"
-                      variant="outlined"
-                      density="comfortable" />
+        <v-text-field
+          v-model.number="priceRub"
+          class="mt-2"
+          type="number"
+          min="0"
+          label="Цена, ₽"
+          variant="outlined"
+          density="comfortable"
+        />
 
-        <v-switch v-model="isActive"
-                  label="Активен"
-                  color="primary"
-                  hide-details />
+        <v-switch
+          v-model="isActive"
+          label="Активен"
+          color="primary"
+          hide-details
+        />
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn variant="text"
-               :disabled="isSubmitting"
-               @click="$emit('cancel')">
+        <v-btn
+          variant="text"
+          :disabled="isSubmitting"
+          @click="$emit('cancel')"
+        >
           Отмена
         </v-btn>
-        <v-btn variant="flat"
-               color="primary"
-               :loading="isSubmitting"
-               @click="onSubmit">
+        <v-btn
+          variant="flat"
+          color="primary"
+          :loading="isSubmitting"
+          @click="onSubmit"
+        >
           Сохранить
         </v-btn>
       </v-card-actions>

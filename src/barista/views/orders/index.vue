@@ -91,9 +91,10 @@ const rejectReasonError = ref("");
 const isRejectSubmitting = ref(false);
 const statusConfirmDialog = ref(false);
 const statusConfirmOrderId = ref<number | null>(null);
-const statusConfirmNextStatus = ref<
-  Exclude<OrderStatus, OrderStatus.REJECTED> | null
->(null);
+const statusConfirmNextStatus = ref<Exclude<
+  OrderStatus,
+  OrderStatus.REJECTED
+> | null>(null);
 const isStatusConfirmSubmitting = ref(false);
 
 const statusFilters = ref<OrderStatus[]>([]);
@@ -172,7 +173,11 @@ const sortedOrders = computed(() => {
 
     const createdA = createdTs(a);
     const createdB = createdTs(b);
-    if (!Number.isNaN(createdA) && !Number.isNaN(createdB) && createdA !== createdB) {
+    if (
+      !Number.isNaN(createdA) &&
+      !Number.isNaN(createdB) &&
+      createdA !== createdB
+    ) {
       return createdA - createdB;
     }
 
@@ -290,7 +295,10 @@ async function submitStatusConfirm(): Promise<void> {
 
   isStatusConfirmSubmitting.value = true;
   try {
-    await applyStatusAction(statusConfirmOrderId.value, statusConfirmNextStatus.value);
+    await applyStatusAction(
+      statusConfirmOrderId.value,
+      statusConfirmNextStatus.value,
+    );
   } finally {
     isStatusConfirmSubmitting.value = false;
   }

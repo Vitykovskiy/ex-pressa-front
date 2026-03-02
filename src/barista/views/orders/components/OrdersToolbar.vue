@@ -2,48 +2,58 @@
   <div class="barista-orders__toolbar">
     <h2>Заказы</h2>
     <div class="barista-orders__toolbar-actions">
-      <v-select class="barista-orders__status-filter"
-                v-model="statusFiltersModel"
-                :items="statusFilterItems"
-                chips
-                variant="outlined"
-                density="compact"
-                hide-details
-                placeholder="Статусы"
-                persistent-placeholder
-                single-line
-                multiple
-                clearable />
+      <v-select
+        class="barista-orders__status-filter"
+        v-model="statusFiltersModel"
+        :items="statusFilterItems"
+        chips
+        variant="outlined"
+        density="compact"
+        hide-details
+        placeholder="Статусы"
+        persistent-placeholder
+        single-line
+        multiple
+        clearable
+      />
 
-      <v-text-field class="barista-orders__date-filter"
-                    v-model="selectedDateModel"
-                    type="date"
-                    variant="outlined"
-                    density="compact"
-                    hide-details
-                    placeholder="Дата"
-                    persistent-placeholder
-                    single-line
-                    clearable />
+      <v-text-field
+        class="barista-orders__date-filter"
+        v-model="selectedDateModel"
+        type="date"
+        variant="outlined"
+        density="compact"
+        hide-details
+        placeholder="Дата"
+        persistent-placeholder
+        single-line
+        clearable
+      />
 
-      <v-tooltip text="Очтисть фильтры"
-                 location="top">
+      <v-tooltip
+        text="Очтисть фильтры"
+        location="top"
+      >
         <template #activator="{ props: tooltipProps }">
-          <v-btn v-bind="tooltipProps"
-                 class="barista-orders__clear-btn"
-                 variant="text"
-                 icon="mdi-trash-can-outline"
-                 :disabled="isLoading"
-                 @click="$emit('clear')" />
+          <v-btn
+            v-bind="tooltipProps"
+            class="barista-orders__clear-btn"
+            variant="text"
+            icon="mdi-trash-can-outline"
+            :disabled="isLoading"
+            @click="$emit('clear')"
+          />
         </template>
       </v-tooltip>
 
-      <v-btn class="barista-orders__refresh-btn"
-             variant="flat"
-             color="primary"
-             prepend-icon="mdi-magnify"
-             :loading="isLoading"
-             @click="$emit('search')">
+      <v-btn
+        class="barista-orders__refresh-btn"
+        variant="flat"
+        color="primary"
+        prepend-icon="mdi-magnify"
+        :loading="isLoading"
+        @click="$emit('search')"
+      >
         Поиск
       </v-btn>
     </div>

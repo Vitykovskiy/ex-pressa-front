@@ -82,7 +82,9 @@ async function createProductPrice(
 
 async function replaceProductPrices(
   productId: number,
-  payload: Array<Pick<CreateProductPriceDto, "sizeCode" | "priceRub" | "isActive">>,
+  payload: Array<
+    Pick<CreateProductPriceDto, "sizeCode" | "priceRub" | "isActive">
+  >,
 ): Promise<ProductPrice[]> {
   return http.put<
     ProductPrice[],
@@ -121,7 +123,10 @@ async function updateAddon(
   addonId: number,
   payload: UpdateAddonDto,
 ): Promise<Addon> {
-  return http.patch<Addon, UpdateAddonDto>(`/catalog/addons/${addonId}`, payload);
+  return http.patch<Addon, UpdateAddonDto>(
+    `/catalog/addons/${addonId}`,
+    payload,
+  );
 }
 
 async function deleteAddon(addonId: number): Promise<void> {

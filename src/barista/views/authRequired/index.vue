@@ -1,6 +1,8 @@
 <template>
-  <AccessState type="warning"
-               message="Для входа в панель баристы нужна авторизация через Telegram." />
+  <AccessState
+    type="warning"
+    message="Для входа в панель баристы нужна авторизация через Telegram."
+  />
 </template>
 
 <script lang="ts" setup>

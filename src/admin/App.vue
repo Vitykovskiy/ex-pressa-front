@@ -4,21 +4,22 @@
       <div class="admin-frame">
         <header class="admin-header">
           <h1>Панель администратора</h1>
-          <v-tabs class="admin-tabs"
-                  density="comfortable"
-                  color="primary">
-            <v-tab :to="{ name: AdminRouteNames.Menu }">
-              Меню
-            </v-tab>
-            <v-tab :to="{ name: AdminRouteNames.Users }">
-              Пользователи
-            </v-tab>
+          <v-tabs
+            class="admin-tabs"
+            density="comfortable"
+            color="primary"
+          >
+            <v-tab :to="{ name: AdminRouteNames.Menu }"> Меню </v-tab>
+            <v-tab :to="{ name: AdminRouteNames.Users }"> Пользователи </v-tab>
           </v-tabs>
         </header>
 
         <section class="admin-content">
           <router-view v-slot="{ Component }">
-            <component :is="Component" class="admin-content__view" />
+            <component
+              :is="Component"
+              class="admin-content__view"
+            />
           </router-view>
         </section>
       </div>

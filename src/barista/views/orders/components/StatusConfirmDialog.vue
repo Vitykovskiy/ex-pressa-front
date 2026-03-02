@@ -1,7 +1,9 @@
 <template>
-  <v-dialog :model-value="modelValue"
-            max-width="420"
-            @update:model-value="onModelUpdate">
+  <v-dialog
+    :model-value="modelValue"
+    max-width="420"
+    @update:model-value="onModelUpdate"
+  >
     <v-card>
       <v-card-title>Подтверждение</v-card-title>
       <v-card-text>
@@ -9,15 +11,19 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn variant="text"
-               :disabled="isSubmitting"
-               @click="$emit('cancel')">
+        <v-btn
+          variant="text"
+          :disabled="isSubmitting"
+          @click="$emit('cancel')"
+        >
           Отмена
         </v-btn>
-        <v-btn variant="flat"
-               color="primary"
-               :loading="isSubmitting"
-               @click="$emit('confirm')">
+        <v-btn
+          variant="flat"
+          color="primary"
+          :loading="isSubmitting"
+          @click="$emit('confirm')"
+        >
           Подтвердить
         </v-btn>
       </v-card-actions>

@@ -8,7 +8,10 @@
 
         <section class="barista-content">
           <router-view v-slot="{ Component }">
-            <component :is="Component" class="barista-content__view" />
+            <component
+              :is="Component"
+              class="barista-content__view"
+            />
           </router-view>
         </section>
       </div>

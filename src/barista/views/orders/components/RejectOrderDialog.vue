@@ -1,28 +1,36 @@
 <template>
-  <v-dialog :model-value="modelValue"
-            max-width="460"
-            @update:model-value="onModelUpdate">
+  <v-dialog
+    :model-value="modelValue"
+    max-width="460"
+    @update:model-value="onModelUpdate"
+  >
     <v-card>
       <v-card-title>Отклонить заказ</v-card-title>
       <v-card-text>
-        <v-textarea :model-value="reason"
-                    label="Причина отклонения"
-                    variant="outlined"
-                    rows="4"
-                    auto-grow
-                    :error-messages="reasonError"
-                    @update:model-value="onReasonUpdate" />
+        <v-textarea
+          :model-value="reason"
+          label="Причина отклонения"
+          variant="outlined"
+          rows="4"
+          auto-grow
+          :error-messages="reasonError"
+          @update:model-value="onReasonUpdate"
+        />
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn variant="text"
-               @click="$emit('cancel')">
+        <v-btn
+          variant="text"
+          @click="$emit('cancel')"
+        >
           Отмена
         </v-btn>
-        <v-btn variant="flat"
-               color="error"
-               :loading="isSubmitting"
-               @click="$emit('confirm')">
+        <v-btn
+          variant="flat"
+          color="error"
+          :loading="isSubmitting"
+          @click="$emit('confirm')"
+        >
           Подтвердить
         </v-btn>
       </v-card-actions>

@@ -287,7 +287,11 @@ function onSubmit(): void {
       drinkPriceLargeError.value = "Укажи цену больше 0";
     }
 
-    if (drinkPriceSmallError.value || drinkPriceMediumError.value || drinkPriceLargeError.value) {
+    if (
+      drinkPriceSmallError.value ||
+      drinkPriceMediumError.value ||
+      drinkPriceLargeError.value
+    ) {
       return;
     }
 

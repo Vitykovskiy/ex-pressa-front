@@ -1,6 +1,8 @@
 <template>
-  <AccessState type="error"
-               message="У вас нет прав для доступа к панели баристы." />
+  <AccessState
+    type="error"
+    message="У вас нет прав для доступа к панели баристы."
+  />
 </template>
 
 <script lang="ts" setup>

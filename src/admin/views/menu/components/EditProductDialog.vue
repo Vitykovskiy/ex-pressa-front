@@ -1,113 +1,140 @@
-<template>
-  <v-dialog :model-value="modelValue"
-            max-width="520"
-            @update:model-value="onModelUpdate">
+﻿<template>
+  <v-dialog
+    :model-value="modelValue"
+    max-width="520"
+    @update:model-value="onModelUpdate"
+  >
     <v-card>
       <v-card-title>Редактировать товар</v-card-title>
       <v-card-text>
-        <v-select v-model="groupId"
-                  :items="groupItems"
-                  label="Группа"
-                  variant="outlined"
-                  density="comfortable"
-                  :error-messages="groupError" />
+        <v-select
+          v-model="groupId"
+          :items="groupItems"
+          label="Группа"
+          variant="outlined"
+          density="comfortable"
+          :error-messages="groupError"
+        />
 
-        <v-text-field v-model.trim="name"
-                      class="mt-2"
-                      label="Название"
-                      variant="outlined"
-                      density="comfortable"
-                      :error-messages="nameError" />
+        <v-text-field
+          v-model.trim="name"
+          class="mt-2"
+          label="Название"
+          variant="outlined"
+          density="comfortable"
+          :error-messages="nameError"
+        />
 
-        <v-textarea v-model.trim="description"
-                    class="mt-2"
-                    label="Описание"
-                    variant="outlined"
-                    density="comfortable"
-                    rows="3"
-                    auto-grow />
+        <v-textarea
+          v-model.trim="description"
+          class="mt-2"
+          label="Описание"
+          variant="outlined"
+          density="comfortable"
+          rows="3"
+          auto-grow
+        />
 
-        <v-select v-model="type"
-                  class="mt-2"
-                  :items="typeItems"
-                  label="Тип продукта"
-                  variant="outlined"
-                  density="comfortable"
-                  :error-messages="typeError" />
+        <v-select
+          v-model="type"
+          class="mt-2"
+          :items="typeItems"
+          label="Тип продукта"
+          variant="outlined"
+          density="comfortable"
+          :error-messages="typeError"
+        />
 
         <template v-if="type === ProductType.Drink">
           <div class="admin-edit-product__price-grid mt-2">
-            <v-text-field v-model.number="drinkPriceSmall"
-                          type="number"
-                          min="1"
-                          label="Цена S"
-                          variant="outlined"
-                          density="comfortable"
-                          :error-messages="drinkPriceSmallError" />
-            <v-text-field v-model.number="drinkPriceMedium"
-                          type="number"
-                          min="1"
-                          label="Цена M"
-                          variant="outlined"
-                          density="comfortable"
-                          :error-messages="drinkPriceMediumError" />
-            <v-text-field v-model.number="drinkPriceLarge"
-                          type="number"
-                          min="1"
-                          label="Цена L"
-                          variant="outlined"
-                          density="comfortable"
-                          :error-messages="drinkPriceLargeError" />
+            <v-text-field
+              v-model.number="drinkPriceSmall"
+              type="number"
+              min="1"
+              label="Цена S"
+              variant="outlined"
+              density="comfortable"
+              :error-messages="drinkPriceSmallError"
+            />
+            <v-text-field
+              v-model.number="drinkPriceMedium"
+              type="number"
+              min="1"
+              label="Цена M"
+              variant="outlined"
+              density="comfortable"
+              :error-messages="drinkPriceMediumError"
+            />
+            <v-text-field
+              v-model.number="drinkPriceLarge"
+              type="number"
+              min="1"
+              label="Цена L"
+              variant="outlined"
+              density="comfortable"
+              :error-messages="drinkPriceLargeError"
+            />
           </div>
         </template>
 
-        <v-text-field v-else
-                      v-model.number="singlePrice"
-                      class="mt-2"
-                      type="number"
-                      min="1"
-                      label="Цена"
-                      variant="outlined"
-                      density="comfortable"
-                      :error-messages="singlePriceError" />
+        <v-text-field
+          v-else
+          v-model.number="singlePrice"
+          class="mt-2"
+          type="number"
+          min="1"
+          label="Цена"
+          variant="outlined"
+          density="comfortable"
+          :error-messages="singlePriceError"
+        />
 
-        <v-text-field v-model.number="sortOrder"
-                      class="mt-2"
-                      type="number"
-                      min="0"
-                      label="Порядок сортировки"
-                      variant="outlined"
-                      density="comfortable" />
+        <v-text-field
+          v-model.number="sortOrder"
+          class="mt-2"
+          type="number"
+          min="0"
+          label="Порядок сортировки"
+          variant="outlined"
+          density="comfortable"
+        />
 
-        <v-switch v-model="isActive"
-                  class="mt-1"
-                  label="Активен"
-                  color="primary"
-                  hide-details />
+        <v-switch
+          v-model="isActive"
+          class="mt-1"
+          label="Активен"
+          color="primary"
+          hide-details
+        />
 
-        <v-switch v-model="isAvailable"
-                  label="Доступен к заказу"
-                  color="primary"
-                  hide-details />
+        <v-switch
+          v-model="isAvailable"
+          label="Доступен к заказу"
+          color="primary"
+          hide-details
+        />
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn variant="text"
-               :disabled="isSubmitting"
-               @click="$emit('cancel')">
+        <v-btn
+          variant="text"
+          :disabled="isSubmitting"
+          @click="$emit('cancel')"
+        >
           Отмена
         </v-btn>
-        <v-btn variant="flat"
-               color="primary"
-               :loading="isSubmitting"
-               @click="onSubmit">
+        <v-btn
+          variant="flat"
+          color="primary"
+          :loading="isSubmitting"
+          @click="onSubmit"
+        >
           Сохранить
         </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
-
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
 import {
@@ -172,7 +199,8 @@ watch(
       return;
     }
 
-    groupId.value = product.group.id;
+    const fallbackGroupId = props.groups[0]?.id ?? null;
+    groupId.value = product.group?.id ?? fallbackGroupId;
     name.value = product.name;
     description.value = product.description ?? "";
     type.value = product.type;
@@ -182,14 +210,14 @@ watch(
 
     singlePrice.value = product.prices[0]?.priceRub ?? null;
     drinkPriceSmall.value =
-      product.prices.find((price) => price.sizeCode === SizeCode.Small)?.priceRub ??
-      null;
+      product.prices.find((price) => price.sizeCode === SizeCode.Small)
+        ?.priceRub ?? null;
     drinkPriceMedium.value =
-      product.prices.find((price) => price.sizeCode === SizeCode.Medium)?.priceRub ??
-      null;
+      product.prices.find((price) => price.sizeCode === SizeCode.Medium)
+        ?.priceRub ?? null;
     drinkPriceLarge.value =
-      product.prices.find((price) => price.sizeCode === SizeCode.Large)?.priceRub ??
-      null;
+      product.prices.find((price) => price.sizeCode === SizeCode.Large)
+        ?.priceRub ?? null;
 
     groupError.value = "";
     nameError.value = "";
@@ -242,7 +270,11 @@ function onSubmit(): void {
     if (!drinkPriceLarge.value || drinkPriceLarge.value <= 0) {
       drinkPriceLargeError.value = "Укажи цену больше 0";
     }
-    if (drinkPriceSmallError.value || drinkPriceMediumError.value || drinkPriceLargeError.value) {
+    if (
+      drinkPriceSmallError.value ||
+      drinkPriceMediumError.value ||
+      drinkPriceLargeError.value
+    ) {
       return;
     }
 

@@ -1,8 +1,10 @@
 <template>
   <div class="access-state">
-    <v-alert :type="type"
-             variant="tonal"
-             class="access-state__card">
+    <v-alert
+      :type="type"
+      variant="tonal"
+      class="access-state__card"
+    >
       {{ message }}
     </v-alert>
   </div>
