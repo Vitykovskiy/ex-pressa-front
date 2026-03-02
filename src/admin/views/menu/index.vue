@@ -21,7 +21,7 @@
     </div>
 
     <div class="admin-menu__list">
-      <v-card v-for="group in groups"
+      <v-card v-for="group in menuGroups"
               :key="group.id"
               class="admin-menu__group"
               variant="outlined">
@@ -54,12 +54,12 @@
                      size="x-small"
                      variant="text"
                      color="primary"
-                     @click="openEditProductDialog(product)" />
+                     @click="onEditPosition(group, product)" />
               <v-btn icon="mdi-trash-can-outline"
                      size="x-small"
                      variant="text"
                      color="error"
-                     @click="openDeleteProductDialog(product)" />
+                     @click="onDeletePosition(group, product)" />
             </div>
           </div>
         </div>
@@ -67,18 +67,20 @@
     </div>
 
     <AddGroupDialog v-model="isAddGroupDialogOpen"
+                    :addon-groups="addonGroupOptions"
                     :is-submitting="isCreateGroupLoading"
                     @submit="onCreateGroup"
                     @cancel="isAddGroupDialogOpen = false" />
 
     <AddProductDialog v-model="isAddProductDialogOpen"
-                      :groups="groups"
+                      :groups="menuGroups"
                       :is-submitting="isCreateProductLoading"
                       @submit="onCreateProduct"
                       @cancel="isAddProductDialogOpen = false" />
 
     <EditGroupDialog v-model="isEditGroupDialogOpen"
                      :group="selectedGroup"
+                     :addon-groups="addonGroupOptions"
                      :is-submitting="isUpdateGroupLoading"
                      @submit="onEditGroup"
                      @cancel="isEditGroupDialogOpen = false" />
@@ -90,6 +92,12 @@
                        @submit="onEditProduct"
                        @cancel="isEditProductDialogOpen = false" />
 
+    <EditAddonDialog v-model="isEditAddonDialogOpen"
+                     :addon="selectedAddon"
+                     :is-submitting="isUpdateAddonLoading"
+                     @submit="onEditAddon"
+                     @cancel="isEditAddonDialogOpen = false" />
+
     <DeleteConfirmDialog v-model="isDeleteDialogOpen"
                          :entity-label="deleteEntityLabel"
                          :entity-name="deleteEntityName"
@@ -100,22 +108,27 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import menuService from "@/services/menu";
+import { ProductType } from "@/services/menu/types";
 import AddGroupDialog from "./components/AddGroupDialog.vue";
 import AddProductDialog from "./components/AddProductDialog.vue";
 import DeleteConfirmDialog from "./components/DeleteConfirmDialog.vue";
+import EditAddonDialog from "./components/EditAddonDialog.vue";
 import EditGroupDialog from "./components/EditGroupDialog.vue";
 import EditProductDialog from "./components/EditProductDialog.vue";
 import type {
-  CreateProductGroupDto,
+  Addon,
+  AddonGroup,
   CreateProductPriceDto,
   ProductGroup,
   Product,
   ProductPrice,
 } from "@/services/menu/types";
 import type {
+  AddGroupSubmitPayload,
   AddProductSubmitPayload,
+  EditAddonSubmitPayload,
   EditGroupSubmitPayload,
   EditProductSubmitPayload,
 } from "./components/types";
@@ -125,6 +138,7 @@ defineOptions({
 });
 
 const groups = ref<ProductGroup[]>([]);
+const addonGroupOptions = ref<ProductGroup[]>([]);
 const isAddGroupDialogOpen = ref(false);
 const isCreateGroupLoading = ref(false);
 const isAddProductDialogOpen = ref(false);
@@ -133,13 +147,31 @@ const isEditGroupDialogOpen = ref(false);
 const isUpdateGroupLoading = ref(false);
 const isEditProductDialogOpen = ref(false);
 const isUpdateProductLoading = ref(false);
+const isEditAddonDialogOpen = ref(false);
+const isUpdateAddonLoading = ref(false);
 const selectedGroup = ref<ProductGroup | null>(null);
 const selectedProduct = ref<Product | null>(null);
+const selectedAddon = ref<{
+  id: number;
+  addonGroupId: number;
+  name: string;
+  priceRub: number;
+  isActive: boolean;
+} | null>(null);
 const isDeleteDialogOpen = ref(false);
 const isDeleteLoading = ref(false);
 const deleteEntityLabel = ref("");
 const deleteEntityName = ref("");
-const deleteTarget = ref<{ kind: "group" | "product"; id: number } | null>(null);
+const deleteTarget = ref<{
+  kind: "group" | "product" | "addon";
+  id: number;
+  isAddonsGroup?: boolean;
+} | null>(null);
+
+const menuGroups = computed<ProductGroup[]>(() => [
+  ...groups.value,
+  ...addonGroupOptions.value,
+]);
 
 function minPrice(prices: ProductPrice[]): number {
   return prices.reduce((acc, row) => Math.min(acc, row.priceRub), prices[0]?.priceRub ?? 0);
@@ -149,12 +181,51 @@ async function loadGroups(): Promise<void> {
   groups.value = await menuService.fetchMenu();
 }
 
-async function onCreateGroup(payload: CreateProductGroupDto): Promise<void> {
+async function loadAddonGroupOptions(): Promise<void> {
+  const addonGroups = await menuService.fetchAddonGroups();
+  addonGroupOptions.value = addonGroups
+    .filter((group) => group.isAddonsGroup)
+    .map((group: AddonGroup) => ({
+      id: group.id,
+      name: group.name,
+      sortOrder: group.sortOrder,
+      isActive: group.isActive,
+      isAddonsGroup: group.isAddonsGroup,
+      products: group.addons.map((addon: Addon) => ({
+        id: addon.id,
+        group: { id: group.id, name: group.name },
+        name: addon.name,
+        description: null,
+        type: ProductType.Food,
+        isActive: addon.isActive,
+        isAvailable: true,
+        sortOrder: 0,
+        prices: [{ id: addon.id, priceRub: addon.priceRub, isActive: addon.isActive }],
+      })),
+      addonLinks: [],
+    }));
+}
+
+async function onCreateGroup(payload: AddGroupSubmitPayload): Promise<void> {
   isCreateGroupLoading.value = true;
   try {
-    await menuService.createProductGroup(payload);
+    if (payload.mode === "addon") {
+      await menuService.createAddonGroup(payload.payload);
+    } else {
+      const createdGroup = await menuService.createProductGroup(payload.payload);
+      if (payload.addonGroupIds.length) {
+        await Promise.all(
+          payload.addonGroupIds.map((addonGroupId) =>
+            menuService.linkAddonGroup({
+              productGroupId: createdGroup.id,
+              addonGroupId,
+            }),
+          ),
+        );
+      }
+    }
     isAddGroupDialogOpen.value = false;
-    await loadGroups();
+    await Promise.all([loadGroups(), loadAddonGroupOptions()]);
   } finally {
     isCreateGroupLoading.value = false;
   }
@@ -163,6 +234,20 @@ async function onCreateGroup(payload: CreateProductGroupDto): Promise<void> {
 async function onCreateProduct(payload: AddProductSubmitPayload): Promise<void> {
   isCreateProductLoading.value = true;
   try {
+    const targetGroup = menuGroups.value.find((group) => group.id === payload.product.groupId);
+    if (targetGroup?.isAddonsGroup) {
+      const basePrice = payload.prices[0]?.priceRub ?? 0;
+      await menuService.createAddon({
+        addonGroupId: targetGroup.id,
+        name: payload.product.name,
+        priceRub: basePrice,
+        isActive: payload.product.isActive,
+      });
+      isAddProductDialogOpen.value = false;
+      await Promise.all([loadGroups(), loadAddonGroupOptions()]);
+      return;
+    }
+
     const createdProduct = await menuService.createProduct(payload.product);
     const pricePayloads: CreateProductPriceDto[] = payload.prices.map((price) => ({
       productId: createdProduct.id,
@@ -176,7 +261,7 @@ async function onCreateProduct(payload: AddProductSubmitPayload): Promise<void> 
     );
 
     isAddProductDialogOpen.value = false;
-    await loadGroups();
+    await Promise.all([loadGroups(), loadAddonGroupOptions()]);
   } finally {
     isCreateProductLoading.value = false;
   }
@@ -192,8 +277,19 @@ function openEditProductDialog(product: Product): void {
   isEditProductDialogOpen.value = true;
 }
 
+function openEditAddonDialog(group: ProductGroup, product: Product): void {
+  selectedAddon.value = {
+    id: product.id,
+    addonGroupId: group.id,
+    name: product.name,
+    priceRub: minPrice(product.prices),
+    isActive: product.isActive,
+  };
+  isEditAddonDialogOpen.value = true;
+}
+
 function openDeleteGroupDialog(group: ProductGroup): void {
-  deleteTarget.value = { kind: "group", id: group.id };
+  deleteTarget.value = { kind: "group", id: group.id, isAddonsGroup: group.isAddonsGroup };
   deleteEntityLabel.value = "группу";
   deleteEntityName.value = group.name;
   isDeleteDialogOpen.value = true;
@@ -206,6 +302,29 @@ function openDeleteProductDialog(product: Product): void {
   isDeleteDialogOpen.value = true;
 }
 
+function openDeleteAddonDialog(product: Product): void {
+  deleteTarget.value = { kind: "addon", id: product.id };
+  deleteEntityLabel.value = "доп";
+  deleteEntityName.value = product.name;
+  isDeleteDialogOpen.value = true;
+}
+
+function onEditPosition(group: ProductGroup, product: Product): void {
+  if (group.isAddonsGroup) {
+    openEditAddonDialog(group, product);
+    return;
+  }
+  openEditProductDialog(product);
+}
+
+function onDeletePosition(group: ProductGroup, product: Product): void {
+  if (group.isAddonsGroup) {
+    openDeleteAddonDialog(product);
+    return;
+  }
+  openDeleteProductDialog(product);
+}
+
 function closeDeleteDialog(): void {
   isDeleteDialogOpen.value = false;
   deleteTarget.value = null;
@@ -213,12 +332,31 @@ function closeDeleteDialog(): void {
   deleteEntityName.value = "";
 }
 
-async function onEditGroup({ groupId, payload }: EditGroupSubmitPayload): Promise<void> {
+async function onEditGroup({
+  groupId,
+  payload,
+  addonGroupIds,
+}: EditGroupSubmitPayload): Promise<void> {
   isUpdateGroupLoading.value = true;
   try {
-    await menuService.updateProductGroup(groupId, payload);
+    if (selectedGroup.value?.isAddonsGroup) {
+      await menuService.updateAddonGroup(groupId, payload);
+    } else {
+      await menuService.updateProductGroup(groupId, payload);
+    }
+
+    if (!payload.isAddonsGroup && addonGroupIds.length) {
+      await Promise.all(
+        addonGroupIds.map((addonGroupId) =>
+          menuService.linkAddonGroup({
+            productGroupId: groupId,
+            addonGroupId,
+          }),
+        ),
+      );
+    }
     isEditGroupDialogOpen.value = false;
-    await loadGroups();
+    await Promise.all([loadGroups(), loadAddonGroupOptions()]);
   } finally {
     isUpdateGroupLoading.value = false;
   }
@@ -241,9 +379,20 @@ async function onEditProduct({
       })),
     );
     isEditProductDialogOpen.value = false;
-    await loadGroups();
+    await Promise.all([loadGroups(), loadAddonGroupOptions()]);
   } finally {
     isUpdateProductLoading.value = false;
+  }
+}
+
+async function onEditAddon({ addonId, payload }: EditAddonSubmitPayload): Promise<void> {
+  isUpdateAddonLoading.value = true;
+  try {
+    await menuService.updateAddon(addonId, payload);
+    isEditAddonDialogOpen.value = false;
+    await Promise.all([loadGroups(), loadAddonGroupOptions()]);
+  } finally {
+    isUpdateAddonLoading.value = false;
   }
 }
 
@@ -255,19 +404,25 @@ async function onDeleteEntity(): Promise<void> {
   isDeleteLoading.value = true;
   try {
     if (deleteTarget.value.kind === "group") {
-      await menuService.deleteProductGroup(deleteTarget.value.id);
-    } else {
+      if (deleteTarget.value.isAddonsGroup) {
+        await menuService.deleteAddonGroup(deleteTarget.value.id);
+      } else {
+        await menuService.deleteProductGroup(deleteTarget.value.id);
+      }
+    } else if (deleteTarget.value.kind === "product") {
       await menuService.deleteProduct(deleteTarget.value.id);
+    } else {
+      await menuService.deleteAddon(deleteTarget.value.id);
     }
     closeDeleteDialog();
-    await loadGroups();
+    await Promise.all([loadGroups(), loadAddonGroupOptions()]);
   } finally {
     isDeleteLoading.value = false;
   }
 }
 
 onMounted(async () => {
-  await loadGroups();
+  await Promise.all([loadGroups(), loadAddonGroupOptions()]);
 });
 </script>
 
@@ -301,13 +456,12 @@ onMounted(async () => {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
-  display: flex;
   flex-direction: column;
-  gap: 10px;
   padding-bottom: 10px;
 }
 
 .admin-menu__group {
+  margin: 5px;
   padding: 12px;
   transition:
     border-color 0.2s ease,

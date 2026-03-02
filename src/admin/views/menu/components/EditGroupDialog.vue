@@ -1,6 +1,6 @@
 <template>
   <v-dialog :model-value="modelValue"
-            max-width="460"
+            max-width="520"
             @update:model-value="onModelUpdate">
     <v-card>
       <v-card-title>Редактировать группу</v-card-title>
@@ -23,6 +23,25 @@
                   label="Активна"
                   color="primary"
                   hide-details />
+
+        <v-switch v-model="isAddonsGroup"
+                  class="mt-1"
+                  label="Это группа допов"
+                  color="primary"
+                  hide-details />
+
+        <v-select v-model="selectedAddonGroupIds"
+                  class="mt-3"
+                  label="Группы допов"
+                  variant="outlined"
+                  density="comfortable"
+                  multiple
+                  chips
+                  clearable
+                  item-title="name"
+                  item-value="id"
+                  :items="addonGroups"
+                  :disabled="isAddonsGroup" />
       </v-card-text>
       <v-card-actions>
         <v-spacer />
@@ -51,6 +70,7 @@ const props = defineProps<{
   modelValue: boolean;
   isSubmitting: boolean;
   group: ProductGroup | null;
+  addonGroups: ProductGroup[];
 }>();
 
 const emit = defineEmits<{
@@ -62,6 +82,8 @@ const emit = defineEmits<{
 const name = ref("");
 const sortOrder = ref<number | null>(0);
 const isActive = ref(true);
+const isAddonsGroup = ref(false);
+const selectedAddonGroupIds = ref<number[]>([]);
 const nameError = ref("");
 
 watch(
@@ -73,9 +95,17 @@ watch(
     name.value = group.name;
     sortOrder.value = group.sortOrder ?? 0;
     isActive.value = group.isActive;
+    isAddonsGroup.value = group.isAddonsGroup;
+    selectedAddonGroupIds.value = group.addonLinks.map((link) => link.addonGroupId);
     nameError.value = "";
   },
 );
+
+watch(isAddonsGroup, (next) => {
+  if (next) {
+    selectedAddonGroupIds.value = [];
+  }
+});
 
 function onModelUpdate(value: boolean): void {
   emit("update:modelValue", value);
@@ -98,7 +128,9 @@ function onSubmit(): void {
       name: name.value,
       sortOrder: sortOrder.value ?? 0,
       isActive: isActive.value,
+      isAddonsGroup: isAddonsGroup.value,
     },
+    addonGroupIds: selectedAddonGroupIds.value,
   });
 }
 </script>

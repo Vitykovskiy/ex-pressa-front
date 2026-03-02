@@ -30,6 +30,7 @@ export interface AddonGroup {
   name: string;
   sortOrder?: number;
   isActive: boolean;
+  isAddonsGroup: boolean;
   addons: Addon[];
 }
 
@@ -69,6 +70,7 @@ export interface ProductGroup {
   name: string;
   sortOrder?: number;
   isActive: boolean;
+  isAddonsGroup: boolean;
   products: Product[];
   addonLinks: ProductGroupAddonGroup[];
 }
@@ -77,12 +79,14 @@ export interface CreateProductGroupDto {
   name: string;
   sortOrder?: number;
   isActive?: boolean;
+  isAddonsGroup?: boolean;
 }
 
 export interface UpdateProductGroupDto {
   name?: string;
   sortOrder?: number;
   isActive?: boolean;
+  isAddonsGroup?: boolean;
 }
 
 export interface CreateProductDto {
@@ -116,11 +120,26 @@ export interface CreateAddonGroupDto {
   name: string;
   sortOrder?: number;
   isActive?: boolean;
+  isAddonsGroup?: boolean;
+}
+
+export interface UpdateAddonGroupDto {
+  name?: string;
+  sortOrder?: number;
+  isActive?: boolean;
+  isAddonsGroup?: boolean;
 }
 
 export interface CreateAddonDto {
   addonGroupId: number;
   name: string;
+  priceRub?: number;
+  isActive?: boolean;
+}
+
+export interface UpdateAddonDto {
+  addonGroupId?: number;
+  name?: string;
   priceRub?: number;
   isActive?: boolean;
 }
