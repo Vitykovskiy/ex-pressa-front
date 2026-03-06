@@ -431,3 +431,48 @@ interface TimeSlot {
 3. PATCH /orders/{id}/status — смена статуса (CONFIRMED → READY → CLOSED)
 4. POST /orders/{id}/reject — отклонение с причиной
 ```
+
+---
+
+## E2E-тестирование (Playwright)
+
+**Конфигурация**: `playwright.config.ts` в корне репозитория.
+
+**Три проекта** (соответствуют трём приложениям):
+- `customer` — `baseURL: http://localhost:3000`, тесты в `e2e/customer/`
+- `admin` — `baseURL: http://localhost:3001`, тесты в `e2e/admin/`
+- `barista` — `baseURL: http://localhost:3002`, тесты в `e2e/barista/`
+
+**Структура тестов:**
+```
+e2e/
+├── mocks/
+│   └── data.ts              # Фиктивные данные API (продукты, заказы, слоты)
+├── support/
+│   ├── api-mocks.ts         # Хелперы page.route() для мокирования API
+│   └── helpers.ts           # waitForApp(), waitForDialogClose()
+├── customer/
+│   ├── menu.spec.ts         # Меню: группы, продукты, навигация (9 тестов)
+│   ├── cart.spec.ts         # Корзина: добавление, удаление, оформление (8 тестов)
+│   └── order.spec.ts        # Слоты заказа + история заказов (10 тестов)
+├── admin/
+│   ├── menu.spec.ts         # Управление меню: CRUD группы/товары/аддоны (15 тестов)
+│   └── users.spec.ts        # Список пользователей, поиск, фильтры (9 тестов)
+└── barista/
+    └── orders.spec.ts       # Заказы: просмотр, смена статусов, отклонение (15 тестов)
+```
+
+**Скрипты:**
+```bash
+npm run test:e2e            # Все тесты
+npm run test:e2e:customer   # Только customer
+npm run test:e2e:admin      # Только admin
+npm run test:e2e:barista    # Только barista
+npm run test:e2e:ui         # Интерактивный режим Playwright UI
+```
+
+**Ключевые решения:**
+- API полностью мокируется через `page.route()` — сервер не нужен
+- В DEV-режиме авторизация создаёт мок-пользователя автоматически
+- `waitForApp()` ожидает окончания redirect-а на `/auth` (если есть)
+- `workers: 1` — последовательный запуск во избежание конфликтов портов
