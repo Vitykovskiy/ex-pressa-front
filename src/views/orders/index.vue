@@ -110,8 +110,6 @@ defineOptions({
   name: "OrdersHistoryView",
 });
 
-const CURRENT_USER_ID = 1;
-
 const isLoading = ref(false);
 const errorMessage = ref("");
 const orders = ref<Order[]>([]);
@@ -139,7 +137,7 @@ async function loadOrders(): Promise<void> {
   errorMessage.value = "";
 
   try {
-    orders.value = await fetchOrderHistory(CURRENT_USER_ID);
+    orders.value = await fetchOrderHistory();
   } catch {
     errorMessage.value = "Не удалось загрузить историю заказов";
   } finally {

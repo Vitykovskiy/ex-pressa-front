@@ -5,19 +5,16 @@ import type {
   UpdateCartItemDto,
 } from "@/services/menu/types";
 
-export async function fetchCart(userId: number): Promise<Cart> {
-  return http.get<Cart>(`/cart/${userId}`);
+export async function fetchCart(): Promise<Cart> {
+  return http.get<Cart>(`/cart`);
 }
 
-export async function clearCart(userId: number): Promise<Cart> {
-  return http.delete<Cart>(`/cart/${userId}`);
+export async function clearCart(): Promise<Cart> {
+  return http.delete<Cart>(`/cart`);
 }
 
-export async function addCartItem(
-  userId: number,
-  payload: AddCartItemDto,
-): Promise<Cart> {
-  return http.post<Cart, AddCartItemDto>(`/cart/${userId}/items`, payload);
+export async function addCartItem(payload: AddCartItemDto): Promise<Cart> {
+  return http.post<Cart, AddCartItemDto>(`/cart/items`, payload);
 }
 
 export async function updateCartItem(

@@ -8,21 +8,13 @@ import type {
 } from "@/services/menu/types";
 
 export async function createOrderFromCart(
-  userId: number,
   payload: CreateOrderDto,
 ): Promise<Order> {
-  return http.post<Order, CreateOrderDto>(
-    `/orders/from-cart/${userId}`,
-    payload,
-  );
+  return http.post<Order, CreateOrderDto>(`/orders/from-cart`, payload);
 }
 
-export async function fetchOrderHistory(
-  userId: number | string,
-): Promise<Order[]> {
-  return http.get<Order[]>("/orders/history", {
-    headers: { "x-user-id": String(userId) },
-  });
+export async function fetchOrderHistory(): Promise<Order[]> {
+  return http.get<Order[]>("/orders/history");
 }
 
 export async function searchOrders(payload: OrdersFilterDto): Promise<Order[]> {

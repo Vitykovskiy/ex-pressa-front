@@ -75,8 +75,6 @@ defineOptions({
   name: "OrderSlotView",
 });
 
-const CURRENT_USER_ID = 1;
-
 const router = useRouter();
 const { cart, clearCart } = useCart();
 
@@ -149,13 +147,13 @@ async function onConfirmOrder(): Promise<void> {
   errorMessage.value = "";
 
   try {
-    await clearServerCart(CURRENT_USER_ID);
+    await clearServerCart();
 
     for (const item of cart.value) {
-      await addCartItem(CURRENT_USER_ID, mapToServerCartItem(item));
+      await addCartItem(mapToServerCartItem(item));
     }
 
-    await createOrderFromCart(CURRENT_USER_ID, {
+    await createOrderFromCart({
       timeSlotId: selectedSlotId.value,
     });
 
