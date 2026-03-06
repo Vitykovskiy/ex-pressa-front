@@ -20,12 +20,7 @@
     "type-check": "vue-tsc --build --force",
     "lint": "eslint . --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "test:e2e": "playwright test",
-    "test:e2e:customer": "playwright test --project=customer",
-    "test:e2e:admin": "playwright test --project=admin",
-    "test:e2e:barista": "playwright test --project=barista",
-    "test:e2e:ui": "playwright test --ui"
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@fontsource/roboto": "5.2.7",
@@ -38,7 +33,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "@playwright/test": "^1.58.2",
     "@tsconfig/node22": "^22.0.0",
     "@types/node": "^22.9.0",
     "@vitejs/plugin-vue": "^6.0.1",
