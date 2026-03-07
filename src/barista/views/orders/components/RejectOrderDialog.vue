@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <v-dialog
     :model-value="modelValue"
     max-width="460"
@@ -9,6 +9,7 @@
       <v-card-text>
         <v-textarea
           :model-value="reason"
+          data-testid="barista-reject-reason"
           label="Причина отклонения"
           variant="outlined"
           rows="4"
@@ -28,6 +29,7 @@
         <v-btn
           variant="flat"
           color="error"
+          data-testid="barista-reject-confirm"
           :loading="isSubmitting"
           @click="$emit('confirm')"
         >
