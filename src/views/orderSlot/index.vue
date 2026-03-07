@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="order-slot-view">
     <div class="order-slot-view__content">
       <h2>Выбор времени</h2>
@@ -27,6 +27,7 @@
           v-for="slot in slots"
           :key="slot.id"
           :value="slot.id"
+          :data-testid="`slot-option-${slot.id}`"
           :disabled="isSlotFull(slot)"
         >
           <template #label>
@@ -51,6 +52,7 @@
         block
         size="large"
         color="primary"
+        data-testid="slot-confirm-btn"
         :disabled="!selectedSlotId || isSubmitting"
         :loading="isSubmitting"
         @click="onConfirmOrder"
@@ -213,3 +215,4 @@ onMounted(() => {
   padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
 }
 </style>
+

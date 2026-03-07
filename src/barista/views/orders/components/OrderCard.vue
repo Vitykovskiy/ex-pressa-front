@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <v-card
     class="order-card"
     :data-testid="`order-card-${order.id}`"
@@ -17,9 +17,7 @@
             formatDate(order.createdAt)
           }}</span>
           <span class="order-card__meta-separator">·</span>
-          <span class="order-card__meta-count"
-            >{{ order.items.length }} позиции</span
-          >
+          <span class="order-card__meta-count">{{ order.items.length }} позиции</span>
         </div>
       </div>
       <v-chip
@@ -43,7 +41,7 @@
       </div>
       <div class="order-card__total">
         <span class="order-card__total-label">Итого:</span>
-        <strong class="order-card__total-value">{{ order.totalRub }} ₽</strong>
+        <strong class="order-card__total-value">{{ order.totalRub }} ?</strong>
       </div>
     </div>
 
@@ -68,9 +66,7 @@
               + {{ addon.addonName }} x{{ addon.quantity }}
             </div>
           </div>
-          <strong class="order-card__item-price"
-            >{{ item.lineTotalRub }} ₽</strong
-          >
+          <strong class="order-card__item-price">{{ item.lineTotalRub }} ?</strong>
         </div>
         <v-divider class="mt-2" />
       </div>
@@ -218,90 +214,49 @@ function formatOnlyDate(value: string): string {
   gap: 6px;
 }
 
-.order-card__author-label {
-  font-weight: 600;
-  color: rgba(var(--v-theme-on-surface), 0.68);
-}
-
-.order-card__author-value {
-  font-weight: 600;
-  color: rgba(var(--v-theme-on-surface), 0.86);
+.order-card__author-label,
+.order-card__meta-label,
+.order-card__slot-label,
+.order-card__total-label {
+  color: rgba(0, 0, 0, 0.55);
 }
 
 .order-card__meta {
-  font-size: 13px;
+  margin-top: 4px;
   display: flex;
   align-items: center;
   gap: 6px;
-  color: rgba(var(--v-theme-on-surface), 0.75);
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.65);
 }
 
-.order-card__meta-label {
-  font-weight: 600;
-  color: rgba(var(--v-theme-on-surface), 0.68);
-}
-
-.order-card__meta-value {
-  font-weight: 600;
-  color: rgb(var(--v-theme-info));
-}
-
-.order-card__meta-count {
-  font-weight: 600;
-  color: rgb(var(--v-theme-secondary));
-}
-
-.order-card__meta-separator {
-  color: rgba(var(--v-theme-on-surface), 0.45);
+.order-card__slot-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .order-card__slot {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 16px;
-}
-
-.order-card__slot-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-
-.order-card__slot-label {
-  font-weight: 700;
-  color: rgb(var(--v-theme-warning));
-}
-
-.order-card__slot-value {
-  font-weight: 600;
-  color: rgb(var(--v-theme-primary));
+  font-size: 13px;
 }
 
 .order-card__total {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 6px;
-  white-space: nowrap;
-}
-
-.order-card__total-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: rgba(var(--v-theme-on-surface), 0.72);
-}
-
-.order-card__total-value {
-  font-size: 20px;
-  line-height: 1;
-  color: rgb(var(--v-theme-primary));
+  font-size: 14px;
 }
 
 .order-card__items {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 4px;
 }
 
 .order-card__item-wrap:last-child :deep(.v-divider) {
@@ -311,31 +266,26 @@ function formatOnlyDate(value: string): string {
 .order-card__item {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
-  line-height: 1.3;
+  gap: 12px;
 }
 
 .order-card__item-main {
-  font-size: 18px;
-  font-weight: 700;
-  color: rgba(var(--v-theme-on-surface), 0.95);
-}
-
-.order-card__item-price {
-  font-size: 18px;
-  color: rgb(var(--v-theme-primary));
+  font-weight: 500;
 }
 
 .order-card__addon {
   margin-top: 2px;
-  font-size: 14px;
-  font-weight: 500;
-  color: rgba(var(--v-theme-on-surface), 0.72);
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.62);
+}
+
+.order-card__item-price {
+  white-space: nowrap;
 }
 
 .order-card__reject {
+  color: rgb(var(--v-theme-error));
   font-size: 13px;
-  color: #b3261e;
 }
 
 .order-card__actions {
@@ -344,3 +294,4 @@ function formatOnlyDate(value: string): string {
   flex-wrap: wrap;
 }
 </style>
+

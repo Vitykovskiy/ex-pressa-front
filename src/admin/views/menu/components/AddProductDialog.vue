@@ -10,6 +10,7 @@
         <v-select
           v-model="groupId"
           :items="groupItems"
+          data-testid="admin-product-group-select"
           label="Группа"
           variant="outlined"
           density="comfortable"
@@ -19,6 +20,7 @@
         <v-text-field
           v-model.trim="name"
           class="mt-2"
+          data-testid="admin-product-name-input"
           label="Название"
           variant="outlined"
           density="comfortable"
@@ -42,6 +44,7 @@
           v-model="type"
           class="mt-2"
           :items="typeItems"
+          data-testid="admin-product-type-select"
           label="Тип продукта"
           variant="outlined"
           density="comfortable"
@@ -63,6 +66,7 @@
           <div class="admin-add-product__price-grid mt-2">
             <v-text-field
               v-model.number="drinkPriceSmall"
+              data-testid="admin-product-price-s"
               type="number"
               min="1"
               label="Цена S"
@@ -72,6 +76,7 @@
             />
             <v-text-field
               v-model.number="drinkPriceMedium"
+              data-testid="admin-product-price-m"
               type="number"
               min="1"
               label="Цена M"
@@ -81,6 +86,7 @@
             />
             <v-text-field
               v-model.number="drinkPriceLarge"
+              data-testid="admin-product-price-l"
               type="number"
               min="1"
               label="Цена L"
@@ -95,6 +101,7 @@
           v-else
           v-model.number="singlePrice"
           class="mt-2"
+          data-testid="admin-product-price-single"
           type="number"
           :min="isAddonGroup ? 0 : 1"
           :label="isAddonGroup ? 'Цена (0 — бесплатно)' : 'Цена'"
@@ -144,6 +151,7 @@
         <v-btn
           variant="flat"
           color="primary"
+          data-testid="admin-product-submit-btn"
           :loading="isSubmitting"
           @click="onSubmit"
         >
@@ -374,3 +382,4 @@ function onSubmit(): void {
   }
 }
 </style>
+

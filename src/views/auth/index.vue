@@ -25,6 +25,7 @@
       <v-card-actions class="auth__actions">
         <v-btn
           v-if="status !== AuthStatus.Authorized"
+          data-testid="auth-retry-btn"
           color="primary"
           variant="flat"
           @click="onRetry"
@@ -33,6 +34,7 @@
         </v-btn>
         <v-btn
           v-else
+          data-testid="auth-continue-btn"
           color="primary"
           variant="flat"
           @click="onContinue"
@@ -155,3 +157,4 @@ watch(
   justify-content: flex-end;
 }
 </style>
+

@@ -8,6 +8,7 @@
           prepend-icon="mdi-folder-plus"
           color="primary"
           variant="flat"
+          data-testid="admin-add-group-btn"
           @click="isAddGroupDialogOpen = true"
         >
           Добавить группу</v-btn
@@ -17,6 +18,7 @@
           prepend-icon="mdi-plus"
           color="primary"
           variant="outlined"
+          data-testid="admin-add-product-btn"
           @click="isAddProductDialogOpen = true"
         >
           Добавить товар</v-btn
@@ -294,3 +296,4 @@ onMounted(async () => {
   }
 }
 </style>
+

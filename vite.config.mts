@@ -56,6 +56,7 @@ export default defineConfig({
     extensions: [".js", ".json", ".jsx", ".mjs", ".ts", ".tsx", ".vue"],
   },
   server: {
+    allowedHosts: ["front_admin", "front_customer", "front_barista", "localhost", "127.0.0.1"],
     port: 3000,
   },
 });

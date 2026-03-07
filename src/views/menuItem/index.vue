@@ -18,6 +18,7 @@
             <v-btn
               v-for="{ size } of sizes"
               :key="size"
+              :data-testid="`menu-item-size-${size}`"
               variant="outlined"
               :ripple="false"
             >
@@ -72,6 +73,7 @@
         <v-btn
           height="48"
           color="primary"
+          data-testid="menu-item-submit-btn"
           :ripple="false"
           @click="onConfirmCallback"
         >
@@ -293,3 +295,4 @@ function onEdit(): void {
   }
 }
 </style>
+

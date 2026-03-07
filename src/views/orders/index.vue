@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="orders-view">
     <div class="orders-view__head">
       <h2>История заказов</h2>
@@ -41,6 +41,7 @@
       <v-expansion-panel
         v-for="order in orders"
         :key="order.id"
+        :data-testid="`order-history-${order.id}`"
       >
         <v-expansion-panel-title>
           <div class="order-title">
@@ -54,12 +55,13 @@
             <div class="order-title__right">
               <v-chip
                 size="small"
+                :data-testid="`order-history-status-${order.id}`"
                 :color="statusMap[order.status].color"
                 variant="tonal"
               >
                 {{ statusMap[order.status].label }}
               </v-chip>
-              <strong>{{ order.totalRub }} ₽</strong>
+              <strong>{{ order.totalRub }} ?</strong>
             </div>
           </div>
         </v-expansion-panel-title>
@@ -79,12 +81,10 @@
               <div class="order-card__row">
                 <span>
                   {{ item.productName }}
-                  <template v-if="item.sizeCode"
-                    >({{ item.sizeCode }})</template
-                  >
+                  <template v-if="item.sizeCode">({{ item.sizeCode }})</template>
                   x{{ item.quantity }}
                 </span>
-                <strong>{{ item.lineTotalRub }} ₽</strong>
+                <strong>{{ item.lineTotalRub }} ?</strong>
               </div>
               <div
                 v-for="addon in item.addons"
@@ -220,3 +220,4 @@ onMounted(() => {
   color: rgba(0, 0, 0, 0.6);
 }
 </style>
+
