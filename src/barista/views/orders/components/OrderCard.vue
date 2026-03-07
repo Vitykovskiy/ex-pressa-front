@@ -113,7 +113,7 @@
 <script lang="ts" setup>
 import { OrderStatus, type Order } from "@/services/menu/types";
 
-const props = defineProps<{
+defineProps<{
   order: Order;
   pendingOrderId: number | null;
   statusMap: Record<OrderStatus, { label: string; color: string }>;
