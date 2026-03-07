@@ -21,6 +21,7 @@ export type AddGroupSubmitPayload =
 
 export type AddProductSubmitPayload = {
   product: CreateProductDto;
+  isAddonsGroup: boolean;
   prices: Array<{
     sizeCode?: SizeCode;
     priceRub: number;

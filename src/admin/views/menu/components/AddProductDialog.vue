@@ -22,6 +22,7 @@
           label="Название"
           variant="outlined"
           density="comfortable"
+          :disabled="!groupId"
           :error-messages="nameError"
         />
 
@@ -33,17 +34,30 @@
           density="comfortable"
           rows="3"
           auto-grow
+          :disabled="!groupId"
         />
 
         <v-select
+          v-if="!isAddonGroup"
           v-model="type"
           class="mt-2"
           :items="typeItems"
           label="Тип продукта"
           variant="outlined"
           density="comfortable"
+          :disabled="!groupId"
           :error-messages="typeError"
         />
+
+        <v-chip
+          v-else
+          class="mt-2"
+          color="secondary"
+          size="small"
+          label
+        >
+          Тип: Еда (группа допов)
+        </v-chip>
 
         <template v-if="type === ProductType.Drink">
           <div class="admin-add-product__price-grid mt-2">
@@ -82,10 +96,11 @@
           v-model.number="singlePrice"
           class="mt-2"
           type="number"
-          min="1"
-          label="Цена"
+          :min="isAddonGroup ? 0 : 1"
+          :label="isAddonGroup ? 'Цена (0 — бесплатно)' : 'Цена'"
           variant="outlined"
           density="comfortable"
+          :disabled="!groupId"
           :error-messages="singlePriceError"
         />
 
@@ -97,6 +112,7 @@
           label="Порядок сортировки"
           variant="outlined"
           density="comfortable"
+          :disabled="!groupId"
         />
 
         <v-switch
@@ -105,6 +121,7 @@
           label="Активен"
           color="primary"
           hide-details
+          :disabled="!groupId"
         />
 
         <v-switch
@@ -112,6 +129,7 @@
           label="Доступен к заказу"
           color="primary"
           hide-details
+          :disabled="!groupId"
         />
       </v-card-text>
       <v-card-actions>
@@ -158,7 +176,9 @@ const emit = defineEmits<{
   cancel: [];
 }>();
 
-const groupId = ref<number | null>(null);
+// Составной ключ 'p:{id}' для групп товаров, 'a:{id}' для групп аддонов.
+// Необходим, чтобы избежать коллизий ID между двумя отдельными таблицами БД.
+const groupId = ref<string | null>(null);
 const name = ref("");
 const description = ref("");
 const type = ref<ProductType | null>(null);
@@ -179,10 +199,12 @@ const drinkPriceSmallError = ref("");
 const drinkPriceMediumError = ref("");
 const drinkPriceLargeError = ref("");
 
+const isAddonGroup = computed(() => groupId.value?.startsWith("a:") ?? false);
+
 const groupItems = computed(() =>
   props.groups.map((group) => ({
     title: group.name,
-    value: group.id,
+    value: (group.isAddonsGroup ? "a:" : "p:") + group.id,
   })),
 );
 
@@ -195,14 +217,21 @@ const typeItems = [
 watch(
   () => props.modelValue,
   (isOpen) => {
-    if (isOpen) {
-      resetForm();
-      if (props.groups.length > 0) {
-        groupId.value = props.groups[0]!.id;
-      }
-    }
+    if (isOpen) resetForm();
   },
 );
+
+watch(groupId, (key) => {
+  if (key?.startsWith("a:")) {
+    type.value = ProductType.Food;
+  } else if (!key) {
+    type.value = null;
+  }
+  singlePriceError.value = "";
+  drinkPriceSmallError.value = "";
+  drinkPriceMediumError.value = "";
+  drinkPriceLargeError.value = "";
+});
 
 watch(type, () => {
   singlePriceError.value = "";
@@ -215,7 +244,7 @@ function resetForm(): void {
   groupId.value = null;
   name.value = "";
   description.value = "";
-  type.value = ProductType.Drink;
+  type.value = null;
   sortOrder.value = 0;
   isActive.value = true;
   isAvailable.value = true;
@@ -266,8 +295,12 @@ function onSubmit(): void {
   drinkPriceMediumError.value = "";
   drinkPriceLargeError.value = "";
 
+  const key = groupId.value!;
+  const isAddonsGroupValue = isAddonGroup.value;
+  const numericGroupId = parseInt(key.slice(2), 10);
+
   const product: CreateProductDto = {
-    groupId: groupId.value!,
+    groupId: numericGroupId,
     name: name.value,
     description: description.value || null,
     type: type.value!,
@@ -297,6 +330,7 @@ function onSubmit(): void {
 
     emit("submit", {
       product,
+      isAddonsGroup: isAddonsGroupValue,
       prices: [
         { sizeCode: SizeCode.Small, priceRub: drinkPriceSmall.value! },
         { sizeCode: SizeCode.Medium, priceRub: drinkPriceMedium.value! },
@@ -307,14 +341,22 @@ function onSubmit(): void {
     return;
   }
 
-  if (!singlePrice.value || singlePrice.value <= 0) {
-    singlePriceError.value = "Укажи цену больше 0";
-    return;
+  if (isAddonsGroupValue) {
+    if (singlePrice.value === null || singlePrice.value < 0) {
+      singlePriceError.value = "Укажи цену (0 или больше)";
+      return;
+    }
+  } else {
+    if (!singlePrice.value || singlePrice.value <= 0) {
+      singlePriceError.value = "Укажи цену больше 0";
+      return;
+    }
   }
 
   emit("submit", {
     product,
-    prices: [{ priceRub: singlePrice.value }],
+    isAddonsGroup: isAddonsGroupValue,
+    prices: [{ priceRub: singlePrice.value! }],
   });
 }
 </script>

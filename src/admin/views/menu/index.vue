@@ -358,19 +358,17 @@ async function onCreateProduct(
 ): Promise<void> {
   isCreateProductLoading.value = true;
   try {
-    const targetGroup = menuGroups.value.find(
-      (group) => group.id === payload.product.groupId,
-    );
-    if (targetGroup?.isAddonsGroup) {
+    if (payload.isAddonsGroup) {
+      const addonGroupId = payload.product.groupId;
       const basePrice = payload.prices[0]?.priceRub ?? 0;
       const createdAddon = await menuService.createAddon({
-        addonGroupId: targetGroup.id,
+        addonGroupId,
         name: payload.product.name,
         priceRub: basePrice,
         isActive: payload.product.isActive,
       });
       const standaloneGroup = standaloneAddonGroups.value.find(
-        (group) => group.id === targetGroup.id,
+        (group) => group.id === addonGroupId,
       );
       if (standaloneGroup) {
         standaloneGroup.products.unshift({
