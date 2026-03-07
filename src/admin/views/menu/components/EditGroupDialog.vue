@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <v-dialog
     :model-value="modelValue"
     max-width="520"
@@ -112,9 +112,7 @@ watch(
     sortOrder.value = group.sortOrder ?? 0;
     isActive.value = group.isActive;
     isAddonsGroup.value = group.isAddonsGroup;
-    selectedAddonGroupIds.value = group.addonLinks.map(
-      (link) => link.addonGroupId,
-    );
+    selectedAddonGroupIds.value = group.addonLinks.map((link) => link.addonGroupId);
     nameError.value = "";
   },
 );

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <v-dialog
     :model-value="modelValue"
     max-width="520"

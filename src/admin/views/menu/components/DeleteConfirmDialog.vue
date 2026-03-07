@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <v-dialog
     :model-value="modelValue"
     max-width="420"
@@ -6,7 +6,7 @@
   >
     <v-card>
       <v-card-title>Подтверждение удаления</v-card-title>
-      <v-card-text> Удалить {{ entityLabel }} «{{ entityName }}»? </v-card-text>
+      <v-card-text>Удалить {{ entityLabel }} «{{ entityName }}»?</v-card-text>
       <v-card-actions>
         <v-spacer />
         <v-btn
