@@ -1,6 +1,7 @@
 <template>
   <v-card
     class="order-card"
+    :data-testid="`order-card-${order.id}`"
     variant="outlined"
   >
     <div class="order-card__head">

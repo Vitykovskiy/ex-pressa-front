@@ -29,6 +29,7 @@
             <div class="cart">
               <v-btn
                 class="cart__btn"
+                data-testid="cart-btn"
                 variant="plain"
                 color="primary"
                 icon="mdi-cart-variant"

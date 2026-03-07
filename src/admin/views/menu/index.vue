@@ -29,6 +29,7 @@
         v-for="group in menuGroups"
         :key="group.id"
         class="admin-menu__group"
+        :data-testid="`group-card-${group.id}`"
         variant="outlined"
       >
         <div class="admin-menu__group-head">
@@ -39,6 +40,7 @@
               size="x-small"
               variant="text"
               color="primary"
+              :data-testid="`group-edit-${group.id}`"
               @click="openEditGroupDialog(group)"
             />
             <v-btn
@@ -46,6 +48,7 @@
               size="x-small"
               variant="text"
               color="error"
+              :data-testid="`group-delete-${group.id}`"
               @click="openDeleteGroupDialog(group)"
             />
           </div>
@@ -67,6 +70,7 @@
                 size="x-small"
                 variant="text"
                 color="primary"
+                :data-testid="`product-edit-${product.id}`"
                 @click="onEditPosition(group, product)"
               />
               <v-btn
@@ -74,6 +78,7 @@
                 size="x-small"
                 variant="text"
                 color="error"
+                :data-testid="`product-delete-${product.id}`"
                 @click="onDeletePosition(group, product)"
               />
             </div>
