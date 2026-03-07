@@ -41,7 +41,7 @@
       </div>
       <div class="order-card__total">
         <span class="order-card__total-label">Итого:</span>
-        <strong class="order-card__total-value">{{ order.totalRub }} ?</strong>
+        <strong class="order-card__total-value">{{ order.totalRub }} ₽</strong>
       </div>
     </div>
 
@@ -66,7 +66,7 @@
               + {{ addon.addonName }} x{{ addon.quantity }}
             </div>
           </div>
-          <strong class="order-card__item-price">{{ item.lineTotalRub }} ?</strong>
+          <strong class="order-card__item-price">{{ item.lineTotalRub }} ₽</strong>
         </div>
         <v-divider class="mt-2" />
       </div>

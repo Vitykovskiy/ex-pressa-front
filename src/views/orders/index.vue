@@ -61,7 +61,7 @@
               >
                 {{ statusMap[order.status].label }}
               </v-chip>
-              <strong>{{ order.totalRub }} ?</strong>
+              <strong>{{ order.totalRub }} ₽</strong>
             </div>
           </div>
         </v-expansion-panel-title>
@@ -84,7 +84,7 @@
                   <template v-if="item.sizeCode">({{ item.sizeCode }})</template>
                   x{{ item.quantity }}
                 </span>
-                <strong>{{ item.lineTotalRub }} ?</strong>
+                <strong>{{ item.lineTotalRub }} ₽</strong>
               </div>
               <div
                 v-for="addon in item.addons"
