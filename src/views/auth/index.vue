@@ -28,6 +28,11 @@
       <v-btn
         v-if="status !== AuthStatus.Checking"
         class="auth-view__button"
+        :data-testid="
+          status === AuthStatus.Authorized
+            ? 'auth-continue-btn'
+            : 'auth-retry-btn'
+        "
         :variant="status === AuthStatus.Authorized ? 'flat' : 'outlined'"
         @click="onAction"
       >
