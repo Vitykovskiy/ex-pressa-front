@@ -28,7 +28,7 @@ jobs:
             set -euo pipefail
 
             cd "${{ secrets.VPS_DEPLOY_PATH }}/frontend"
-            git fetch origin prod
+            git fetch origin prod:refs/remotes/origin/prod
             git checkout -B prod origin/prod
 
             cd "${{ secrets.VPS_DEPLOY_PATH }}/deploy"
