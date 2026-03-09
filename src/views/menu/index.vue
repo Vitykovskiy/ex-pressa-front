@@ -1,24 +1,6 @@
 <template>
   <div class="customer-page menu-view">
     <template v-if="!activeGroup && !isMissingGroup">
-      <section class="menu-hero-grid">
-        <div class="menu-hero-grid__visual menu-hero-grid__visual--primary">
-          <div class="menu-hero-grid__beans" />
-        </div>
-        <div class="menu-hero-grid__intro">
-          <p class="customer-eyebrow">Daily menu</p>
-          <h1 class="customer-title">
-            Меню
-            <br />
-            кофейни
-          </h1>
-          <p class="customer-subtitle">Напитки, десерты и быстрые позиции навынос.</p>
-        </div>
-        <div class="menu-hero-grid__visual menu-hero-grid__visual--secondary">
-          <div class="menu-hero-grid__cup" />
-        </div>
-      </section>
-
       <div class="customer-section-label">
         <span class="customer-section-label__text">Categories</span>
         <span class="customer-section-label__line" />
@@ -32,34 +14,19 @@
           v-for="(group, index) in menu"
           :key="group.id"
           class="menu-category"
+          :class="rowToneClass(index)"
           type="button"
           @click="onGroupClick(group.id)"
         >
-          <div
-            class="menu-category__preview"
-            :class="previewToneClass(index)"
-          >
-            <span class="menu-category__preview-mark" />
-          </div>
-
-          <div
-            class="menu-category__content"
-            :class="rowToneClass(index)"
-          >
-            <div class="menu-category__head">
-              <div>
-                <p class="menu-category__eyebrow">Category</p>
-                <h2 class="menu-category__title">{{ group.name }}</h2>
-              </div>
-
-              <span class="menu-category__arrow">
-                <v-icon icon="mdi-arrow-top-right" size="16" />
-              </span>
+          <div class="menu-category__content">
+            <div>
+              <p class="menu-category__eyebrow">{{ group.products.length }} позиций</p>
+              <h2 class="menu-category__title">{{ group.name }}</h2>
             </div>
 
-            <p class="menu-category__meta">
-              {{ group.products.length }} позиций доступно для заказа
-            </p>
+            <span class="menu-category__arrow">
+              <v-icon icon="mdi-arrow-top-right" size="16" />
+            </span>
           </div>
         </button>
       </div>
@@ -219,92 +186,6 @@ function onProductClick(itemId: number): void {
 </script>
 
 <style lang="scss" scoped>
-.menu-hero-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 180px 180px;
-}
-
-.menu-hero-grid__visual,
-.menu-hero-grid__intro {
-  position: relative;
-  overflow: hidden;
-}
-
-.menu-hero-grid__visual--primary {
-  grid-row: 1 / 3;
-  background:
-    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.18), transparent 30%),
-    linear-gradient(145deg, #4a2f1a 0%, #9a6a3d 45%, #241509 100%);
-}
-
-.menu-hero-grid__visual--secondary {
-  background:
-    radial-gradient(circle at 60% 40%, rgba(255, 255, 255, 0.2), transparent 26%),
-    linear-gradient(145deg, #7f5a3d 0%, #d6b38d 52%, #604129 100%);
-}
-
-.menu-hero-grid__intro {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 18px 16px;
-  background: var(--customer-bg);
-}
-
-.menu-hero-grid__beans,
-.menu-hero-grid__cup {
-  position: absolute;
-  inset: 0;
-}
-
-.menu-hero-grid__beans::before,
-.menu-hero-grid__beans::after,
-.menu-hero-grid__cup::before,
-.menu-hero-grid__cup::after {
-  content: "";
-  position: absolute;
-  border-radius: 999px;
-}
-
-.menu-hero-grid__beans::before {
-  width: 108px;
-  height: 190px;
-  top: 14px;
-  left: 28px;
-  transform: rotate(-18deg);
-  background: linear-gradient(180deg, rgba(32, 15, 6, 0.95), rgba(98, 58, 28, 0.5));
-}
-
-.menu-hero-grid__beans::after {
-  width: 68px;
-  height: 128px;
-  bottom: 22px;
-  right: 22px;
-  transform: rotate(18deg);
-  background: linear-gradient(180deg, rgba(230, 197, 154, 0.38), rgba(255, 255, 255, 0.02));
-}
-
-.menu-hero-grid__cup::before {
-  width: 124px;
-  height: 124px;
-  top: 30px;
-  left: calc(50% - 62px);
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(255, 245, 232, 0.92) 0 24%, transparent 25%),
-    radial-gradient(circle at 50% 50%, #f4d7b1 0 43%, #7a5237 44% 64%, transparent 65%);
-}
-
-.menu-hero-grid__cup::after {
-  width: 150px;
-  height: 150px;
-  top: 18px;
-  left: calc(50% - 75px);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 50%;
-}
-
 .menu-list,
 .menu-products {
   display: flex;
@@ -319,41 +200,18 @@ function onProductClick(itemId: number): void {
 }
 
 .menu-category {
-  display: flex;
-  align-items: stretch;
-}
-
-.menu-category__preview,
-.menu-product__preview {
-  position: relative;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.menu-category__preview {
-  width: 96px;
-  min-height: 96px;
-}
-
-.menu-category__preview-mark {
-  position: absolute;
-  inset: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.08);
+  display: block;
 }
 
 .menu-category__content,
 .menu-product__content {
   flex: 1 1 auto;
-  padding: 14px 16px;
-}
-
-.menu-category__head {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
+  padding: 16px 20px;
+  min-height: 72px;
 }
 
 .menu-category__eyebrow {
@@ -369,13 +227,6 @@ function onProductClick(itemId: number): void {
   font-family: "Georgia", "Times New Roman", serif;
   font-size: 20px;
   line-height: 1.2;
-}
-
-.menu-category__meta,
-.menu-product__type {
-  margin-top: 8px;
-  color: var(--customer-text-muted);
-  font-size: 12px;
 }
 
 .menu-category__arrow {
