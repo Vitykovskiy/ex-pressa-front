@@ -1,0 +1,51 @@
+name: Deploy Frontend Prod
+
+on:
+  push:
+    branches:
+      - prod
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-frontend-prod
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            set -euo pipefail
+
+            cd "${{ secrets.VPS_DEPLOY_PATH }}/frontend"
+            git fetch origin
+            git checkout prod
+            git pull --ff-only origin prod
+
+            cd "${{ secrets.VPS_DEPLOY_PATH }}/deploy"
+            docker-compose build customer_frontend admin_frontend barista_frontend
+
+            for container in \
+              ex-pressa-customer-frontend \
+              ex-pressa-admin-frontend \
+              ex-pressa-barista-frontend; do
+              docker rm -f "$container" >/dev/null 2>&1 || true
+            done
+
+            docker run -d --name ex-pressa-customer-frontend --restart unless-stopped -p 127.0.0.1:18100:80 deploy_customer_frontend:latest >/dev/null
+            docker run -d --name ex-pressa-admin-frontend --restart unless-stopped -p 127.0.0.1:18101:80 deploy_admin_frontend:latest >/dev/null
+            docker run -d --name ex-pressa-barista-frontend --restart unless-stopped -p 127.0.0.1:18102:80 deploy_barista_frontend:latest >/dev/null
+
+            curl -fsS https://customer.216.57.105.133.sslip.io >/dev/null
+            curl -fsS https://admin.216.57.105.133.sslip.io >/dev/null
+            curl -fsS https://barista.216.57.105.133.sslip.io >/dev/null
