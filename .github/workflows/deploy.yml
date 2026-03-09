@@ -28,9 +28,8 @@ jobs:
             set -euo pipefail
 
             cd "${{ secrets.VPS_DEPLOY_PATH }}/frontend"
-            git fetch origin
-            git checkout prod
-            git pull --ff-only origin prod
+            git fetch origin prod
+            git checkout -B prod origin/prod
 
             cd "${{ secrets.VPS_DEPLOY_PATH }}/deploy"
             docker-compose build customer_frontend admin_frontend barista_frontend
