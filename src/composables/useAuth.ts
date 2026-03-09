@@ -25,6 +25,47 @@ const roleCodes = computed(
   () => currentUser.value?.roles.map((role) => role.code) ?? [],
 );
 
+type TelegramWebAppWindow = Window & {
+  Telegram?: {
+    WebApp?: {
+      initData?: string;
+    };
+  };
+};
+
+function readTelegramInitData(): string {
+  const sdkInitData = retrieveRawInitData() || "";
+  if (sdkInitData) {
+    return sdkInitData;
+  }
+
+  const telegramInitData =
+    (window as TelegramWebAppWindow).Telegram?.WebApp?.initData?.trim() || "";
+  if (telegramInitData) {
+    return telegramInitData;
+  }
+
+  const url = new URL(window.location.href);
+  const queryInitData = url.searchParams.get("tgWebAppData")?.trim() || "";
+  if (queryInitData) {
+    return queryInitData;
+  }
+
+  return "";
+}
+
+async function resolveTelegramInitData(attempts = 5): Promise<string> {
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    const initData = readTelegramInitData();
+    if (initData) {
+      return initData;
+    }
+    await new Promise((resolve) => window.setTimeout(resolve, 250));
+  }
+
+  return "";
+}
+
 function createMockAuthorizedUser(): User {
   const now = new Date().toISOString();
   const appTarget = String(import.meta.env.VITE_APP_TARGET ?? "customer")
@@ -135,7 +176,7 @@ export function useAuth() {
     userFullName.value = "";
     currentUser.value = null;
 
-    const initData = retrieveRawInitData() || "";
+    const initData = await resolveTelegramInitData();
     if (!initData) {
       setUnauthorized(OPEN_APP_BY_TELEGRAM_MESSAGE);
       return;
