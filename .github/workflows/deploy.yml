@@ -29,6 +29,8 @@ jobs:
 
             cd "${{ secrets.VPS_DEPLOY_PATH }}/frontend"
             git fetch origin prod:refs/remotes/origin/prod
+            git reset --hard
+            git clean -fd
             git checkout -B prod origin/prod
 
             cd "${{ secrets.VPS_DEPLOY_PATH }}/deploy"
