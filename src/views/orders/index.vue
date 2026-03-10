@@ -1,31 +1,22 @@
 <template>
   <div class="customer-page orders-view">
-    <section class="customer-hero">
+    <section class="customer-hero orders-view__hero">
       <div class="orders-view__hero-head">
         <div>
-          <p class="customer-eyebrow">History</p>
-          <h1 class="customer-title">История заказов</h1>
-          <p class="customer-subtitle">
-            Статусы, состав и стоимость последних заказов.
-          </p>
+          <p class="orders-view__eyebrow">{{ orders.length }} заказов</p>
+          <h1 class="orders-view__title">История</h1>
         </div>
 
         <button
           class="orders-view__refresh"
           type="button"
+          :disabled="isLoading"
           @click="loadOrders"
         >
-          <v-progress-circular
-            v-if="isLoading"
-            indeterminate
-            size="16"
-            width="2"
-            color="primary"
-          />
           <v-icon
-            v-else
             icon="mdi-refresh"
             size="16"
+            :class="{ 'orders-view__refresh-icon--spinning': isLoading }"
           />
         </button>
       </div>
@@ -51,77 +42,91 @@
       v-else-if="!orders.length"
       class="customer-empty"
     >
-      <div class="customer-empty__icon">☕</div>
-      <p class="customer-empty__text">История заказов пока пуста.</p>
+      <p class="orders-view__empty-text">История заказов пуста</p>
     </div>
 
     <div
       v-else
       class="orders-view__list"
     >
-      <v-expansion-panels variant="accordion" class="orders-view__panels">
-        <v-expansion-panel
-          v-for="order in orders"
-          :key="order.id"
-          :data-testid="`order-history-${order.id}`"
-          class="orders-view__panel"
+      <article
+        v-for="order in orders"
+        :key="order.id"
+        :data-testid="`order-history-${order.id}`"
+        class="order-card"
+        :class="{ 'order-card--muted': isMutedCard(order.status) }"
+      >
+        <button
+          class="order-card__header"
+          type="button"
+          @click="toggleOrder(order.id)"
         >
-          <v-expansion-panel-title class="orders-view__panel-title">
-            <div class="order-title">
-              <div class="order-title__main">
-                <div class="order-title__id">
-                  Заказ #{{ order.id }}
-                </div>
-                <div class="order-title__meta">
-                  {{ formatDate(order.createdAt) }} · {{ order.items.length }} поз.
-                </div>
-              </div>
-
-              <div class="order-title__right">
-                <span
-                  class="order-title__status"
-                  :class="statusMap[order.status].className"
-                  :data-testid="`order-history-status-${order.id}`"
-                >
-                  {{ statusMap[order.status].label }}
-                </span>
-                <strong>{{ order.totalRub }} ₽</strong>
-              </div>
-            </div>
-          </v-expansion-panel-title>
-
-          <v-expansion-panel-text class="orders-view__panel-text">
-            <div class="order-card">
-              <div class="order-card__slot">
-                Слот: {{ order.timeSlot.date }} {{ order.slotTimeFrom }}-{{ order.slotTimeTo }}
-              </div>
-
-              <div
-                v-for="item in order.items"
-                :key="item.id"
-                class="order-card__item"
+          <div class="order-card__header-row">
+            <div class="order-card__title-wrap">
+              <p class="order-card__title">
+                Заказ #{{ order.id }}
+              </p>
+              <span
+                class="order-card__status"
+                :class="statusMap[order.status].className"
+                :data-testid="`order-history-status-${order.id}`"
               >
-                <div class="order-card__row">
-                  <span>
+                {{ statusMap[order.status].label }}
+              </span>
+            </div>
+
+            <div class="order-card__summary">
+              <strong class="order-card__total">{{ order.totalRub }} ₽</strong>
+              <v-icon
+                :icon="isOpen(order.id) ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                size="16"
+                class="order-card__chevron"
+              />
+            </div>
+          </div>
+
+          <p class="order-card__meta">
+            {{ formatDate(order.createdAt) }} · {{ order.items.length }} поз.
+          </p>
+        </button>
+
+        <div
+          v-if="isOpen(order.id)"
+          class="order-card__body"
+        >
+          <p class="order-card__slot">
+            Слот: {{ order.timeSlot.date }} {{ order.slotTimeFrom }}-{{ order.slotTimeTo }}
+          </p>
+
+          <div class="order-card__items">
+            <div
+              v-for="(item, index) in order.items"
+              :key="item.id"
+              class="order-card__item"
+              :class="{ 'order-card__item--last': index === order.items.length - 1 }"
+            >
+              <div class="order-card__item-row">
+                <div class="order-card__item-main">
+                  <p class="order-card__item-name">
                     {{ item.productName }}
                     <template v-if="item.sizeCode">({{ item.sizeCode }})</template>
-                    ×{{ item.quantity }}
-                  </span>
-                  <strong>{{ item.lineTotalRub }} ₽</strong>
+                  </p>
+                  <p class="order-card__item-qty">×{{ item.quantity }}</p>
                 </div>
-
-                <div
-                  v-for="addon in item.addons"
-                  :key="addon.id"
-                  class="order-card__addon"
-                >
-                  + {{ addon.addonName }} ×{{ addon.quantity }}
-                </div>
+                <p class="order-card__item-total">{{ item.lineTotalRub }} ₽</p>
               </div>
+
+              <p
+                v-for="addon in item.addons"
+                :key="addon.id"
+                class="order-card__addon"
+              >
+                + {{ addon.addonName }} ×{{ addon.quantity }}
+              </p>
             </div>
-          </v-expansion-panel-text>
-        </v-expansion-panel>
-      </v-expansion-panels>
+          </div>
+        </div>
+      </article>
     </div>
   </div>
 </template>
@@ -138,6 +143,7 @@ defineOptions({
 const isLoading = ref(false);
 const errorMessage = ref("");
 const orders = ref<Order[]>([]);
+const openOrderIds = ref<number[]>([]);
 
 const statusMap: Record<
   Order["status"],
@@ -160,12 +166,30 @@ function formatDate(value: string): string {
   }).format(date);
 }
 
+function isOpen(orderId: number): boolean {
+  return openOrderIds.value.includes(orderId);
+}
+
+function toggleOrder(orderId: number): void {
+  openOrderIds.value = isOpen(orderId)
+    ? openOrderIds.value.filter((id) => id !== orderId)
+    : [...openOrderIds.value, orderId];
+}
+
+function isMutedCard(status: OrderStatus): boolean {
+  return status === OrderStatus.CLOSED || status === OrderStatus.REJECTED;
+}
+
 async function loadOrders(): Promise<void> {
   isLoading.value = true;
   errorMessage.value = "";
 
   try {
-    orders.value = await fetchOrderHistory();
+    const nextOrders = await fetchOrderHistory();
+    orders.value = nextOrders;
+    openOrderIds.value = openOrderIds.value.filter((id) =>
+      nextOrders.some((order) => order.id === id),
+    );
   } catch {
     errorMessage.value = "Не удалось загрузить историю заказов";
   } finally {
@@ -183,6 +207,12 @@ onMounted(() => {
   gap: 18px;
 }
 
+.orders-view__hero {
+  padding-top: 24px;
+  padding-bottom: 28px;
+  border-bottom: 0;
+}
+
 .orders-view__hero-head {
   display: flex;
   align-items: flex-start;
@@ -190,155 +220,279 @@ onMounted(() => {
   gap: 16px;
 }
 
+.orders-view__eyebrow {
+  margin: 0 0 6px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.orders-view__title {
+  margin: 0;
+  color: #fff;
+  font-size: 36px;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
 .orders-view__refresh {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   margin-top: 2px;
-  border: 1px solid var(--customer-border);
   border-radius: 999px;
-  color: var(--customer-text-muted);
-  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.orders-view__refresh:disabled {
+  opacity: 0.8;
+}
+
+.orders-view__refresh-icon--spinning {
+  animation: orders-view-spin 0.8s linear infinite;
 }
 
 .orders-view__list {
-  padding: 0 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 16px 24px;
 }
 
-.orders-view__panels {
-  gap: 8px;
+.orders-view__empty-text {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
 }
 
-.orders-view__panel {
-  border: 1px solid var(--customer-border);
-  border-radius: 18px;
+.order-card {
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.03);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
-.orders-view__panel-title {
-  padding: 14px 16px;
+.order-card--muted {
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
 }
 
-.orders-view__panel-text {
-  background: rgba(0, 0, 0, 0.15);
-}
-
-.order-title {
+.order-card__header {
   width: 100%;
+  padding: 16px 18px;
+  text-align: left;
+}
+
+.order-card__header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  margin-bottom: 8px;
 }
 
-.order-title__main {
+.order-card__title-wrap {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
 }
 
-.order-title__id {
-  color: var(--customer-text);
-  font-size: 14px;
-  font-weight: 500;
+.order-card__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f2880;
 }
 
-.order-title__meta {
-  color: var(--customer-text-soft);
-  font-size: 12px;
+.order-card--muted .order-card__title {
+  color: #fff;
 }
 
-.order-title__right {
+.order-card__status {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.order-card__summary {
   display: flex;
   align-items: center;
-  gap: 10px;
-  color: var(--customer-accent);
-  font-size: 15px;
+  gap: 8px;
+}
+
+.order-card__total {
+  color: #1847e8;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.order-card--muted .order-card__total {
+  color: #fff;
+}
+
+.order-card__chevron {
+  color: rgba(15, 40, 128, 0.4);
+}
+
+.order-card--muted .order-card__chevron {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.order-card__meta {
+  margin: 0;
+  color: rgba(15, 40, 128, 0.45);
+  font-size: 12px;
   font-weight: 600;
 }
 
-.order-title__status {
-  display: inline-flex;
-  align-items: center;
-  border-width: 1px;
-  border-style: solid;
-  border-radius: 999px;
-  padding: 3px 8px;
-  font-size: 11px;
-  font-weight: 500;
+.order-card--muted .order-card__meta {
+  color: rgba(255, 255, 255, 0.5);
 }
 
-.status-created {
-  border-color: rgba(255, 200, 50, 0.25);
-  background: rgba(255, 200, 50, 0.1);
-  color: #ffc832;
+.order-card__body {
+  padding: 14px 18px;
+  border-top: 1px solid rgba(15, 40, 128, 0.08);
+  background: rgba(24, 71, 232, 0.04);
 }
 
-.status-confirmed {
-  border-color: rgba(50, 150, 255, 0.25);
-  background: rgba(50, 150, 255, 0.1);
-  color: #3296ff;
-}
-
-.status-ready {
-  border-color: rgba(50, 220, 100, 0.25);
-  background: rgba(50, 220, 100, 0.1);
-  color: #32dc64;
-}
-
-.status-closed {
-  border-color: rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.42);
-}
-
-.status-rejected {
-  border-color: rgba(212, 24, 61, 0.25);
-  background: rgba(212, 24, 61, 0.1);
-  color: #d4183d;
-}
-
-.order-card {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 12px 16px 16px;
+.order-card--muted .order-card__body {
+  border-top-color: rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .order-card__slot {
-  color: var(--customer-text-soft);
+  margin: 0 0 10px;
+  color: rgba(15, 40, 128, 0.45);
   font-size: 11px;
-  letter-spacing: 0.05em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.order-card--muted .order-card__slot {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.order-card__items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .order-card__item {
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(15, 40, 128, 0.07);
 }
 
-.order-card__item:last-child {
+.order-card--muted .order-card__item {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.order-card__item--last {
   padding-bottom: 0;
   border-bottom: 0;
 }
 
-.order-card__row {
+.order-card__item-row {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
-  color: rgba(255, 255, 255, 0.78);
-  font-size: 13px;
 }
 
-.order-card__row strong {
-  color: var(--customer-accent);
+.order-card__item-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.order-card__item-name {
+  margin: 0;
+  color: #0f2880;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.order-card--muted .order-card__item-name {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.order-card__item-qty {
+  margin: 0;
+  color: rgba(15, 40, 128, 0.4);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.order-card--muted .order-card__item-qty {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.order-card__item-total {
+  margin: 0;
+  color: #1847e8;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.order-card--muted .order-card__item-total {
+  color: #fff;
 }
 
 .order-card__addon {
-  margin-top: 4px;
-  color: var(--customer-text-soft);
+  margin: 2px 0 0;
+  color: rgba(15, 40, 128, 0.4);
   font-size: 11px;
+  font-weight: 600;
+}
+
+.order-card--muted .order-card__addon {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.status-created {
+  color: #cc8800;
+  background: #fff7e0;
+}
+
+.status-confirmed {
+  color: #1847e8;
+  background: #e0eaff;
+}
+
+.status-ready {
+  color: #00a854;
+  background: #e0fff0;
+}
+
+.status-closed {
+  color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.status-rejected {
+  color: #ff4466;
+  background: rgba(212, 24, 61, 0.15);
+}
+
+@keyframes orders-view-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>
