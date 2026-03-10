@@ -30,9 +30,9 @@ jobs:
 
             cd "${{ secrets.VPS_DEPLOY_PATH }}/frontend"
             git fetch --prune origin prod
-            git reset --hard
+            git checkout -B prod
+            git reset --hard FETCH_HEAD
             git clean -fd
-            git checkout -B prod FETCH_HEAD
 
             cd "${{ secrets.VPS_DEPLOY_PATH }}/deploy"
             docker-compose build customer_frontend admin_frontend barista_frontend
