@@ -25,6 +25,7 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_KEY }}
           script: |
+            bash <<'EOF'
             set -euo pipefail
 
             cd "${{ secrets.VPS_DEPLOY_PATH }}/frontend"
@@ -50,3 +51,4 @@ jobs:
             curl -fsS https://customer.216.57.105.133.sslip.io >/dev/null
             curl -fsS https://admin.216.57.105.133.sslip.io >/dev/null
             curl -fsS https://barista.216.57.105.133.sslip.io >/dev/null
+            EOF
