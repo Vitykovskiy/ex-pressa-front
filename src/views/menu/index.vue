@@ -75,9 +75,6 @@
             </div>
 
             <div class="menu-product__chips">
-              <span class="menu-product__price-chip">
-                {{ productPriceLabel(product) }}
-              </span>
               <span
                 v-for="price in product.prices.filter((entry) => entry.sizeCode)"
                 :key="price.id"
@@ -107,11 +104,7 @@ import { useRoute } from "vue-router";
 import { useMenu } from "@/composables/useMenu";
 import router from "@/router";
 import { RouteNames } from "@/routes";
-import {
-  ProductType,
-  type Product,
-  type ProductGroup,
-} from "@/services/menu/types";
+import { ProductType, type ProductGroup } from "@/services/menu/types";
 
 defineOptions({
   name: "MenuView",
@@ -143,12 +136,6 @@ function productTypeLabel(type: ProductType): string {
     default:
       return "Позиция";
   }
-}
-
-function productPriceLabel(product: Product): string {
-  const prices = product.prices.map((entry) => entry.priceRub);
-  const minPrice = prices.length ? Math.min(...prices) : 0;
-  return product.type === ProductType.Drink ? `от ${minPrice} ₽` : `${minPrice} ₽`;
 }
 
 function onGroupClick(groupId: number): void {
@@ -263,23 +250,12 @@ function onProductClick(itemId: number): void {
   gap: 8px;
 }
 
-.menu-product__price-chip,
 .menu-product__size-chip {
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
   padding: 3px 10px;
   font-size: 11px;
-}
-
-.menu-product__price-chip {
-  border: 1px solid rgba(201, 169, 110, 0.24);
-  background: rgba(201, 169, 110, 0.12);
-  color: var(--customer-accent);
-  font-weight: 600;
-}
-
-.menu-product__size-chip {
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.05);
   color: var(--customer-text-muted);

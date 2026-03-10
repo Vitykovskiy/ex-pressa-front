@@ -452,6 +452,11 @@ onMounted(() => {
   color: var(--customer-accent);
 }
 
+.version-dialog__section span,
+.version-dialog__actions .v-btn {
+  color: var(--customer-text);
+}
+
 .version-dialog__actions {
   padding: 0 16px 16px;
 }
