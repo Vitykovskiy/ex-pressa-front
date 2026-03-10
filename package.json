@@ -4,6 +4,7 @@
   "type": "module",
   "version": "0.0.0",
   "scripts": {
+    "version:generate": "node scripts/version/write-build-version.mjs",
     "check:text": "node tools/check-text-corruption.mjs",
     "dev": "vite --mode customer",
     "dev:customer": "vite --mode customer",

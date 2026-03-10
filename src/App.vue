@@ -20,6 +20,15 @@
 
           <div class="header__right">
             <v-btn
+              v-if="showVersionButton"
+              class="header__icon-btn"
+              icon="mdi-information-outline"
+              variant="text"
+              :ripple="false"
+              @click="isVersionDialogOpen = true"
+            />
+
+            <v-btn
               class="header__icon-btn"
               icon="mdi-history"
               variant="text"
@@ -51,18 +60,54 @@
         </div>
       </div>
     </v-main>
+
+    <v-dialog
+      v-model="isVersionDialogOpen"
+      max-width="420"
+    >
+      <v-card class="version-dialog">
+        <v-card-title class="version-dialog__title">Версия приложения</v-card-title>
+        <v-card-text class="version-dialog__content">
+          <div class="version-dialog__section">
+            <strong>Frontend</strong>
+            <span>{{ frontendVersion.version }}</span>
+            <span>{{ frontendVersion.generatedAt }}</span>
+          </div>
+
+          <div class="version-dialog__section">
+            <strong>Backend</strong>
+            <span v-if="backendVersion">{{ backendVersion.version }}</span>
+            <span v-else-if="backendVersionError">{{ backendVersionError }}</span>
+            <span v-else>Загрузка...</span>
+            <span v-if="backendVersion">{{ backendVersion.generatedAt }}</span>
+          </div>
+        </v-card-text>
+        <v-card-actions class="version-dialog__actions">
+          <v-spacer />
+          <v-btn variant="text" @click="isVersionDialogOpen = false">Закрыть</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
 <script lang="ts" setup>
-import { computed } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
+import { SHOW_VERSION_BUTTON } from "@/config/versionInfo";
+import { APP_VERSION_INFO } from "@/generated/app-version";
+import { fetchHealth, type AppVersionInfo } from "@/services/system";
 import router from "./router";
 import { RouteNames } from "./routes";
 import { useCart } from "./composables/useCart";
 
 const route = useRoute();
 const { cart } = useCart();
+const showVersionButton = SHOW_VERSION_BUTTON;
+const frontendVersion = APP_VERSION_INFO;
+const isVersionDialogOpen = ref(false);
+const backendVersion = ref<AppVersionInfo | null>(null);
+const backendVersionError = ref("");
 
 const cartCount = computed(() =>
   cart.value.reduce((sum, item) => sum + item.quantity, 0),
@@ -86,6 +131,26 @@ function onCart(): void {
 function onOrders(): void {
   router.push({ name: RouteNames.OrdersHistory });
 }
+
+async function loadBackendVersion(): Promise<void> {
+  backendVersionError.value = "";
+
+  try {
+    const response = await fetchHealth();
+    backendVersion.value = response.app ?? null;
+    if (!response.app) {
+      backendVersionError.value = "Версия недоступна";
+    }
+  } catch {
+    backendVersionError.value = "Не удалось получить версию";
+  }
+}
+
+onMounted(() => {
+  if (showVersionButton) {
+    void loadBackendVersion();
+  }
+});
 </script>
 
 <style lang="scss">
@@ -173,7 +238,7 @@ function onOrders(): void {
 }
 
 .header__right {
-  width: 84px;
+  width: 124px;
   justify-content: flex-end;
   gap: 4px;
 }
@@ -360,6 +425,35 @@ function onOrders(): void {
   justify-content: center;
   user-select: none;
   pointer-events: none;
+}
+
+.version-dialog {
+  background: linear-gradient(180deg, rgba(16, 31, 62, 0.98), rgba(8, 18, 37, 1));
+  color: var(--customer-text);
+  border: 1px solid var(--customer-border);
+}
+
+.version-dialog__title {
+  font-family: var(--customer-display-font);
+  letter-spacing: 0.04em;
+}
+
+.version-dialog__content {
+  display: grid;
+  gap: 16px;
+}
+
+.version-dialog__section {
+  display: grid;
+  gap: 4px;
+}
+
+.version-dialog__section strong {
+  color: var(--customer-accent);
+}
+
+.version-dialog__actions {
+  padding: 0 16px 16px;
 }
 
 @media (max-width: 420px) {
