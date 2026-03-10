@@ -1,14 +1,11 @@
 <template>
   <div class="auth-view">
-    <div class="auth-view__glow" />
-
     <div class="auth-view__content">
       <div class="auth-view__icon">
         <v-icon
           :icon="statusUi.icon"
-          :color="statusUi.iconColor"
           :class="{ 'auth-view__icon--spinning': status === AuthStatus.Checking }"
-          size="30"
+          size="34"
         />
       </div>
 
@@ -33,7 +30,6 @@
             ? 'auth-continue-btn'
             : 'auth-retry-btn'
         "
-        :variant="status === AuthStatus.Authorized ? 'flat' : 'outlined'"
         @click="onAction"
       >
         {{ statusUi.actionLabel }}
@@ -65,7 +61,7 @@ const detail = computed(() => {
   if (status.value === AuthStatus.Authorized) {
     return userFullName.value
       ? `Здравствуйте, ${userFullName.value}`
-      : "Авторизация прошла успешно. Можете приступить к заказу.";
+      : "Авторизация прошла успешно. Можно переходить к заказу.";
   }
 
   if (status.value === AuthStatus.Checking) {
@@ -76,7 +72,7 @@ const detail = computed(() => {
     return message.value;
   }
 
-  return "Войдите через Telegram для доступа к заказам и истории.";
+  return "Войдите через Telegram для доступа к меню, заказам и истории.";
 });
 
 const statusUi = computed(() => {
@@ -86,14 +82,12 @@ const statusUi = computed(() => {
         title: "Добро пожаловать!",
         actionLabel: "Продолжить",
         icon: "mdi-check-circle-outline",
-        iconColor: "#32dc64",
       };
     case AuthStatus.Checking:
       return {
         title: "Авторизация...",
         actionLabel: "",
         icon: "mdi-loading",
-        iconColor: "#c9a96e",
       };
     case AuthStatus.Unauthorized:
       return {
@@ -109,15 +103,12 @@ const statusUi = computed(() => {
           message.value === AUTHORIZATION_FAILED_MESSAGE
             ? "mdi-close-circle-outline"
             : "mdi-send-outline",
-        iconColor:
-          message.value === AUTHORIZATION_FAILED_MESSAGE ? "#d4183d" : "#c9a96e",
       };
     default:
       return {
         title: "Требуется вход",
         actionLabel: "Войти через Telegram",
         icon: "mdi-send-outline",
-        iconColor: "#c9a96e",
       };
   }
 });
@@ -164,30 +155,19 @@ watch(
 
 <style lang="scss" scoped>
 .auth-view {
-  position: relative;
   display: flex;
   flex: 1 1 auto;
   align-items: center;
   justify-content: center;
-  padding: 24px;
-  overflow: hidden;
-}
-
-.auth-view__glow {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse at 50% 38%, rgba(201, 169, 110, 0.08) 0%, transparent 65%);
+  padding: 28px 20px;
 }
 
 .auth-view__content {
-  position: relative;
   display: flex;
-  width: min(380px, 100%);
+  width: min(420px, 100%);
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 22px;
   text-align: center;
 }
 
@@ -195,11 +175,11 @@ watch(
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 72px;
-  height: 72px;
-  border: 1px solid var(--customer-border);
+  width: 88px;
+  height: 88px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
 }
 
 .auth-view__icon--spinning {
@@ -207,36 +187,38 @@ watch(
 }
 
 .auth-view__detail {
-  color: var(--customer-text-muted);
-  font-size: 14px;
-  line-height: 1.6;
+  margin: 12px 0 0;
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 15px;
+  line-height: 1.55;
 }
 
 .auth-view__hint {
   width: 100%;
-  border: 1px solid rgba(201, 169, 110, 0.2);
-  border-radius: 16px;
-  padding: 14px 16px;
-  background: rgba(201, 169, 110, 0.08);
-  color: var(--customer-text-muted);
-  font-size: 12px;
+  border-radius: 24px;
+  padding: 16px 18px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 14px;
   line-height: 1.5;
 }
 
 .auth-view__button.v-btn {
   width: 100%;
-  height: 48px;
-  border-radius: 14px;
+  height: 52px;
+  border-radius: 18px;
+  font-weight: 800;
+  letter-spacing: 0;
 }
 
-.auth-view__button.v-btn--variant-flat {
-  background: var(--customer-accent);
-  color: var(--customer-bg);
+.auth-view__button.v-btn {
+  background: #fff;
+  color: var(--customer-blue);
 }
 
-.auth-view__button.v-btn--variant-outlined {
-  border-color: rgba(201, 169, 110, 0.34);
-  color: var(--customer-accent);
+.auth-view__button[data-testid="auth-continue-btn"].v-btn {
+  background: var(--customer-orange);
+  color: #fff;
 }
 
 @keyframes auth-spin {

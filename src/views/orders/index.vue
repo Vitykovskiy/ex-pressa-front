@@ -3,8 +3,8 @@
     <section class="customer-hero orders-view__hero">
       <div class="orders-view__hero-head">
         <div>
-          <p class="orders-view__eyebrow">{{ orders.length }} заказов</p>
-          <h1 class="orders-view__title">История</h1>
+          <p class="customer-eyebrow">{{ orders.length }} заказов</p>
+          <h1 class="customer-title">История</h1>
         </div>
 
         <button
@@ -34,7 +34,7 @@
       v-else-if="!orders.length && isLoading"
       class="customer-status customer-status--loading"
     >
-      <v-progress-circular indeterminate size="16" width="2" color="primary" />
+      <v-progress-circular indeterminate size="16" width="2" color="white" />
       <span>Загружаем историю заказов.</span>
     </div>
 
@@ -63,9 +63,7 @@
         >
           <div class="order-card__header-row">
             <div class="order-card__title-wrap">
-              <p class="order-card__title">
-                Заказ #{{ order.id }}
-              </p>
+              <p class="order-card__title">Заказ #{{ order.id }}</p>
               <span
                 class="order-card__status"
                 :class="statusMap[order.status].className"
@@ -203,14 +201,8 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.orders-view {
-  gap: 18px;
-}
-
 .orders-view__hero {
-  padding-top: 24px;
-  padding-bottom: 28px;
-  border-bottom: 0;
+  padding-bottom: 20px;
 }
 
 .orders-view__hero-head {
@@ -220,38 +212,16 @@ onMounted(() => {
   gap: 16px;
 }
 
-.orders-view__eyebrow {
-  margin: 0 0 6px;
-  color: rgba(255, 255, 255, 0.65);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.orders-view__title {
-  margin: 0;
-  color: #fff;
-  font-size: 36px;
-  font-weight: 900;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-}
-
 .orders-view__refresh {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 40px;
   height: 40px;
-  margin-top: 2px;
+  margin-top: 4px;
   border-radius: 999px;
-  color: rgba(255, 255, 255, 0.9);
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.orders-view__refresh:disabled {
-  opacity: 0.8;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
 }
 
 .orders-view__refresh-icon--spinning {
@@ -261,32 +231,31 @@ onMounted(() => {
 .orders-view__list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   padding: 0 16px 24px;
 }
 
 .orders-view__empty-text {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.84);
   font-size: 16px;
-  font-weight: 700;
-  text-align: center;
+  font-weight: 800;
 }
 
 .order-card {
   overflow: hidden;
-  border-radius: 22px;
+  border-radius: 24px;
   background: #fff;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 10px 30px rgba(6, 28, 109, 0.16);
 }
 
 .order-card--muted {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.14);
   box-shadow: none;
 }
 
 .order-card__header {
   width: 100%;
-  padding: 16px 18px;
+  padding: 18px;
   text-align: left;
 }
 
@@ -307,9 +276,9 @@ onMounted(() => {
 
 .order-card__title {
   margin: 0;
-  font-size: 15px;
-  font-weight: 800;
-  color: #0f2880;
+  color: var(--customer-ink);
+  font-size: 16px;
+  font-weight: 900;
 }
 
 .order-card--muted .order-card__title {
@@ -320,7 +289,7 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  padding: 3px 10px;
+  padding: 4px 10px;
   font-size: 11px;
   font-weight: 800;
 }
@@ -332,8 +301,8 @@ onMounted(() => {
 }
 
 .order-card__total {
-  color: #1847e8;
-  font-size: 16px;
+  color: var(--customer-blue);
+  font-size: 18px;
   font-weight: 900;
 }
 
@@ -346,56 +315,48 @@ onMounted(() => {
 }
 
 .order-card--muted .order-card__chevron {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .order-card__meta {
   margin: 0;
-  color: rgba(15, 40, 128, 0.45);
+  color: rgba(15, 40, 128, 0.5);
   font-size: 12px;
   font-weight: 600;
 }
 
 .order-card--muted .order-card__meta {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.62);
 }
 
 .order-card__body {
-  padding: 14px 18px;
-  border-top: 1px solid rgba(15, 40, 128, 0.08);
-  background: rgba(24, 71, 232, 0.04);
-}
-
-.order-card--muted .order-card__body {
-  border-top-color: rgba(255, 255, 255, 0.12);
-  background: rgba(0, 0, 0, 0.1);
+  padding: 0 18px 18px;
 }
 
 .order-card__slot {
-  margin: 0 0 10px;
-  color: rgba(15, 40, 128, 0.45);
-  font-size: 11px;
+  margin: 0 0 12px;
+  color: rgba(15, 40, 128, 0.58);
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.04em;
 }
 
 .order-card--muted .order-card__slot {
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.68);
 }
 
 .order-card__items {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .order-card__item {
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(15, 40, 128, 0.07);
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(15, 40, 128, 0.08);
 }
 
 .order-card--muted .order-card__item {
-  border-bottom-color: rgba(255, 255, 255, 0.08);
+  border-bottom-color: rgba(255, 255, 255, 0.14);
 }
 
 .order-card__item--last {
@@ -417,73 +378,68 @@ onMounted(() => {
   flex-wrap: wrap;
 }
 
-.order-card__item-name {
+.order-card__item-name,
+.order-card__item-qty,
+.order-card__item-total,
+.order-card__addon {
   margin: 0;
-  color: #0f2880;
-  font-size: 13px;
-  font-weight: 700;
+}
+
+.order-card__item-name {
+  color: var(--customer-ink);
+  font-size: 14px;
+  font-weight: 800;
 }
 
 .order-card--muted .order-card__item-name {
-  color: rgba(255, 255, 255, 0.85);
+  color: #fff;
 }
 
-.order-card__item-qty {
-  margin: 0;
-  color: rgba(15, 40, 128, 0.4);
+.order-card__item-qty,
+.order-card__addon {
+  color: rgba(15, 40, 128, 0.52);
   font-size: 12px;
   font-weight: 600;
 }
 
-.order-card--muted .order-card__item-qty {
-  color: rgba(255, 255, 255, 0.4);
+.order-card--muted .order-card__item-qty,
+.order-card--muted .order-card__addon {
+  color: rgba(255, 255, 255, 0.62);
 }
 
 .order-card__item-total {
-  margin: 0;
-  color: #1847e8;
-  font-size: 13px;
-  font-weight: 800;
+  color: var(--customer-blue);
+  font-size: 14px;
+  font-weight: 900;
 }
 
 .order-card--muted .order-card__item-total {
   color: #fff;
 }
 
-.order-card__addon {
-  margin: 2px 0 0;
-  color: rgba(15, 40, 128, 0.4);
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.order-card--muted .order-card__addon {
-  color: rgba(255, 255, 255, 0.35);
-}
-
 .status-created {
   color: #cc8800;
-  background: #fff7e0;
+  background: #fff6da;
 }
 
 .status-confirmed {
-  color: #1847e8;
-  background: #e0eaff;
+  color: var(--customer-blue);
+  background: #e6eeff;
 }
 
 .status-ready {
-  color: #00a854;
-  background: #e0fff0;
+  color: #0d9b52;
+  background: #e3fff0;
 }
 
 .status-closed {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.74);
   background: rgba(255, 255, 255, 0.12);
 }
 
 .status-rejected {
-  color: #ff4466;
-  background: rgba(212, 24, 61, 0.15);
+  color: #ff4b59;
+  background: #ffe7ea;
 }
 
 @keyframes orders-view-spin {

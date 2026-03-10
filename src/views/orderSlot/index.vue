@@ -4,7 +4,7 @@
       <p class="customer-eyebrow">Pickup</p>
       <h1 class="customer-title">Выбор времени</h1>
       <p class="customer-subtitle">
-        Выберите ближайший доступный слот для приготовления и выдачи заказа.
+        Выберите удобный слот для выдачи заказа.
       </p>
     </section>
 
@@ -20,16 +20,11 @@
       v-if="isLoadingSlots"
       class="customer-status customer-status--loading"
     >
-      <v-progress-circular indeterminate size="16" width="2" color="primary" />
+      <v-progress-circular indeterminate size="16" width="2" color="white" />
       <span>Подбираем доступные слоты.</span>
     </div>
 
     <template v-else>
-      <div class="customer-section-label">
-        <span class="customer-section-label__text">Доступные слоты</span>
-        <span class="customer-section-label__line" />
-      </div>
-
       <div
         v-if="visibleSlots.length"
         class="slot-view__list"
@@ -39,31 +34,34 @@
           :key="slot.id"
           :data-testid="`slot-option-${slot.id}`"
           class="slot-view__item"
-          :class="{
-            'slot-view__item--selected': selectedSlotId === slot.id,
-            'slot-view__item--disabled': isSlotUnavailable(slot),
-          }"
+          :class="{ 'slot-view__item--selected': selectedSlotId === slot.id }"
           type="button"
-          :disabled="isSlotUnavailable(slot)"
           @click="selectedSlotId = slot.id"
         >
-          <div class="slot-view__item-head">
-            <div class="slot-view__item-time">
+          <div class="slot-view__time-wrap">
+            <span
+              class="slot-view__clock"
+              :class="{ 'slot-view__clock--selected': selectedSlotId === slot.id }"
+            >
               <v-icon icon="mdi-clock-outline" size="16" />
-              <span>{{ formatSlotDate(slot.date) }} · {{ slot.timeFrom }}-{{ slot.timeTo }}</span>
-            </div>
+            </span>
 
-            <div class="slot-view__item-capacity">
-              <v-icon icon="mdi-account-group-outline" size="14" />
-              <span>
-                {{
-                  isSlotFull(slot)
-                    ? "Занято"
-                    : `${Math.max(slot.capacity - slot.bookedCount, 0)} из ${slot.capacity}`
-                }}
-              </span>
+            <div>
+              <p class="slot-view__time">
+                {{ formatSlotDate(slot.date) }} · {{ slot.timeFrom }}-{{ slot.timeTo }}
+              </p>
+              <p class="slot-view__capacity">
+                Осталось {{ Math.max(slot.capacity - slot.bookedCount, 0) }} из {{ slot.capacity }}
+              </p>
             </div>
           </div>
+
+          <v-icon
+            v-if="selectedSlotId === slot.id"
+            icon="mdi-check-circle"
+            size="20"
+            class="slot-view__check"
+          />
         </button>
       </div>
 
@@ -118,10 +116,6 @@ const errorMessage = ref("");
 const cartItemsCount = computed(() => cart.value.length);
 const visibleSlots = computed(() => slots.value.filter((slot) => !isSlotExpired(slot)));
 
-function isSlotFull(slot: TimeSlot): boolean {
-  return slot.bookedCount >= slot.capacity;
-}
-
 function isSlotExpired(slot: Pick<TimeSlot, "date" | "timeTo">): boolean {
   const now = new Date();
   const today = [
@@ -146,10 +140,6 @@ function isSlotExpired(slot: Pick<TimeSlot, "date" | "timeTo">): boolean {
   return slot.timeTo <= currentTime;
 }
 
-function isSlotUnavailable(slot: TimeSlot): boolean {
-  return isSlotFull(slot) || isSlotExpired(slot);
-}
-
 function formatSlotDate(value: string): string {
   const date = new Date(`${value}T00:00:00`);
   if (Number.isNaN(date.getTime())) {
@@ -170,8 +160,7 @@ async function loadSlots(): Promise<void> {
   try {
     const data = await fetchActiveTimeSlots();
     slots.value = data;
-    selectedSlotId.value =
-      data.find((slot) => !isSlotUnavailable(slot))?.id ?? null;
+    selectedSlotId.value = data.find((slot) => !isSlotExpired(slot))?.id ?? null;
   } catch (error) {
     if (error instanceof HttpError && error.status === 401) {
       void router.replace({
@@ -254,72 +243,86 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.slot-view {
-  gap: 18px;
-}
-
 .slot-view__list {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  gap: 10px;
-  padding: 0 20px 16px;
+  gap: 12px;
+  padding: 0 16px 22px;
 }
 
 .slot-view__item {
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  padding: 14px 16px;
-  text-align: left;
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--customer-text);
-}
-
-.slot-view__item--selected {
-  border-color: var(--customer-accent);
-  background: rgba(201, 169, 110, 0.12);
-}
-
-.slot-view__item--disabled {
-  opacity: 0.45;
-}
-
-.slot-view__item-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 16px;
+  border-radius: 24px;
+  padding: 16px 18px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  text-align: left;
 }
 
-.slot-view__item-time,
-.slot-view__item-capacity {
+.slot-view__item--selected {
+  background: #fff;
+  color: var(--customer-ink);
+  box-shadow: 0 10px 30px rgba(6, 28, 109, 0.16);
+}
+
+.slot-view__time-wrap {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 14px;
 }
 
-.slot-view__item-time {
-  font-size: 14px;
-  font-weight: 500;
+.slot-view__clock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
 }
 
-.slot-view__item-capacity {
-  color: var(--customer-text-soft);
-  font-size: 12px;
-  white-space: nowrap;
+.slot-view__clock--selected {
+  background: #e7efff;
+  color: var(--customer-blue);
 }
 
-.slot-view__submit.v-btn {
-  height: 48px;
-  border-radius: 14px;
-  background: var(--customer-accent);
-  color: var(--customer-bg);
+.slot-view__time,
+.slot-view__capacity {
+  margin: 0;
+}
+
+.slot-view__time {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.slot-view__capacity {
+  margin-top: 4px;
+  color: inherit;
+  opacity: 0.62;
+  font-size: 13px;
   font-weight: 600;
 }
 
+.slot-view__check {
+  color: var(--customer-blue);
+}
+
+.slot-view__submit.v-btn {
+  height: 52px;
+  border-radius: 18px;
+  background: var(--customer-orange);
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
 @media (max-width: 520px) {
-  .slot-view__item-head {
-    flex-direction: column;
+  .slot-view__item {
     align-items: flex-start;
   }
 }

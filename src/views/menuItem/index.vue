@@ -4,18 +4,17 @@
     class="customer-page product-view"
   >
     <section class="customer-hero product-view__hero">
-      <p class="customer-eyebrow">Menu item</p>
-      <h1 class="customer-title">{{ item.name }}</h1>
-    </section>
-
-    <div class="product-view__content">
-      <section class="product-view__summary">
+      <div class="product-view__hero-card">
+        <p class="customer-eyebrow">Позиция меню</p>
+        <h1 class="customer-title">{{ item.name }}</h1>
         <p class="product-view__description">
           {{ item.description || "Выберите размер, добавки и количество." }}
         </p>
-        <div class="product-view__total">{{ totalPrice }} ₽</div>
-      </section>
+        <div class="product-view__hero-price">{{ totalPrice }} ₽</div>
+      </div>
+    </section>
 
+    <div class="product-view__content">
       <section
         v-if="sizes?.length"
         class="product-view__section"
@@ -63,7 +62,7 @@
           type="button"
           @click="quantityComputed -= 1"
         >
-          <v-icon icon="mdi-minus" size="16" />
+          <v-icon icon="mdi-minus" size="18" />
         </button>
         <span class="product-view__quantity-value">{{ quantityComputed }}</span>
         <button
@@ -71,17 +70,17 @@
           type="button"
           @click="quantityComputed += 1"
         >
-          <v-icon icon="mdi-plus" size="16" />
+          <v-icon icon="mdi-plus" size="18" />
         </button>
       </div>
 
       <v-btn
         class="product-view__submit"
-        color="primary"
         data-testid="menu-item-submit-btn"
         :ripple="false"
         @click="onConfirmCallback"
       >
+        <v-icon icon="mdi-cart-variant" size="18" start />
         {{ isEditForm ? "Изменить" : "Добавить" }} · {{ totalPrice }} ₽
       </v-btn>
     </div>
@@ -293,34 +292,39 @@ function onEdit(): void {
 
 <style lang="scss" scoped>
 .product-view__hero {
-  padding-top: 28px;
-  padding-bottom: 24px;
+  padding-top: 18px;
+}
+
+.product-view__hero-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 20px 26px;
+  border-radius: 28px 28px 36px 36px;
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.product-view__description {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.product-view__hero-price {
+  color: #fff;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
 }
 
 .product-view__content {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  gap: 20px;
-  padding: 20px;
-}
-
-.product-view__summary {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.product-view__description {
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.product-view__total {
-  color: var(--customer-accent);
-  font-size: 22px;
-  font-weight: 600;
+  gap: 22px;
+  padding: 8px 20px 28px;
 }
 
 .product-view__section {
@@ -330,8 +334,10 @@ function onEdit(): void {
 }
 
 .product-view__section-label {
-  color: rgba(255, 255, 255, 0.35);
-  font-size: 10px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 12px;
+  font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
@@ -339,23 +345,22 @@ function onEdit(): void {
 .product-view__chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
 
 .product-view__choice {
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
-  padding: 8px 14px;
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 13px;
-  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 14px;
+  font-weight: 700;
+  transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
 .product-view__choice--active {
-  border-color: var(--customer-accent);
-  background: rgba(201, 169, 110, 0.12);
-  color: var(--customer-accent);
+  background: #fff;
+  color: var(--customer-blue);
 }
 
 .product-view__action-bar {
@@ -366,36 +371,37 @@ function onEdit(): void {
   display: flex;
   align-items: center;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.04);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
 }
 
 .product-view__quantity-btn {
-  width: 40px;
-  height: 44px;
-  color: rgba(255, 255, 255, 0.7);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 50px;
+  color: #fff;
 }
 
 .product-view__quantity-value {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 44px;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
-  color: var(--customer-text);
-  font-size: 16px;
-  font-weight: 500;
+  width: 42px;
+  height: 50px;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
 }
 
 .product-view__submit.v-btn {
   flex: 1 1 auto;
-  height: 44px;
-  border-radius: 12px;
-  background: var(--customer-accent);
-  color: var(--customer-bg);
-  font-weight: 600;
+  height: 50px;
+  border-radius: 18px;
+  background: var(--customer-orange);
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 0;
 }
 </style>

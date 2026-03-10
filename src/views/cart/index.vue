@@ -1,73 +1,61 @@
 <template>
   <div class="customer-page cart-view">
     <section class="customer-hero">
-      <p class="customer-eyebrow">Checkout</p>
+      <p class="customer-eyebrow">{{ cart.length }} позиций</p>
       <h1 class="customer-title">Корзина</h1>
       <p class="customer-subtitle">
         Проверьте состав заказа перед выбором временного слота.
       </p>
-      <div class="cart-view__hero-chip">
-        <span class="customer-chip">{{ cart.length }} поз.</span>
-      </div>
     </section>
 
     <template v-if="cart.length">
-      <div class="customer-section-label">
-        <span class="customer-section-label__text">Состав заказа</span>
-        <span class="customer-section-label__line" />
-      </div>
-
       <div class="cart-view__list">
         <article
           v-for="(item, index) in cart"
           :key="`${item.id}-${index}`"
           class="cart-item"
-          :class="index % 2 === 0 ? 'cart-item--base' : 'cart-item--alt'"
         >
-          <div class="cart-item__main">
-            <div class="cart-item__head">
-              <div>
-                <h2 class="cart-item__name">
-                  {{ item.name }}
-                  <span v-if="item.size">({{ item.size }})</span>
-                </h2>
-                <p
-                  v-if="item.selectedOptions?.length"
-                  class="cart-item__addons"
-                >
-                  + {{ item.selectedOptions.map((option) => option.name).join(", ") }}
-                </p>
-              </div>
-
-              <div class="cart-item__actions">
-                <button
-                  class="cart-item__action"
-                  type="button"
-                  @click="onEditItem(index, item)"
-                >
-                  <v-icon icon="mdi-pencil-outline" size="16" />
-                </button>
-                <button
-                  class="cart-item__action cart-item__action--danger"
-                  type="button"
-                  @click="onRemoveItem(index)"
-                >
-                  <v-icon icon="mdi-trash-can-outline" size="16" />
-                </button>
-              </div>
+          <div class="cart-item__head">
+            <div class="cart-item__title-block">
+              <h2 class="cart-item__name">{{ item.name }}</h2>
+              <span v-if="item.size" class="cart-item__size">{{ item.size }}</span>
             </div>
 
-            <div class="cart-item__meta">
-              <span>×{{ item.quantity }}</span>
-              <span class="cart-item__price">{{ item.price * item.quantity }} ₽</span>
+            <div class="cart-item__actions">
+              <button
+                class="cart-item__action"
+                type="button"
+                @click="onEditItem(index, item)"
+              >
+                <v-icon icon="mdi-pencil-outline" size="16" />
+              </button>
+              <button
+                class="cart-item__action cart-item__action--danger"
+                type="button"
+                @click="onRemoveItem(index)"
+              >
+                <v-icon icon="mdi-trash-can-outline" size="16" />
+              </button>
             </div>
+          </div>
+
+          <p
+            v-if="item.selectedOptions?.length"
+            class="cart-item__addons"
+          >
+            + {{ item.selectedOptions.map((option) => option.name).join(", ") }}
+          </p>
+
+          <div class="cart-item__meta">
+            <span>×{{ item.quantity }}</span>
+            <strong>{{ item.price * item.quantity }} ₽</strong>
           </div>
         </article>
       </div>
 
-      <div class="cart-view__total">
-        <span>Итого</span>
-        <strong>{{ totalPrice }} ₽</strong>
+      <div class="cart-view__total-card">
+        <span class="cart-view__total-label">Итого к оплате</span>
+        <strong class="cart-view__total-value">{{ totalPrice }} ₽</strong>
       </div>
 
       <div class="customer-action-bar">
@@ -83,13 +71,12 @@
 
     <div
       v-else
-      class="customer-empty"
+      class="customer-empty cart-view__empty"
     >
-      <div class="customer-empty__icon">🛒</div>
-      <p class="customer-empty__text">Пока ничего не добавлено.</p>
+      <div class="cart-view__empty-icon">🛒</div>
+      <p class="customer-empty__text">Корзина пока пустая. Выберите напиток или десерт в меню.</p>
       <v-btn
         class="cart-view__back-btn"
-        variant="outlined"
         @click="onBackToMenu"
       >
         Перейти в меню
@@ -99,9 +86,9 @@
 </template>
 
 <script lang="ts" setup>
-import { useCart } from "@/composables/useCart";
 import { computed } from "vue";
 import router from "@/router";
+import { useCart } from "@/composables/useCart";
 import { RouteNames } from "@/routes";
 import type { ICartItem } from "@/composables/types";
 
@@ -141,29 +128,21 @@ function onBackToMenu(): void {
 </script>
 
 <style lang="scss" scoped>
-.cart-view__hero-chip {
-  margin-top: 12px;
-}
-
 .cart-view__list {
   display: flex;
   flex-direction: column;
+  gap: 12px;
+  padding: 0 16px 16px;
 }
 
 .cart-item {
-  border-bottom: 1px solid var(--customer-border-soft);
-}
-
-.cart-item--base {
-  background: var(--customer-bg);
-}
-
-.cart-item--alt {
-  background: var(--customer-bg-soft);
-}
-
-.cart-item__main {
-  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(6, 28, 109, 0.16);
 }
 
 .cart-item__head {
@@ -173,18 +152,30 @@ function onBackToMenu(): void {
   gap: 12px;
 }
 
-.cart-item__name {
-  color: var(--customer-text);
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 1.4;
+.cart-item__title-block {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
 }
 
-.cart-item__addons {
-  margin-top: 4px;
-  color: var(--customer-text-soft);
+.cart-item__name {
+  margin: 0;
+  color: var(--customer-ink);
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.cart-item__size {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 10px;
+  background: #e7efff;
+  color: var(--customer-blue);
   font-size: 12px;
-  line-height: 1.5;
+  font-weight: 700;
 }
 
 .cart-item__actions {
@@ -196,58 +187,94 @@ function onBackToMenu(): void {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 999px;
-  color: var(--customer-text-muted);
-  background: rgba(255, 255, 255, 0.06);
+  color: var(--customer-blue);
+  background: #edf2ff;
 }
 
 .cart-item__action--danger {
-  color: var(--customer-danger);
-  background: rgba(212, 24, 61, 0.12);
+  color: #ff5500;
+  background: #fff0e8;
+}
+
+.cart-item__addons {
+  margin: 0;
+  color: rgba(15, 40, 128, 0.58);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
 }
 
 .cart-item__meta {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-top: 10px;
-  color: var(--customer-text-muted);
-  font-size: 12px;
-}
-
-.cart-item__price {
-  color: var(--customer-accent);
+  justify-content: space-between;
+  color: rgba(15, 40, 128, 0.6);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
-.cart-view__total {
+.cart-item__meta strong {
+  color: var(--customer-blue);
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.cart-view__total-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 20px;
-  border-bottom: 1px solid var(--customer-border-soft);
-  color: var(--customer-text-muted);
+  margin: 0 16px 8px;
+  border-radius: 24px;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
 }
 
-.cart-view__total strong {
-  color: var(--customer-text);
-  font-size: 20px;
+.cart-view__total-label {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.cart-view__total-value {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
 }
 
 .cart-view__submit.v-btn {
-  height: 48px;
-  border-radius: 14px;
-  background: var(--customer-accent);
-  color: var(--customer-bg);
-  font-weight: 600;
+  height: 52px;
+  border-radius: 18px;
+  background: var(--customer-orange);
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.cart-view__empty {
+  gap: 0;
+}
+
+.cart-view__empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 104px;
+  height: 104px;
+  margin-bottom: 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  font-size: 42px;
 }
 
 .cart-view__back-btn.v-btn {
-  margin-top: 18px;
-  border-color: rgba(201, 169, 110, 0.32);
-  color: var(--customer-accent);
+  margin-top: 20px;
+  height: 48px;
+  border-radius: 16px;
+  background: #fff;
+  color: var(--customer-blue);
+  font-weight: 800;
 }
 </style>
