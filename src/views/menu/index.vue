@@ -1,27 +1,31 @@
 <template>
   <div class="customer-page menu-view">
     <template v-if="!activeGroup && !isMissingGroup">
-      <div class="customer-section-label">
-        <span class="customer-section-label__text">Categories</span>
-        <span class="customer-section-label__line" />
-      </div>
+      <section class="customer-hero menu-root-hero">
+        <p class="customer-eyebrow">Daily menu</p>
+        <h1 class="customer-title customer-title--xl">Меню кофейни</h1>
+
+        <div class="menu-root-hero__meta">
+          <p class="menu-root-hero__count">{{ menu.length }} категории</p>
+          <span class="menu-root-hero__line" />
+        </div>
+      </section>
 
       <div
         v-if="menu.length"
         class="menu-list"
       >
         <button
-          v-for="(group, index) in menu"
+          v-for="group in menu"
           :key="group.id"
           class="menu-category"
-          :class="rowToneClass(index)"
           type="button"
           @click="onGroupClick(group.id)"
         >
           <div class="menu-category__content">
             <div>
-              <p class="menu-category__eyebrow">{{ group.products.length }} позиций</p>
               <h2 class="menu-category__title">{{ group.name }}</h2>
+              <p class="menu-category__meta">{{ group.products.length }} позиций</p>
             </div>
 
             <span class="menu-category__arrow">
@@ -41,15 +45,12 @@
     </template>
 
     <template v-else-if="activeGroup">
-      <section class="menu-group-hero">
-        <div class="menu-group-hero__overlay" />
-        <div class="menu-group-hero__content">
-          <p class="customer-eyebrow">Selected collection</p>
-          <h1 class="customer-title">{{ activeGroup.name }}</h1>
-          <p class="customer-subtitle">
-            Собранный список позиций для быстрого выбора и перехода в карточку товара.
-          </p>
-        </div>
+      <section class="customer-hero">
+        <p class="customer-eyebrow">Selected collection</p>
+        <h1 class="customer-title">{{ activeGroup.name }}</h1>
+        <p class="customer-subtitle">
+          Собранный список позиций для быстрого выбора и перехода в карточку товара.
+        </p>
       </section>
 
       <div class="customer-section-label">
@@ -61,16 +62,13 @@
 
       <div class="menu-products">
         <button
-          v-for="(product, index) in activeGroup.products"
+          v-for="product in activeGroup.products"
           :key="product.id"
           class="menu-product"
           type="button"
           @click="onProductClick(product.id)"
         >
-          <div
-            class="menu-product__content"
-            :class="rowToneClass(index)"
-          >
+          <div class="menu-product__content">
             <div>
               <h2 class="menu-product__title">{{ product.name }}</h2>
               <p class="menu-product__type">{{ productTypeLabel(product.type) }}</p>
@@ -81,7 +79,7 @@
                 {{ productPriceLabel(product) }}
               </span>
               <span
-                v-for="price in product.prices.filter((item) => item.sizeCode)"
+                v-for="price in product.prices.filter((entry) => entry.sizeCode)"
                 :key="price.id"
                 class="menu-product__size-chip"
               >
@@ -89,11 +87,6 @@
               </span>
             </div>
           </div>
-
-          <div
-            class="menu-product__preview"
-            :class="previewToneClass(index)"
-          />
         </button>
       </div>
     </template>
@@ -109,16 +102,16 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from "vue";
+import { useRoute } from "vue-router";
+import { useMenu } from "@/composables/useMenu";
 import router from "@/router";
 import { RouteNames } from "@/routes";
-import { useMenu } from "@/composables/useMenu";
 import {
   ProductType,
   type Product,
   type ProductGroup,
 } from "@/services/menu/types";
-import { computed } from "vue";
-import { useRoute } from "vue-router";
 
 defineOptions({
   name: "MenuView",
@@ -134,6 +127,7 @@ const activeGroup = computed<ProductGroup | null>(() => {
 
   return menu.value.find(({ id }) => id === Number(route.params.group)) ?? null;
 });
+
 const isMissingGroup = computed(
   () => Boolean(route.params.group) && menu.value.length > 0 && !activeGroup.value,
 );
@@ -152,21 +146,9 @@ function productTypeLabel(type: ProductType): string {
 }
 
 function productPriceLabel(product: Product): string {
-  const prices = product.prices.map((item) => item.priceRub);
+  const prices = product.prices.map((entry) => entry.priceRub);
   const minPrice = prices.length ? Math.min(...prices) : 0;
   return product.type === ProductType.Drink ? `от ${minPrice} ₽` : `${minPrice} ₽`;
-}
-
-function rowToneClass(index: number): string {
-  return index % 2 === 0 ? "tone-surface" : "tone-surface-soft";
-}
-
-function previewToneClass(index: number): string {
-  return index % 3 === 0
-    ? "tone-preview-coffee"
-    : index % 3 === 1
-      ? "tone-preview-cream"
-      : "tone-preview-night";
 }
 
 function onGroupClick(groupId: number): void {
@@ -186,100 +168,90 @@ function onProductClick(itemId: number): void {
 </script>
 
 <style lang="scss" scoped>
+.menu-root-hero {
+  padding-top: 32px;
+  padding-bottom: 24px;
+}
+
+.menu-root-hero__meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.menu-root-hero__count {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.menu-root-hero__line {
+  flex: 1 1 auto;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .menu-list,
 .menu-products {
   display: flex;
   flex-direction: column;
+  gap: 12px;
+  padding: 0 20px 40px;
 }
 
 .menu-category,
 .menu-product {
   width: 100%;
-  border-bottom: 1px solid var(--customer-border-soft);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  padding: 16px 18px;
   text-align: left;
-}
-
-.menu-category {
-  display: block;
+  background: #111e38;
 }
 
 .menu-category__content,
 .menu-product__content {
-  flex: 1 1 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 16px 20px;
-  min-height: 72px;
-}
-
-.menu-category__eyebrow {
-  margin-bottom: 4px;
-  color: var(--customer-accent);
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 }
 
 .menu-category__title {
+  margin: 0 0 4px;
   color: var(--customer-text);
-  font-family: "Georgia", "Times New Roman", serif;
+  font-family: var(--customer-display-font);
   font-size: 20px;
   line-height: 1.2;
+}
+
+.menu-category__meta,
+.menu-product__type {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 13px;
 }
 
 .menu-category__arrow {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
-  border: 1px solid rgba(201, 169, 110, 0.28);
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(201, 169, 110, 0.25);
   border-radius: 999px;
   color: var(--customer-accent);
-  background: rgba(201, 169, 110, 0.12);
-}
-
-.menu-group-hero {
-  position: relative;
-  min-height: 220px;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.12), transparent 20%),
-    linear-gradient(180deg, #6e4d31 0%, #2f241c 34%, #0d1b35 100%);
-}
-
-.menu-group-hero__overlay {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(180deg, rgba(13, 27, 53, 0.06), rgba(13, 27, 53, 0.86)),
-    radial-gradient(circle at 72% 28%, rgba(201, 169, 110, 0.18), transparent 24%);
-}
-
-.menu-group-hero__content {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  padding: 24px 20px;
-}
-
-.menu-product {
-  display: flex;
-  align-items: stretch;
+  background: rgba(201, 169, 110, 0.1);
 }
 
 .menu-product__content {
-  display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  min-height: 92px;
+  align-items: flex-start;
   gap: 12px;
 }
 
 .menu-product__title {
+  margin: 0 0 4px;
   color: var(--customer-text);
   font-size: 16px;
   line-height: 1.3;
@@ -311,36 +283,5 @@ function onProductClick(itemId: number): void {
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.05);
   color: var(--customer-text-muted);
-}
-
-.menu-product__preview {
-  width: 80px;
-  min-height: 92px;
-}
-
-.tone-surface {
-  background: var(--customer-bg);
-}
-
-.tone-surface-soft {
-  background: var(--customer-bg-soft);
-}
-
-.tone-preview-coffee {
-  background:
-    linear-gradient(180deg, rgba(13, 27, 53, 0.12), rgba(13, 27, 53, 0.28)),
-    linear-gradient(145deg, #9b6d44, #412512);
-}
-
-.tone-preview-cream {
-  background:
-    linear-gradient(180deg, rgba(13, 27, 53, 0.16), rgba(13, 27, 53, 0.32)),
-    linear-gradient(145deg, #c8a27a, #6a4730);
-}
-
-.tone-preview-night {
-  background:
-    radial-gradient(circle at 28% 24%, rgba(201, 169, 110, 0.26), transparent 18%),
-    linear-gradient(145deg, #233a69, #0d1b35);
 }
 </style>

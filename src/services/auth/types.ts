@@ -23,6 +23,8 @@ export type User = {
   tgId?: string | null;
   tgUsername?: string | null;
   isActive: boolean;
+  isConfirmed: boolean;
+  confirmationRequestedAt?: string | null;
   createdAt: string;
   updatedAt: string;
   roles: Role[];

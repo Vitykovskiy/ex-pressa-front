@@ -3,12 +3,9 @@
     v-if="item"
     class="customer-page product-view"
   >
-    <section class="product-view__hero">
-      <div class="product-view__hero-overlay" />
-      <div class="product-view__hero-content">
-        <p class="customer-eyebrow">Menu item</p>
-        <h1 class="customer-title">{{ item.name }}</h1>
-      </div>
+    <section class="customer-hero product-view__hero">
+      <p class="customer-eyebrow">Menu item</p>
+      <h1 class="customer-title">{{ item.name }}</h1>
     </section>
 
     <div class="product-view__content">
@@ -100,10 +97,10 @@
 </template>
 
 <script lang="ts" setup>
-import { useMenu } from "@/composables/useMenu";
 import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useCart } from "@/composables/useCart";
+import { useMenu } from "@/composables/useMenu";
 import router from "@/router";
 import { RouteNames } from "@/routes";
 import {
@@ -132,6 +129,7 @@ const itemCartIndex = computed(() => {
   const idx = parseInt(String(route.query.cartIndex ?? ""), 10);
   return Number.isNaN(idx) ? null : idx;
 });
+
 const isEditForm = computed(() => itemCartIndex.value !== null);
 const onConfirmCallback = computed(() => (isEditForm.value ? onEdit : onAdd));
 
@@ -158,12 +156,12 @@ const optionsItems = computed<Addon[] | null>(() => {
       (addonGroup.addons || []).filter((addon) => addon.isActive),
     );
 
-  const uniq = new Map<number, Addon>();
+  const unique = new Map<number, Addon>();
   for (const addon of addons) {
-    uniq.set(addon.id, addon);
+    unique.set(addon.id, addon);
   }
 
-  return Array.from(uniq.values());
+  return Array.from(unique.values());
 });
 
 type DrinkSizeItem = { size: SizeCode; price: number };
@@ -295,49 +293,8 @@ function onEdit(): void {
 
 <style lang="scss" scoped>
 .product-view__hero {
-  position: relative;
-  min-height: 264px;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.15), transparent 20%),
-    linear-gradient(180deg, #8d6443 0%, #463221 34%, #0d1b35 100%);
-}
-
-.product-view__hero::before,
-.product-view__hero::after {
-  content: "";
-  position: absolute;
-  border-radius: 999px;
-}
-
-.product-view__hero::before {
-  width: 220px;
-  height: 220px;
-  top: 16px;
-  right: -36px;
-  background: radial-gradient(circle, rgba(201, 169, 110, 0.3), transparent 64%);
-}
-
-.product-view__hero::after {
-  width: 170px;
-  height: 170px;
-  bottom: 34px;
-  left: -44px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.08), transparent 68%);
-}
-
-.product-view__hero-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(13, 27, 53, 0.1), rgba(13, 27, 53, 0.88));
-}
-
-.product-view__hero-content {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  padding: 24px 20px;
+  padding-top: 28px;
+  padding-bottom: 24px;
 }
 
 .product-view__content {
@@ -355,14 +312,14 @@ function onEdit(): void {
 }
 
 .product-view__description {
-  color: var(--customer-text-muted);
+  color: rgba(255, 255, 255, 0.55);
   font-size: 14px;
   line-height: 1.6;
 }
 
 .product-view__total {
   color: var(--customer-accent);
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
 }
 
@@ -373,7 +330,7 @@ function onEdit(): void {
 }
 
 .product-view__section-label {
-  color: var(--customer-text-soft);
+  color: rgba(255, 255, 255, 0.35);
   font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -387,10 +344,10 @@ function onEdit(): void {
 
 .product-view__choice {
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
-  padding: 9px 14px;
+  border-radius: 8px;
+  padding: 8px 14px;
   background: rgba(255, 255, 255, 0.04);
-  color: rgba(255, 255, 255, 0.68);
+  color: rgba(255, 255, 255, 0.6);
   font-size: 13px;
   transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
@@ -410,7 +367,7 @@ function onEdit(): void {
   align-items: center;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 14px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.04);
 }
 
@@ -436,7 +393,7 @@ function onEdit(): void {
 .product-view__submit.v-btn {
   flex: 1 1 auto;
   height: 44px;
-  border-radius: 14px;
+  border-radius: 12px;
   background: var(--customer-accent);
   color: var(--customer-bg);
   font-weight: 600;

@@ -103,11 +103,13 @@ function onOrders(): void {
   --customer-accent: #c9a96e;
   --customer-accent-soft: rgba(201, 169, 110, 0.14);
   --customer-danger: #d4183d;
+  --customer-font: "Inter", "Roboto", "Segoe UI", sans-serif;
+  --customer-display-font: "Playfair Display", Georgia, "Times New Roman", serif;
   background:
     radial-gradient(circle at top left, rgba(201, 169, 110, 0.14), transparent 34%),
     linear-gradient(180deg, #122447 0%, #0d1b35 24%, #081225 100%);
   color: var(--customer-text);
-  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  font-family: var(--customer-font);
 }
 
 .app-shell .v-application__wrap {
@@ -184,10 +186,9 @@ function onOrders(): void {
 
 .header__brand-text {
   color: var(--customer-accent);
-  font-family: "Georgia", "Times New Roman", serif;
+  font-family: var(--customer-display-font);
   font-size: 16px;
   letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .header__icon-btn.v-btn {
@@ -225,9 +226,14 @@ function onOrders(): void {
 .customer-title {
   margin: 0 0 8px;
   color: var(--customer-text);
-  font-family: "Georgia", "Times New Roman", serif;
+  font-family: var(--customer-display-font);
   font-size: 28px;
   line-height: 1.1;
+}
+
+.customer-title--xl {
+  font-size: 32px;
+  line-height: 1.15;
 }
 
 .customer-subtitle {

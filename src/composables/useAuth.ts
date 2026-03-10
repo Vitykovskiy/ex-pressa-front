@@ -85,6 +85,8 @@ function createMockAuthorizedUser(): User {
     tgId: "100000001",
     tgUsername: `mock_${appTarget}`,
     isActive: true,
+    isConfirmed: true,
+    confirmationRequestedAt: null,
     createdAt: now,
     updatedAt: now,
     roles,

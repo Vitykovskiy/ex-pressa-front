@@ -30,18 +30,21 @@
         <span class="customer-section-label__line" />
       </div>
 
-      <div class="slot-view__list">
+      <div
+        v-if="visibleSlots.length"
+        class="slot-view__list"
+      >
         <button
-          v-for="slot in slots"
+          v-for="slot in visibleSlots"
           :key="slot.id"
           :data-testid="`slot-option-${slot.id}`"
           class="slot-view__item"
           :class="{
             'slot-view__item--selected': selectedSlotId === slot.id,
-            'slot-view__item--disabled': isSlotFull(slot),
+            'slot-view__item--disabled': isSlotUnavailable(slot),
           }"
           type="button"
-          :disabled="isSlotFull(slot)"
+          :disabled="isSlotUnavailable(slot)"
           @click="selectedSlotId = slot.id"
         >
           <div class="slot-view__item-head">
@@ -62,6 +65,14 @@
             </div>
           </div>
         </button>
+      </div>
+
+      <div
+        v-else
+        class="customer-empty"
+      >
+        <div class="customer-empty__icon">⏰</div>
+        <p class="customer-empty__text">На сегодня доступных слотов больше нет.</p>
       </div>
     </template>
 
@@ -84,11 +95,12 @@
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useCart } from "@/composables/useCart";
-import { fetchActiveTimeSlots } from "@/services/timeSlots";
 import { addCartItem, clearCart as clearServerCart } from "@/services/cart";
-import { createOrderFromCart } from "@/services/orders";
-import { RouteNames } from "@/routes";
+import { HttpError } from "@/services/http";
 import type { AddCartItemDto, TimeSlot } from "@/services/menu/types";
+import { createOrderFromCart } from "@/services/orders";
+import { fetchActiveTimeSlots } from "@/services/timeSlots";
+import { RouteNames } from "@/routes";
 
 defineOptions({
   name: "OrderSlotView",
@@ -104,13 +116,42 @@ const isSubmitting = ref(false);
 const errorMessage = ref("");
 
 const cartItemsCount = computed(() => cart.value.length);
+const visibleSlots = computed(() => slots.value.filter((slot) => !isSlotExpired(slot)));
 
 function isSlotFull(slot: TimeSlot): boolean {
   return slot.bookedCount >= slot.capacity;
 }
 
+function isSlotExpired(slot: Pick<TimeSlot, "date" | "timeTo">): boolean {
+  const now = new Date();
+  const today = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, "0"),
+    String(now.getDate()).padStart(2, "0"),
+  ].join("-");
+  const currentTime = [
+    String(now.getHours()).padStart(2, "0"),
+    String(now.getMinutes()).padStart(2, "0"),
+    String(now.getSeconds()).padStart(2, "0"),
+  ].join(":");
+
+  if (slot.date < today) {
+    return true;
+  }
+
+  if (slot.date > today) {
+    return false;
+  }
+
+  return slot.timeTo <= currentTime;
+}
+
+function isSlotUnavailable(slot: TimeSlot): boolean {
+  return isSlotFull(slot) || isSlotExpired(slot);
+}
+
 function formatSlotDate(value: string): string {
-  const date = new Date(value);
+  const date = new Date(`${value}T00:00:00`);
   if (Number.isNaN(date.getTime())) {
     return value;
   }
@@ -129,17 +170,24 @@ async function loadSlots(): Promise<void> {
   try {
     const data = await fetchActiveTimeSlots();
     slots.value = data;
-    selectedSlotId.value = data.find((slot) => !isSlotFull(slot))?.id ?? null;
-  } catch {
+    selectedSlotId.value =
+      data.find((slot) => !isSlotUnavailable(slot))?.id ?? null;
+  } catch (error) {
+    if (error instanceof HttpError && error.status === 401) {
+      void router.replace({
+        name: RouteNames.AuthRequired,
+        query: { redirect: "/order/slot" },
+      });
+      return;
+    }
+
     errorMessage.value = "Не удалось загрузить временные слоты";
   } finally {
     isLoadingSlots.value = false;
   }
 }
 
-function mapToServerCartItem(
-  item: (typeof cart.value)[number],
-): AddCartItemDto {
+function mapToServerCartItem(item: (typeof cart.value)[number]): AddCartItemDto {
   return {
     productId: item.id,
     sizeCode: item.size,
@@ -178,8 +226,22 @@ async function onConfirmOrder(): Promise<void> {
     });
 
     clearCart();
-    router.replace({ name: RouteNames.OrdersHistory });
-  } catch {
+    await router.replace({ name: RouteNames.OrdersHistory });
+  } catch (error) {
+    if (error instanceof HttpError) {
+      if (error.status === 401) {
+        await router.replace({
+          name: RouteNames.AuthRequired,
+          query: { redirect: "/order/slot" },
+        });
+        return;
+      }
+
+      errorMessage.value =
+        error.message || "Не удалось оформить заказ. Попробуйте снова.";
+      return;
+    }
+
     errorMessage.value = "Не удалось оформить заказ. Попробуйте снова.";
   } finally {
     isSubmitting.value = false;
